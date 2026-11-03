@@ -1,0 +1,113 @@
+import {SmallWinsBreathingUI} from "./SmallWinsBreathingUI"
+import {SmallWinsDragItem} from "./SmallWinsDragItem"
+import {SmallWinsInviteUI} from "./SmallWinsInviteUI"
+import {SmallWinsNotebookUI} from "./SmallWinsNotebookUI"
+import {SmallWinsRewardUI} from "./SmallWinsRewardUI"
+import {SmallWinsRoomController} from "./SmallWinsRoomController"
+import {SmallWinsState, StickerArt, TASK_DISHES, TASK_LAUNDRY, TASK_MINDFUL} from "./SmallWinsState"
+import {addImage, TEX} from "./SmallWinsUIKit"
+
+/** Orchestrates the day: two chores, the me-time invitation, the breathing. */
+@component
+export class SmallWinsMain extends BaseScriptComponent {
+  @ui.label("Small Wins")
+  @ui.separator
+  @ui.group_start("Personal")
+  @input
+  @hint("Used in the laundry reward message")
+  userName: string = "Szonja"
+
+  @input
+  @hint("The line that pops up after the dishes")
+  dishesMessage: string = "A clear sink for tomorrow."
+  @ui.group_end
+
+  @ui.group_start("Chores")
+  @input dishPlate: SmallWinsDragItem
+  @input dishBowl: SmallWinsDragItem
+  @input dishMug: SmallWinsDragItem
+  @input clothesPile: SmallWinsDragItem
+  @input
+  @hint("Sticker hint beside the dishes")
+  dishHint: SceneObject
+  @input
+  @hint("Sticker hint beside the basket")
+  laundryHint: SceneObject
+  @input dishRewardAnchor: SceneObject
+  @input laundryRewardAnchor: SceneObject
+  @ui.group_end
+
+  @ui.group_start("Modules")
+  @input room: SmallWinsRoomController
+  @input reward: SmallWinsRewardUI
+  @input invite: SmallWinsInviteUI
+  @input breathing: SmallWinsBreathingUI
+  @input notebook: SmallWinsNotebookUI
+  @ui.group_end
+
+  private dishesLoaded = 0
+  private dishesResolved = false
+  private laundryResolved = false
+  private invited = false
+
+  private get laundryMessage(): string {
+    return "Fresh clothes, well done, " + this.userName + "."
+  }
+
+  onAwake() {
+    SmallWinsState.instance.reset()
+    this.addHint(this.dishHint)
+    this.addHint(this.laundryHint)
+    this.createEvent("OnStartEvent").bind(() => this.wireFlow())
+  }
+
+  private addHint(anchor: SceneObject): void {
+    addImage(anchor, "StickerHintOutline", TEX.outline, 10)
+    addImage(anchor, "StickerHintStar", TEX.star, 4).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
+  }
+
+  private wireFlow(): void {
+    for (const dish of [this.dishPlate, this.dishBowl, this.dishMug]) {
+      dish.onDropped.add(() => this.onDishLoaded())
+    }
+    this.clothesPile.onDropped.add(() => {
+      this.laundryHint.enabled = false
+      this.room.closeWasher(() => {
+        this.laundryResolved = true
+        this.resolveChore(TASK_LAUNDRY, "clothes", this.laundryMessage, this.laundryRewardAnchor)
+      })
+    })
+    this.reward.onRewardFinished.add((anchor) => this.maybeInvite(anchor))
+    this.invite.onReady.add(() => {
+      this.notebook.setHudHidden(true)
+      this.breathing.begin()
+    })
+    this.breathing.onFinished.add(() => {
+      SmallWinsState.instance.completeTask(TASK_MINDFUL)
+      this.notebook.setHudHidden(false)
+    })
+  }
+
+  /** The last dish, with the door closing, triggers the reward. */
+  private onDishLoaded(): void {
+    this.dishesLoaded++
+    if (this.dishesLoaded < 3) return
+    this.dishHint.enabled = false
+    this.room.closeDishwasher(() => {
+      this.dishesResolved = true
+      this.resolveChore(TASK_DISHES, "plate", this.dishesMessage, this.dishRewardAnchor)
+    })
+  }
+
+  /** Only tasks you planned earn a sticker, so a task removed from the notebook passes quietly. */
+  private resolveChore(taskId: string, art: StickerArt, message: string, anchor: SceneObject): void {
+    if (SmallWinsState.instance.completeTask(taskId)) this.reward.play(anchor, art, message)
+    else this.maybeInvite(anchor)
+  }
+
+  private maybeInvite(anchor: SceneObject): void {
+    if (this.invited || !this.dishesResolved || !this.laundryResolved || this.reward.isPlaying) return
+    this.invited = true
+    this.invite.showInvitation(anchor)
+  }
+}

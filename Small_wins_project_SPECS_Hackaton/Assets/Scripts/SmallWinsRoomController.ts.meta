@@ -1,0 +1,70 @@
+- !<AssetImportMetadata/451b6cf0-9b46-4dfe-a07d-308821481af5>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 62302930-e2f7-4b8c-930e-5e48503ab28c
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 62302930-e2f7-4b8c-930e-5e48503ab28c
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 83b38832-d109-4b49-9b2b-bb2296af0896
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/83b38832-d109-4b49-9b2b-bb2296af0896>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: 7b8bb8a7-7cab-4df6-aef1-05e6e9d8972a
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    cardGazeDegrees: false
+    dishwasherHinge: false
+    doorView: false
+    entryDoorHinge: false
+    hintGazeDegrees: false
+    openAngle: false
+    openDistance: false
+    questUI: false
+    washerHinge: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - dishwasherHinge: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      washerHinge: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      entryDoorHinge: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      doorView: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      questUI: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      openDistance: !<float> 150.000000
+      openAngle: !<float> 100.000000
+      hintGazeDegrees: !<float> 35.000000
+      cardGazeDegrees: !<float> 60.000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - // @input SceneObject dishwasherHinge
+    - // @input SceneObject washerHinge
+    - // @input SceneObject entryDoorHinge
+    - '// @input SceneObject doorView {"hint":"The simple backdrop seen through the door"}'
+    - // @input AssignableType_1 questUI
+    - '// @input float openDistance = 150 {"hint":"Walking closer than this opens the door, in cm"}'
+    - '// @input float openAngle = 100 {"hint":"How far the door swings open, in degrees"}'
+    - '// @input float hintGazeDegrees = 35 {"hint":"The sign shows when you look within this angle of the door"}'
+    - '// @input float cardGazeDegrees = 60 {"hint":"The card stays while you look within this angle of the door"}'

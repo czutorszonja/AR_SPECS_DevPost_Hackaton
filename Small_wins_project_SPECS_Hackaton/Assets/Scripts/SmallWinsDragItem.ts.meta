@@ -1,0 +1,52 @@
+- !<AssetImportMetadata/76068c0b-6312-470c-9d4f-cf2c635662a6>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 4c6012c4-e5be-42a6-877d-4e80c26dfbb9
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 4c6012c4-e5be-42a6-877d-4e80c26dfbb9
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> e88d3ba1-ecbd-465f-bc05-f786dec04d6c
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/e88d3ba1-ecbd-465f-bc05-f786dec04d6c>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: 7e6340f6-e549-47c8-a7f0-70af12eb45c4
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    dropRadius: false
+    dropZone: false
+    grabSize: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - dropZone: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      dropRadius: !<float> 45.000000
+      grabSize: !<Vec3> {x: 22.000000, y: 16.000000, z: 22.000000}
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject dropZone {"hint":"Where this item has to be dropped"}'
+    - '// @input float dropRadius = 45 {"hint":"How close to the drop zone counts as a drop, in cm"}'
+    - '// @input vec3 grabSize = {22,16,22} {"hint":"Grab volume in cm. Keep it generous: targets should be big"}'

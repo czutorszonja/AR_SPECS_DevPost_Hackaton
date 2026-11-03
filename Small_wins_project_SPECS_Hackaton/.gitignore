@@ -24,3 +24,6 @@ Workspaces/**
 .codex/config.toml
 .claude/settings.local.json
 # END Lens Studio managed Agents-Docs block
+
+# Local editor snapshot written by VirtualScene
+.virtual-scene.json

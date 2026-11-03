@@ -1,0 +1,55 @@
+- !<AssetImportMetadata/11ee4a2d-758b-467d-9486-bbbc4581096b>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> cbf3fa8f-a8c7-4e24-b6f5-9ca1c0a4950e
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> cbf3fa8f-a8c7-4e24-b6f5-9ca1c0a4950e
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 7641ccd9-f092-483a-b16f-ebaec655728d
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/7641ccd9-f092-483a-b16f-ebaec655728d>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: 6771eb13-f795-419b-a709-034eec615967
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    inviteLine: false
+    promptLine: false
+    questionLine: false
+    rewardLine: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - inviteLine: Well done for the dishes and the washing machine.
+      rewardLine: "Want to reward yourself with some me-time? Make a tea, sit down, take a few minutes."
+      questionLine: "Are you ready for some conscious breathing?"
+      promptLine: "Find somewhere comfortable to sit, in this room or another. Take as long as you need."
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input string inviteLine = "Well done for the dishes and the washing machine." {"hint":"Shown after both chores"}'
+    - "// @input string rewardLine = \"Want to reward yourself with some me-time? Make a tea, sit down, take a few minutes.\" {\"hint\":\"Asks if you'd like to reward yourself\"}"
+    - '// @input string questionLine = "Are you ready for some conscious breathing?" {"hint":"The question Yes and No answer"}'
+    - '// @input string promptLine = "Find somewhere comfortable to sit, in this room or another. Take as long as you need." {"hint":"Shown after Yes. It waits as long as you need"}'

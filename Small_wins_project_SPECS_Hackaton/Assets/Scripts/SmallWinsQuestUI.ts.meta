@@ -1,0 +1,55 @@
+- !<AssetImportMetadata/1c3491b0-8e7d-4dc4-9d91-e71f34fdb7b4>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 84a413a4-bf85-440d-8f59-44a0f7098e74
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 84a413a4-bf85-440d-8f59-44a0f7098e74
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> b9b9108f-3b6f-44d6-b996-d65a5748d4b1
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/b9b9108f-3b6f-44d6-b996-d65a5748d4b1>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: b995b930-7bcb-40e7-8d21-669c0558fab4
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    cardAnchor: false
+    hintAnchor: false
+    questExample: false
+    questTitle: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - hintAnchor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      cardAnchor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      questTitle: Find 3 yellow things
+      questExample: or 3 unique leaves
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject hintAnchor {"hint":"Where the sign sits, above the door"}'
+    - '// @input SceneObject cardAnchor {"hint":"Where the card floats, beside the door frame"}'
+    - '// @input string questTitle = "Find 3 yellow things" {"hint":"The quest on offer"}'
+    - '// @input string questExample = "or 3 unique leaves" {"hint":"Another example of a quest"}'

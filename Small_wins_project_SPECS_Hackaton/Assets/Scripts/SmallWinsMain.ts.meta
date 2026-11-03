@@ -1,0 +1,96 @@
+- !<AssetImportMetadata/590ffff9-24b3-4730-a8fc-94d7c34bc61c>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> e4627c98-3422-459c-a74b-fe1b8ff60865
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> e4627c98-3422-459c-a74b-fe1b8ff60865
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 71d3323e-d15c-4307-a7ba-88a409f54742
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/71d3323e-d15c-4307-a7ba-88a409f54742>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: 251b651a-1644-4376-81cf-160ab8adcd8a
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    breathing: false
+    clothesPile: false
+    dishBowl: false
+    dishHint: false
+    dishMug: false
+    dishPlate: false
+    dishRewardAnchor: false
+    dishesMessage: false
+    invite: false
+    laundryHint: false
+    laundryRewardAnchor: false
+    notebook: false
+    reward: false
+    room: false
+    userName: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - userName: Szonja
+      dishesMessage: A clear sink for tomorrow.
+      dishPlate: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      dishBowl: !<MappingBased.AssignableType_2> 00000000-0000-0000-0000-000000000000
+      dishMug: !<MappingBased.AssignableType_3> 00000000-0000-0000-0000-000000000000
+      clothesPile: !<MappingBased.AssignableType_4> 00000000-0000-0000-0000-000000000000
+      dishHint: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      laundryHint: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      dishRewardAnchor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      laundryRewardAnchor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      room: !<MappingBased.AssignableType_5> 00000000-0000-0000-0000-000000000000
+      reward: !<MappingBased.AssignableType_6> 00000000-0000-0000-0000-000000000000
+      invite: !<MappingBased.AssignableType_7> 00000000-0000-0000-0000-000000000000
+      breathing: !<MappingBased.AssignableType_8> 00000000-0000-0000-0000-000000000000
+      notebook: !<MappingBased.AssignableType_9> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"label", "label":"Small Wins"}'
+    - '// @ui {"widget":"separator"}'
+    - '// @ui {"widget":"group_start", "label":"Personal"}'
+    - '// @input string userName = "Szonja" {"hint":"Used in the laundry reward message"}'
+    - '// @input string dishesMessage = "A clear sink for tomorrow." {"hint":"The line that pops up after the dishes"}'
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"group_start", "label":"Chores"}'
+    - // @input AssignableType_1 dishPlate
+    - // @input AssignableType_2 dishBowl
+    - // @input AssignableType_3 dishMug
+    - // @input AssignableType_4 clothesPile
+    - '// @input SceneObject dishHint {"hint":"Sticker hint beside the dishes"}'
+    - '// @input SceneObject laundryHint {"hint":"Sticker hint beside the basket"}'
+    - // @input SceneObject dishRewardAnchor
+    - // @input SceneObject laundryRewardAnchor
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"group_start", "label":"Modules"}'
+    - // @input AssignableType_5 room
+    - // @input AssignableType_6 reward
+    - // @input AssignableType_7 invite
+    - // @input AssignableType_8 breathing
+    - // @input AssignableType_9 notebook
+    - '// @ui {"widget":"group_end"}'
