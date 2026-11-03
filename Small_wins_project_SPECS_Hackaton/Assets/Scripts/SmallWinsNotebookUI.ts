@@ -19,14 +19,15 @@ import {
 import {faceViewer, pointInFront} from "./SmallWinsViewer"
 
 const HUD_DISTANCE = 75
-const HUD_RIGHT = -21
-const HUD_DROP = 24
+const HUD_RIGHT = -12
+const HUD_DROP = 19
 const FOLLOW_RATE = 2.5
 const BOOK_DISTANCE = 70
 const BOOK_DROP = 10
 const BOOK_W = 46
 const BOOK_H = 38
 const ROW_H = 3.6
+const REFRESH_DELAY_SECONDS = 0.12
 
 type Tab = "today" | "stickers"
 
@@ -44,6 +45,8 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
   private picker: {editingId: string | null} | null = null
   private handRaised = false
   private hidden = false
+  private refreshEvent: DelayedCallbackEvent
+  private refreshPending = false
 
   get isOpen(): boolean {
     return this.bookRoot.enabled
@@ -58,9 +61,12 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     this.buildBook()
     this.createEvent("UpdateEvent").bind(() => this.followViewer())
     this.createEvent("OnStartEvent").bind(() => {
-      SmallWinsState.instance.onChanged.add(() => {
-        if (this.bookRoot.enabled) this.refresh()
-      })
+      SmallWinsState.instance.onChanged.add(() => this.requestRefresh())
+    })
+    this.refreshEvent = this.createEvent("DelayedCallbackEvent")
+    this.refreshEvent.bind(() => {
+      this.refreshPending = false
+      if (this.bookRoot.enabled) this.refresh()
     })
     const hide = this.createEvent("DelayedCallbackEvent")
     hide.bind(() => {
@@ -145,7 +151,14 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
   private showTab(tab: Tab): void {
     this.tab = tab
     this.picker = null
-    this.refresh()
+    this.requestRefresh()
+  }
+
+  /** Waits for the press to finish: most rebuilds destroy the very button that asked for them. */
+  private requestRefresh(): void {
+    if (this.refreshPending) return
+    this.refreshPending = true
+    this.refreshEvent.reset(REFRESH_DELAY_SECONDS)
   }
 
   /** Rebuilds the page. FlexLayout only discovers children reliably on a fresh container. */
@@ -198,7 +211,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
 
   private openPicker(editingId: string | null): void {
     this.picker = {editingId}
-    this.refresh()
+    this.requestRefresh()
   }
 
   /** Stands in for typing: the AR keyboard does not appear in SPECS 27 preview (brief: Risks). */
@@ -230,7 +243,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
       3.2,
       () => {
         this.picker = null
-        this.refresh()
+        this.requestRefresh()
       },
       d,
     )

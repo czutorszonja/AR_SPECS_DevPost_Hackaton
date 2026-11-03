@@ -78,10 +78,8 @@ export class SmallWinsMain extends BaseScriptComponent {
       })
     })
     this.reward.onRewardFinished.add((anchor) => this.maybeInvite(anchor))
-    this.invite.onReady.add(() => {
-      this.notebook.setHudHidden(true)
-      this.breathing.begin()
-    })
+    this.invite.onAccepted.add(() => this.notebook.setHudHidden(true))
+    this.invite.onReady.add(() => this.breathing.begin())
     this.breathing.onFinished.add(() => {
       SmallWinsState.instance.completeTask(TASK_MINDFUL)
       this.notebook.setHudHidden(false)

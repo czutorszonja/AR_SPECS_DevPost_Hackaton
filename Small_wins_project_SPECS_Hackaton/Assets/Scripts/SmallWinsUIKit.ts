@@ -4,6 +4,7 @@ import {FlexItem} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/F
 import {FlexLayout} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexLayout"
 import {FlexAlign, FlexDirection, FlexJustify} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexTypes"
 import {RoundedRectangle} from "SpectaclesUIKit.lspkg/Scripts/Visuals/RoundedRectangle/RoundedRectangle"
+import {RoundedRectangleVisual} from "SpectaclesUIKit.lspkg/Scripts/Visuals/RoundedRectangle/RoundedRectangleVisual"
 import {StickerArt} from "./SmallWinsState"
 
 const IMAGE_MATERIAL = requireAsset("../Materials/ImageMaterial.mat") as Material
@@ -28,6 +29,9 @@ export function stickerTexture(art: StickerArt): Texture {
 
 /** Brighter teal than the storyboard, because the display only adds light (brief: Risks). */
 export const PANEL_TEAL = new vec4(0.13, 0.55, 0.51, 1)
+const BUTTON_TEAL = new vec4(0.2, 0.68, 0.62, 1)
+const BUTTON_HOVER = new vec4(0.38, 0.84, 0.76, 1)
+const BUTTON_PRESSED = new vec4(0.55, 0.92, 0.82, 1)
 export const TEXT_LIGHT = new vec4(1, 0.98, 0.9, 1)
 export const TEXT_SOFT = new vec4(0.86, 0.95, 0.88, 1)
 
@@ -166,6 +170,15 @@ export interface ButtonHandle {
   so: SceneObject
 }
 
+/** Light teal that brightens when aimed at. UIKit's default dark grey would fade on the additive display. */
+function styleButton(button: Button): void {
+  const visual = button.visual as RoundedRectangleVisual
+  visual.baseType = "Color"
+  visual.baseDefaultColor = BUTTON_TEAL
+  visual.baseHoveredColor = BUTTON_HOVER
+  visual.baseTriggeredColor = BUTTON_PRESSED
+}
+
 /** UIKit button with a light label. The name is what LEAF finds it by, so keep it stable. */
 export function addButton(
   parent: SceneObject,
@@ -181,6 +194,7 @@ export function addButton(
   button.size = new vec3(width, height, 1)
   button.onInitialized.add(() => {
     button.size = new vec3(width, height, 1)
+    styleButton(button)
   })
   button.onTriggerUp.add(() => onPress())
   const text = addText(so, name + "Label", label, {role: "Body", distance, width: width - 0.4, height})

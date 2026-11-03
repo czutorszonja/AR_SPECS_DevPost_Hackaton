@@ -1,0 +1,106 @@
+import {Scenario} from "Leaf.lspkg/Scenarios/scenario/Scenario"
+import {expect} from "Leaf.lspkg/Utils/common/Expect"
+import {sleep} from "Leaf.lspkg/Utils/common/Utils"
+import {SmallWinsRoomController} from "../Scripts/SmallWinsRoomController"
+import {setViewerOverride} from "../Scripts/SmallWinsViewer"
+import {shown, SmallWinsLeafInteractor, so, textOf, waitFor, worldPos} from "./SmallWinsLeafHelpers"
+
+export function room(): SmallWinsRoomController {
+  return so("Room (virtual stand-in for a real home)").getComponent(SmallWinsRoomController.getTypeName()) as SmallWinsRoomController
+}
+
+export function doorCentre(): vec3 {
+  return worldPos("EntryDoorHinge").add(new vec3(0, 0, 44))
+}
+
+/** LEAF can't walk the preview camera, so these stand the viewer at a point looking at another point. */
+export function standAt(position: vec3, lookAt: vec3): void {
+  setViewerOverride({position, forward: lookAt.sub(position).normalize()})
+}
+
+export function acrossTheRoom(): vec3 {
+  return doorCentre().add(new vec3(350, 55, 0))
+}
+
+export function closeToDoor(): vec3 {
+  return doorCentre().add(new vec3(120, 55, 0))
+}
+
+export function doorAngle(): number {
+  return Math.abs(so("EntryDoorHinge").getTransform().getLocalRotation().toEulerAngles().y)
+}
+
+export async function walkUpToTheDoor(): Promise<void> {
+  standAt(closeToDoor(), doorCentre())
+  await waitFor("the card", () => shown("QuestCard"), 2000)
+  await sleep(1300)
+}
+
+/** Done criterion 4: a sign when you look at the door, then it opens as you approach, with the quest and its options. */
+@component
+export class SmallWinsDoorScenario extends Scenario {
+  async run(): Promise<void> {
+    const hand = new SmallWinsLeafInteractor()
+    await sleep(1200)
+
+    // From across the room: the sign shows only when you look at the door, and the door stays shut.
+    standAt(acrossTheRoom(), doorCentre())
+    await sleep(200)
+    expect(shown("QuestHint")).toBe(true)
+    expect(shown("QuestCard")).toBe(false)
+    expect(doorAngle()).toBeLessThan(0.05)
+    standAt(acrossTheRoom(), acrossTheRoom().add(new vec3(100, 0, 0)))
+    await sleep(200)
+    expect(shown("QuestHint")).toBe(false)
+
+    // Walking within 1.5 m animates the door open, part way first.
+    standAt(closeToDoor(), doorCentre())
+    await sleep(350)
+    const partWay = doorAngle()
+    expect(partWay).toBeGreaterThan(0.05)
+    await sleep(1100)
+    expect(doorAngle()).toBeGreaterThan(partWay)
+    expect(doorAngle() * (180 / Math.PI)).toBeGreaterThan(80)
+    expect(shown("OutsideView")).toBe(true)
+
+    // The card offers the quest and both ways of leaving it, beside the frame so the view stays clear.
+    expect(shown("QuestCard")).toBe(true)
+    expect(shown("QuestHint")).toBe(false)
+    expect(textOf("QuestTitle")).toBe("Find 3 yellow things")
+    expect(shown("QuestStartButton")).toBe(true)
+    expect(shown("IgnoreTodayButton")).toBe(true)
+    expect(shown("IgnoreUntil5Button")).toBe(true)
+    const card = worldPos("QuestCard")
+    expect(Math.abs(card.z - doorCentre().z)).toBeGreaterThan(44)
+
+    // It stays whenever you look at the door.
+    standAt(closeToDoor(), closeToDoor().add(new vec3(100, 0, 0)))
+    await sleep(200)
+    expect(shown("QuestCard")).toBe(false)
+    standAt(closeToDoor(), doorCentre())
+    await sleep(200)
+    expect(shown("QuestCard")).toBe(true)
+
+    // Start, then cancel on purpose. The demo ends here: there is nothing to walk into.
+    await hand.tap("QuestStartButton")
+    expect(room().questState).toBe("started")
+    expect(shown("QuestStartedTitle")).toBe(true)
+    expect(shown("QuestStartButton")).toBe(false)
+    standAt(closeToDoor(), closeToDoor().add(new vec3(100, 0, 0)))
+    await sleep(200)
+    standAt(closeToDoor(), doorCentre())
+    await sleep(200)
+    expect(shown("QuestStartedTitle")).toBe(true)
+    await hand.tap("QuestCancelButton")
+    expect(room().questState).toBe("cancelled")
+    await sleep(200)
+    expect(shown("QuestCard")).toBe(false)
+
+    // Walking away closes the door again.
+    standAt(acrossTheRoom(), doorCentre())
+    await sleep(1400)
+    expect(doorAngle()).toBeLessThan(0.05)
+    expect(shown("QuestHint")).toBe(false)
+    setViewerOverride(null)
+  }
+}

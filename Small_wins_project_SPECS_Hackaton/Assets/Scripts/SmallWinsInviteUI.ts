@@ -11,6 +11,7 @@ const FOLLOW_RATE = 2.5
 /** The me-time invitation on the wall, then the prompt that gently follows you until you're seated. */
 @component
 export class SmallWinsInviteUI extends BaseScriptComponent {
+  readonly onAccepted = new Event<void>()
   readonly onReady = new Event<void>()
 
   @input
@@ -83,6 +84,7 @@ export class SmallWinsInviteUI extends BaseScriptComponent {
 
   /** Fades on either answer. No leaves the room quiet. */
   private answer(yes: boolean): void {
+    if (yes) this.onAccepted.invoke()
     tween(
       this,
       0.3,
