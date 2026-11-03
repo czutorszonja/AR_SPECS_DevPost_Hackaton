@@ -1,9 +1,8 @@
 import {Scenario} from "Leaf.lspkg/Scenarios/scenario/Scenario"
 import {expect} from "Leaf.lspkg/Utils/common/Expect"
 import {sleep} from "Leaf.lspkg/Utils/common/Utils"
-import {SmallWinsRoomController} from "../Scripts/SmallWinsRoomController"
 import {setViewerOverride} from "../Scripts/SmallWinsViewer"
-import {shown, SmallWinsLeafInteractor, so, textOf, waitFor, worldPos} from "./SmallWinsLeafHelpers"
+import {shown, SmallWinsLeafInteractor} from "./SmallWinsLeafHelpers"
 import {room, doorCentre, standAt, acrossTheRoom, walkUpToTheDoor} from "./SmallWinsDoorScenario"
 
 /** Ignore for today hides the card and the sign for the day. */

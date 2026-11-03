@@ -44,6 +44,8 @@ export class SmallWinsChoresScenario extends Scenario {
     expect(anchor.x).toBeGreaterThan(worldPos("DishwasherBody").x)
     expect(imageTexture("RewardPlate")).toBe(TEX.plate)
     await sleep(200)
+    // About 10 cm wide, like a coaster propped against the wall.
+    await waitFor("the plate to settle at full size", () => Math.abs(so("RewardPlate").getTransform().getWorldScale().x - 10) < 0.3, 2000)
     expect(shown("RewardRing")).toBe(true)
     expect(imageAlpha("RewardRing")).toBeGreaterThan(0)
     for (let i = 0; i < 6; i++) {

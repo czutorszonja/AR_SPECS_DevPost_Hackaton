@@ -23,10 +23,11 @@ const HUD_RIGHT = -12
 const HUD_DROP = 19
 const FOLLOW_RATE = 2.5
 const BOOK_DISTANCE = 70
-const BOOK_DROP = 10
-const BOOK_W = 46
-const BOOK_H = 38
-const ROW_H = 3.6
+const BOOK_DROP = 4
+// The display is about 36 degrees wide, so at 70 cm the page has to stay under about 40 cm.
+const BOOK_W = 38
+const BOOK_H = 32
+const ROW_H = 3.2
 const REFRESH_DELAY_SECONDS = 0.12
 
 type Tab = "today" | "stickers"
@@ -141,11 +142,11 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     const d = BOOK_DISTANCE
     const header = flexContainer(this.bookRoot, "NotebookHeader", FlexDirection.Row, BOOK_W - 3, 4, 1, FlexJustify.SpaceBetween)
     header.getTransform().setLocalPosition(new vec3(0, BOOK_H / 2 - 3, 0.6))
-    flexText(header, "NotebookTitle", "My notebook", {role: "Title", distance: d, width: 18, height: 3.6, align: HorizontalAlignment.Left})
-    flexButton(header, "TodayTab", "Today", 7, 3, () => this.showTab("today"), d)
-    flexButton(header, "StickersTab", "Stickers", 8, 3, () => this.showTab("stickers"), d)
-    flexButton(header, "NotebookClose", "Close", 7, 3, () => this.closeBook(), d)
-    this.bodyHost = child(this.bookRoot, "NotebookBodyHost", new vec3(0, -2.2, 0.6))
+    flexText(header, "NotebookTitle", "My notebook", {role: "Headline", distance: d, width: 13, height: 3.6, align: HorizontalAlignment.Left})
+    flexButton(header, "TodayTab", "Today", 6, 3, () => this.showTab("today"), d)
+    flexButton(header, "StickersTab", "Stickers", 7, 3, () => this.showTab("stickers"), d)
+    flexButton(header, "NotebookClose", "Close", 6, 3, () => this.closeBook(), d)
+    this.bodyHost = child(this.bookRoot, "NotebookBodyHost", new vec3(0, -2.4, 0.6))
   }
 
   private showTab(tab: Tab): void {
@@ -177,27 +178,27 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     state.tasks.forEach((task, i) => {
       const row = flexContainer(body, "TaskRow" + i, FlexDirection.Row, BOOK_W - 3, ROW_H, 0.6)
       flexPlace(row, BOOK_W - 3, ROW_H)
-      flexButton(row, "TaskTick" + i, task.done ? "Done" : "Tick", 5, 3.2, () => state.toggleTask(task.id), d)
-      flexText(row, "TaskTitle" + i, task.title, {role: "Body", distance: d, width: 20, height: 3, align: HorizontalAlignment.Left})
-      const art = addImage(row, "TaskArt" + i, task.done ? stickerTexture(task.art) : TEX.outline, 3)
-      flexPlace(art.getSceneObject(), 3, 3)
-      flexButton(row, "TaskEdit" + i, "Edit", 5, 3.2, () => this.openPicker(task.id), d)
-      flexButton(row, "TaskRemove" + i, "Remove", 7, 3.2, () => state.removeTask(task.id), d)
+      flexButton(row, "TaskTick" + i, task.done ? "Done" : "Tick", 4.4, 2.9, () => state.toggleTask(task.id), d)
+      flexText(row, "TaskTitle" + i, task.title, {role: "Body", distance: d, width: 16, height: 2.9, align: HorizontalAlignment.Left})
+      const art = addImage(row, "TaskArt" + i, task.done ? stickerTexture(task.art) : TEX.outline, 2.8)
+      flexPlace(art.getSceneObject(), 2.8, 2.8)
+      flexButton(row, "TaskEdit" + i, "Edit", 4, 2.9, () => this.openPicker(task.id), d)
+      flexButton(row, "TaskRemove" + i, "Remove", 5.6, 2.9, () => state.removeTask(task.id), d)
     })
-    const footer = flexContainer(body, "TodayFooter", FlexDirection.Row, BOOK_W - 3, 4, 1)
-    flexPlace(footer, BOOK_W - 3, 4)
+    const footer = flexContainer(body, "TodayFooter", FlexDirection.Row, BOOK_W - 3, 3.6, 1)
+    flexPlace(footer, BOOK_W - 3, 3.6)
     if (state.tasks.length < MAX_TASKS) {
-      flexButton(footer, "AddTaskButton", "+ Add a task", 13, 3.4, () => this.openPicker(null), d)
+      flexButton(footer, "AddTaskButton", "+ Add a task", 12, 3.2, () => this.openPicker(null), d)
     }
-    flexButton(footer, "ReducedMotionButton", "Reduced motion: " + (state.reducedMotion ? "On" : "Off"), 19, 3.4, () => state.setReducedMotion(!state.reducedMotion), d)
+    flexButton(footer, "ReducedMotionButton", "Reduced motion: " + (state.reducedMotion ? "On" : "Off"), 17, 3.2, () => state.setReducedMotion(!state.reducedMotion), d)
   }
 
   private buildStickers(body: SceneObject): void {
     const d = BOOK_DISTANCE
     const stickers = SmallWinsState.instance.stickers
-    flexText(body, "StickersHeading", "Today's page", {role: "Subheadline", distance: d, width: 40, height: 2.6, color: TEXT_SOFT})
+    flexText(body, "StickersHeading", "Today's page", {role: "Subheadline", distance: d, width: 34, height: 2.6, color: TEXT_SOFT})
     if (stickers.length === 0) {
-      flexText(body, "StickersEmpty", "Your next sticker goes here.", {role: "Body", distance: d, width: 40, height: 3})
+      flexText(body, "StickersEmpty", "Your next sticker goes here.", {role: "Body", distance: d, width: 34, height: 3})
       return
     }
     stickers.forEach((sticker, i) => {
@@ -205,7 +206,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
       flexPlace(row, BOOK_W - 3, ROW_H)
       const art = addImage(row, "StickerArt" + i, stickerTexture(sticker.art), 3.2)
       flexPlace(art.getSceneObject(), 3.2, 3.2)
-      flexText(row, "StickerLabel" + i, sticker.label, {role: "Body", distance: d, width: 34, height: 3, align: HorizontalAlignment.Left})
+      flexText(row, "StickerLabel" + i, sticker.label, {role: "Body", distance: d, width: 28, height: 3, align: HorizontalAlignment.Left})
     })
   }
 
@@ -219,7 +220,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     const d = BOOK_DISTANCE
     const state = SmallWinsState.instance
     const editingId = this.picker ? this.picker.editingId : null
-    flexText(body, "PickerHeading", editingId ? "Change this task to" : "What counts for you today?", {role: "Subheadline", distance: d, width: 40, height: 2.6, color: TEXT_SOFT})
+    flexText(body, "PickerHeading", editingId ? "Change this task to" : "What counts for you today?", {role: "Subheadline", distance: d, width: 34, height: 2.6, color: TEXT_SOFT})
     TASK_PRESETS.forEach((title, i) => {
       flexButton(
         body,

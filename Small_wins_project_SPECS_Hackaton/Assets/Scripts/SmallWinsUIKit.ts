@@ -3,7 +3,7 @@ import {Button} from "SpectaclesUIKit.lspkg/Scripts/Components/Button/Button"
 import {FlexItem} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexItem"
 import {FlexLayout} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexLayout"
 import {FlexAlign, FlexDirection, FlexJustify} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexTypes"
-import {RoundedRectangle} from "SpectaclesUIKit.lspkg/Scripts/Visuals/RoundedRectangle/RoundedRectangle"
+import {GradientParameters, RoundedRectangle} from "SpectaclesUIKit.lspkg/Scripts/Visuals/RoundedRectangle/RoundedRectangle"
 import {RoundedRectangleVisual} from "SpectaclesUIKit.lspkg/Scripts/Visuals/RoundedRectangle/RoundedRectangleVisual"
 import {StickerArt} from "./SmallWinsState"
 
@@ -15,9 +15,9 @@ export const TEX = {
   pebbles: requireAsset("../Textures/StickerPebbles_256x256.png") as Texture,
   custom: requireAsset("../Textures/StickerCustom_256x256.png") as Texture,
   outline: requireAsset("../Textures/StickerOutline_256x256.png") as Texture,
-  star: requireAsset("../Textures/Star_128x128.png") as Texture,
+  star: requireAsset("../Textures/StarGold.png") as Texture,
   ring: requireAsset("../Textures/GoldRing_256x256.png") as Texture,
-  square: requireAsset("../Textures/BreathSquare_512x512.png") as Texture,
+  square: requireAsset("../Textures/BreathSquareTeal.png") as Texture,
   dot: requireAsset("../Textures/BreathDot_128x128.png") as Texture,
   hand: requireAsset("../Textures/RaisedHand.png") as Texture,
   outside: requireAsset("../Textures/OutsideView.png") as Texture,
@@ -93,9 +93,9 @@ export function addImage(parent: SceneObject, name: string, texture: Texture, wi
   return image
 }
 
-/** Component.Image is a 2 x 2 unit quad, so a scale of half the size gives real centimetres. */
+/** Component.Image is a 1 x 1 unit quad, so its scale is its size in centimetres. */
 export function sizeImage(image: Image, width: number, height: number): void {
-  image.getSceneObject().getTransform().setLocalScale(new vec3(width / 2, height / 2, 1))
+  image.getSceneObject().getTransform().setLocalScale(new vec3(width, height, 1))
 }
 
 export function setImageAlpha(image: Image, alpha: number): void {
@@ -173,10 +173,23 @@ export interface ButtonHandle {
 /** Light teal that brightens when aimed at. UIKit's default dark grey would fade on the additive display. */
 function styleButton(button: Button): void {
   const visual = button.visual as RoundedRectangleVisual
-  visual.baseType = "Color"
   visual.baseDefaultColor = BUTTON_TEAL
   visual.baseHoveredColor = BUTTON_HOVER
   visual.baseTriggeredColor = BUTTON_PRESSED
+  // Each state also keeps its own gradient, which wins over the base colour in this style.
+  visual.defaultGradient = solidGradient(BUTTON_TEAL)
+  visual.hoveredGradient = solidGradient(BUTTON_HOVER)
+  visual.triggeredGradient = solidGradient(BUTTON_PRESSED)
+}
+
+function solidGradient(color: vec4): GradientParameters {
+  return {
+    type: "Linear",
+    start: new vec2(-1, 0),
+    end: new vec2(1, 0),
+    stop0: {enabled: true, color, percent: 0},
+    stop1: {enabled: true, color, percent: 1},
+  } as GradientParameters
 }
 
 /** UIKit button with a light label. The name is what LEAF finds it by, so keep it stable. */

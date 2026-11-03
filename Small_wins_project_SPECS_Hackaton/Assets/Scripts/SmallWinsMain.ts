@@ -78,7 +78,7 @@ export class SmallWinsMain extends BaseScriptComponent {
       })
     })
     this.reward.onRewardFinished.add((anchor) => this.maybeInvite(anchor))
-    this.invite.onAccepted.add(() => this.notebook.setHudHidden(true))
+    this.invite.onDeclined.add(() => this.notebook.setHudHidden(false))
     this.invite.onReady.add(() => this.breathing.begin())
     this.breathing.onFinished.add(() => {
       SmallWinsState.instance.completeTask(TASK_MINDFUL)
@@ -106,6 +106,7 @@ export class SmallWinsMain extends BaseScriptComponent {
   private maybeInvite(anchor: SceneObject): void {
     if (this.invited || !this.dishesResolved || !this.laundryResolved || this.reward.isPlaying) return
     this.invited = true
+    this.notebook.setHudHidden(true)
     this.invite.showInvitation(anchor)
   }
 }

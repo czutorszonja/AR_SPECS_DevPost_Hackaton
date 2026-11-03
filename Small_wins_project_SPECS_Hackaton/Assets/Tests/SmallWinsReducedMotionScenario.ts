@@ -3,7 +3,7 @@ import {expect} from "Leaf.lspkg/Utils/common/Expect"
 import {sleep} from "Leaf.lspkg/Utils/common/Utils"
 import {SmallWinsState} from "../Scripts/SmallWinsState"
 import {TEX} from "../Scripts/SmallWinsUIKit"
-import {imageAlpha, imageTexture, shown, SmallWinsLeafInteractor, so, textOf, waitFor, worldPos} from "./SmallWinsLeafHelpers"
+import {imageAlpha, imageTexture, shown, SmallWinsLeafInteractor, waitFor} from "./SmallWinsLeafHelpers"
 
 /** Reduced motion: no pop or stars, the message appears gently, the sticker fades into place, the hold stays. */
 @component

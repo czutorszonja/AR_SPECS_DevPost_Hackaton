@@ -1,10 +1,7 @@
 import {Scenario} from "Leaf.lspkg/Scenarios/scenario/Scenario"
 import {expect} from "Leaf.lspkg/Utils/common/Expect"
 import {sleep} from "Leaf.lspkg/Utils/common/Utils"
-import {SmallWinsBreathingUI} from "../Scripts/SmallWinsBreathingUI"
-import {SmallWinsState, TASK_MINDFUL} from "../Scripts/SmallWinsState"
-import {setViewerOverride} from "../Scripts/SmallWinsViewer"
-import {shown, SmallWinsLeafInteractor, so, textOf, waitFor, worldPos} from "./SmallWinsLeafHelpers"
+import {shown, SmallWinsLeafInteractor, waitFor} from "./SmallWinsLeafHelpers"
 import {breathingUI, checkEarned} from "./SmallWinsBreathingScenario"
 
 /** The full 64 seconds: four rounds at four seconds a side, ending by itself. */
@@ -18,14 +15,15 @@ export class SmallWinsBreathingFullScenario extends Scenario {
     await hand.tap("ReadyButton")
     const ui = breathingUI()
     const rounds: {[label: string]: boolean} = {}
-    let waited = 0
+    const started = getTime()
     while (ui.phase === "running") {
       rounds[ui.currentRoundLabel] = true
       await sleep(250)
-      waited += 250
-      if (waited > 70000) throw new Error("Breathing ran past 64 seconds")
+      if (getTime() - started > 70) throw new Error("Breathing ran past 64 seconds")
     }
-    expect(waited).toBeGreaterThan(60000)
+    const seconds = getTime() - started
+    expect(seconds, `ran for ${seconds} s`).toBeGreaterThan(62)
+    expect(seconds, `ran for ${seconds} s`).toBeLessThan(66)
     for (const r of ["Round 1 of 4", "Round 2 of 4", "Round 3 of 4", "Round 4 of 4"]) {
       expect(rounds[r], r + " should have shown").toBe(true)
     }

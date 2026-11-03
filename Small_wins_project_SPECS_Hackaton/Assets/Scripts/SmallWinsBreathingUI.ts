@@ -1,6 +1,6 @@
 import {FlexDirection} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexTypes"
 import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
-import {addImage, addText, child, ButtonHandle, fadeTree, flexButton, flexContainer, setImageAlpha, smooth, TEX, TEXT_LIGHT, tween} from "./SmallWinsUIKit"
+import {addImage, addPanel, addText, child, ButtonHandle, fadeTree, flexButton, flexContainer, smooth, TEX, tween} from "./SmallWinsUIKit"
 import {faceViewer, pointInFront} from "./SmallWinsViewer"
 
 const VIEW_DISTANCE = 100
@@ -34,7 +34,7 @@ export class SmallWinsBreathingUI extends BaseScriptComponent {
   private dot: SceneObject
   private roundText: Text
   private wordText: Text
-  private introText: Text
+  private introRoot: SceneObject
   private pauseButton: ButtonHandle
   private rewardRoot: SceneObject
 
@@ -73,7 +73,6 @@ export class SmallWinsBreathingUI extends BaseScriptComponent {
     this.square.enabled = true
     this.pauseButton.label.text = "Pause"
     fadeTree(this.square, 1)
-    this.introText.enabled = true
     this.applyElapsed()
   }
 
@@ -82,8 +81,12 @@ export class SmallWinsBreathingUI extends BaseScriptComponent {
     this.square.createComponent("Component.Canvas")
     addImage(this.square, "SquareFrame", TEX.square, SQUARE_CM)
     const d = VIEW_DISTANCE
-    this.introText = addText(this.square, "BreathingIntro", "Follow the dot. Four counts on each side.", {role: "Body", distance: d, width: 36, height: 3})
-    this.introText.getSceneObject().getTransform().setLocalPosition(new vec3(0, SQUARE_CM / 2 + 2.5, 0.2))
+    this.introRoot = child(this.square, "BreathingIntroRoot", new vec3(0, SQUARE_CM / 2 + 3, 0.1))
+    addPanel(this, this.introRoot, 34, 3.8)
+    addText(this.introRoot, "BreathingIntro", "Follow the dot. Four counts on each side.", {role: "Body", distance: d, width: 33, height: 3.8})
+      .getSceneObject()
+      .getTransform()
+      .setLocalPosition(new vec3(0, 0, 0.6))
     this.roundText = addText(this.square, "BreathingRound", "Round 1 of 4", {role: "Subheadline", distance: d, width: 16, height: 3})
     this.roundText.getSceneObject().getTransform().setLocalPosition(new vec3(0, 3, 0.2))
     this.wordText = addText(this.square, "BreathingWord", WORDS[0], {role: "Title", distance: d, width: 17, height: 4})
@@ -104,14 +107,12 @@ export class SmallWinsBreathingUI extends BaseScriptComponent {
     a.getSceneObject().getTransform().setLocalPosition(new vec3(-8, 6, 0.3))
     const b = addImage(this.rewardRoot, "PebbleSparkleB", TEX.star, 1.8)
     b.getSceneObject().getTransform().setLocalPosition(new vec3(8, 1, 0.3))
-    const text = addText(this.rewardRoot, "BreathingRewardMessage", "Breathe normally. Take your time.", {
-      role: "Headline",
-      distance: VIEW_DISTANCE,
-      width: 40,
-      height: 4,
-      color: TEXT_LIGHT,
-    })
-    text.getSceneObject().getTransform().setLocalPosition(new vec3(0, -5.5, 0.2))
+    const messageRoot = child(this.rewardRoot, "BreathingRewardMessageRoot", new vec3(0, -5.5, 0.1))
+    addPanel(this, messageRoot, 36, 4.6)
+    addText(messageRoot, "BreathingRewardMessage", "Breathe normally. Take your time.", {role: "Headline", distance: VIEW_DISTANCE, width: 35, height: 4.6})
+      .getSceneObject()
+      .getTransform()
+      .setLocalPosition(new vec3(0, 0, 0.6))
   }
 
   private togglePause(): void {
@@ -144,7 +145,7 @@ export class SmallWinsBreathingUI extends BaseScriptComponent {
     this.placeDot(new vec2(from.x + (to.x - from.x) * k, from.y + (to.y - from.y) * k))
     this.wordText.text = WORDS[side]
     this.roundText.text = "Round " + (Math.floor(sideIndex / 4) + 1) + " of " + ROUNDS
-    this.introText.enabled = this.elapsed < SIDE_SECONDS * 2
+    this.introRoot.enabled = this.elapsed < SIDE_SECONDS * 2
   }
 
   private placeDot(p: vec2): void {
@@ -195,5 +196,3 @@ export class SmallWinsBreathingUI extends BaseScriptComponent {
     later.reset(REWARD_HOLD_SECONDS)
   }
 }
-
-export {setImageAlpha}

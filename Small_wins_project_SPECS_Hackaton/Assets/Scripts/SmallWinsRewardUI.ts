@@ -90,7 +90,7 @@ export class SmallWinsRewardUI extends BaseScriptComponent {
     this.ring = addImage(this.sceneObject, "RewardRing", TEX.ring, PLATE_CM)
     this.ring.getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.8))
     for (let i = 0; i < 6; i++) {
-      const star = addImage(this.sceneObject, "RewardStar" + i, TEX.star, 2.4)
+      const star = addImage(this.sceneObject, "RewardStar" + i, TEX.star, 2.6)
       star.getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.9))
       this.stars.push(star)
     }
