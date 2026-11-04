@@ -76,6 +76,7 @@ export class SmallWinsDoorScenario extends Scenario {
     // The card offers the quest and both ways of leaving it, in view and low enough to see out over it.
     expect(shown("QuestCard")).toBe(true)
     expect(shown("QuestHint")).toBe(false)
+    expect(shown("RaiseHandButton"), "the demo button should step aside for the card").toBe(false)
     expect(textOf("QuestTitle")).toBe("Find 3 yellow things")
     expect(shown("QuestStartButton")).toBe(true)
     expect(shown("IgnoreTodayButton")).toBe(true)

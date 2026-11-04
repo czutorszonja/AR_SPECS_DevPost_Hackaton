@@ -16,13 +16,17 @@ import {
   TEXT_SOFT,
   tween,
 } from "./SmallWinsUIKit"
-import {faceViewer, pointInFront} from "./SmallWinsViewer"
+import {faceViewer, pointInFront, pointInView} from "./SmallWinsViewer"
 
+// The bottom-left corner of the view, clear of cards and tasks. The display is about 36 degrees wide.
 const HUD_DISTANCE = 75
-const HUD_RIGHT = -12
-const HUD_DROP = 19
-const FOLLOW_RATE = 2.5
+const HUD_RIGHT = -15.5
+const HUD_DROP = 22
+const FOLLOW_RATE = 6
 const BOOK_DISTANCE = 70
+// Text is scaled well past the page's real distance, so it stays easy to read on the narrow display.
+const BOOK_TEXT_DISTANCE = 140
+const HUD_TEXT_DISTANCE = 150
 const BOOK_DROP = 4
 // The display is about 36 degrees wide, so at 70 cm the page has to stay under about 40 cm.
 const BOOK_W = 38
@@ -46,6 +50,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
   private picker: {editingId: string | null} | null = null
   private handRaised = false
   private hidden = false
+  private cardShowing = false
   private refreshEvent: DelayedCallbackEvent
   private refreshPending = false
 
@@ -80,18 +85,29 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
   /** Prompts stand back while the breathing runs. */
   setHudHidden(hidden: boolean): void {
     this.hidden = hidden
-    this.hudRoot.enabled = !hidden && !this.bookRoot.enabled
+    this.updateHudVisibility()
+  }
+
+  /** The demo button also steps aside for the quest card, rather than sitting on top of it. */
+  setCardShowing(showing: boolean): void {
+    if (showing === this.cardShowing) return
+    this.cardShowing = showing
+    this.updateHudVisibility()
+  }
+
+  private updateHudVisibility(): void {
+    this.hudRoot.enabled = !this.hidden && !this.cardShowing && !this.bookRoot.enabled
   }
 
   private buildHud(): void {
     this.hudRoot = child(this.sceneObject, "RaiseHandHud")
     this.hudRoot.createComponent("Component.Canvas")
-    this.raiseButton = addButton(this.hudRoot, "RaiseHandButton", "Raise hand (demo)", 13, 3.2, () => this.toggleHand(), HUD_DISTANCE)
+    this.raiseButton = addButton(this.hudRoot, "RaiseHandButton", "Raise hand (demo)", 11, 2.8, () => this.toggleHand(), HUD_TEXT_DISTANCE)
     this.handRoot = child(this.hudRoot, "RaisedHandRoot", new vec3(-2, 8, 0))
     this.handImage = addImage(this.handRoot, "AnimatedHand", TEX.hand, 8, 10.5)
-    addButton(this.handRoot, "NotebookTab", "My notebook", 11, 3.4, () => this.openBook(), HUD_DISTANCE).so.getTransform().setLocalPosition(new vec3(10, 0, 0.3))
+    addButton(this.handRoot, "NotebookTab", "My notebook", 11, 3.4, () => this.openBook(), HUD_TEXT_DISTANCE).so.getTransform().setLocalPosition(new vec3(10, 0, 0.3))
     this.getTransform().setWorldPosition(vec3.zero())
-    this.hudRoot.getTransform().setWorldPosition(pointInFront(HUD_DISTANCE, HUD_RIGHT, -HUD_DROP))
+    this.hudRoot.getTransform().setWorldPosition(pointInView(HUD_DISTANCE, HUD_RIGHT, -HUD_DROP))
   }
 
   private toggleHand(): void {
@@ -132,14 +148,14 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
 
   private closeBook(): void {
     this.bookRoot.enabled = false
-    this.hudRoot.enabled = !this.hidden
+    this.updateHudVisibility()
   }
 
   private buildBook(): void {
     this.bookRoot = child(this.sceneObject, "Notebook")
     this.bookRoot.createComponent("Component.Canvas")
     addPanel(this, this.bookRoot, BOOK_W, BOOK_H)
-    const d = BOOK_DISTANCE
+    const d = BOOK_TEXT_DISTANCE
     const header = flexContainer(this.bookRoot, "NotebookHeader", FlexDirection.Row, BOOK_W - 3, 4, 1, FlexJustify.SpaceBetween)
     header.getTransform().setLocalPosition(new vec3(0, BOOK_H / 2 - 3, 0.6))
     flexText(header, "NotebookTitle", "My notebook", {role: "Headline", distance: d, width: 13, height: 3.6, align: HorizontalAlignment.Left})
@@ -173,7 +189,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
   }
 
   private buildToday(body: SceneObject): void {
-    const d = BOOK_DISTANCE
+    const d = BOOK_TEXT_DISTANCE
     const state = SmallWinsState.instance
     state.tasks.forEach((task, i) => {
       const row = flexContainer(body, "TaskRow" + i, FlexDirection.Row, BOOK_W - 3, ROW_H, 0.6)
@@ -194,7 +210,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
   }
 
   private buildStickers(body: SceneObject): void {
-    const d = BOOK_DISTANCE
+    const d = BOOK_TEXT_DISTANCE
     const stickers = SmallWinsState.instance.stickers
     flexText(body, "StickersHeading", "Today's page", {role: "Subheadline", distance: d, width: 34, height: 2.6, color: TEXT_SOFT})
     if (stickers.length === 0) {
@@ -217,7 +233,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
 
   /** Stands in for typing: the AR keyboard does not appear in SPECS 27 preview (brief: Risks). */
   private buildPicker(body: SceneObject): void {
-    const d = BOOK_DISTANCE
+    const d = BOOK_TEXT_DISTANCE
     const state = SmallWinsState.instance
     const editingId = this.picker ? this.picker.editingId : null
     flexText(body, "PickerHeading", editingId ? "Change this task to" : "What counts for you today?", {role: "Subheadline", distance: d, width: 34, height: 2.6, color: TEXT_SOFT})
@@ -254,7 +270,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     if (!this.hudRoot.enabled) return
     const t = this.hudRoot.getTransform()
     const k = Math.min(1, getDeltaTime() * FOLLOW_RATE)
-    const position = vec3.lerp(t.getWorldPosition(), pointInFront(HUD_DISTANCE, HUD_RIGHT, -HUD_DROP), k)
+    const position = vec3.lerp(t.getWorldPosition(), pointInView(HUD_DISTANCE, HUD_RIGHT, -HUD_DROP), k)
     t.setWorldPosition(position)
     t.setWorldRotation(faceViewer(position))
   }

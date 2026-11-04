@@ -5,6 +5,7 @@ import {setViewerOverride, viewerPose} from "../Scripts/SmallWinsViewer"
 
 const STEER_GAIN = 0.15
 const CARRY_MS = 1500
+const TAP_LIMIT_MS = 3000
 
 export function so(name: string): SceneObject {
   const found = findSceneObjectByName(name)
@@ -60,7 +61,9 @@ export class SmallWinsLeafInteractor extends DefaultLeafInteractor {
   async tap(name: string): Promise<void> {
     const target = findInteractablesByName(name, undefined, true)[0]
     if (!target) throw new Error(`Button "${name}" is not on screen`)
-    await this.trigger(target)
+    // A tap can rebuild the page and destroy this very button, and then the press would never report finishing.
+    // Scenarios check what the tap did, so this only stops a finished tap from waiting forever.
+    await Promise.race([this.trigger(target), sleep(TAP_LIMIT_MS)])
     await sleep(250)
   }
 

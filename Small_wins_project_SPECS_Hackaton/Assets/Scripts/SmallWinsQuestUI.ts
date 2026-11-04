@@ -3,11 +3,12 @@ import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
 import {addImage, addPanel, addText, child, flexButton, flexContainer, flexPlace, flexText, TEX, TEXT_SOFT} from "./SmallWinsUIKit"
 import {keepInView} from "./SmallWinsViewer"
 
-const VIEW_DISTANCE = 130
+// Text is scaled well past the card's real distance, so it stays easy to read on the narrow display.
+const TEXT_DISTANCE = 225
 const HINT_TEXT_DISTANCE = 480
 
 // The card rides low in view, leaving the top of the doorway clear to look through.
-const CARD_IN_VIEW_DEGREES = 5
+const CARD_IN_VIEW_DEGREES = 3
 const CARD_IN_VIEW_DISTANCE = 115
 const CARD_BELOW_GAZE = -14
 
@@ -69,6 +70,10 @@ export class SmallWinsQuestUI extends BaseScriptComponent {
     this.hintRoot.enabled = visible
   }
 
+  get isCardVisible(): boolean {
+    return this.cardRoot.enabled
+  }
+
   setCardVisible(visible: boolean): void {
     this.cardRoot.enabled = visible
     if (visible) keepInView(this.cardRoot.getTransform(), {maxDegrees: CARD_IN_VIEW_DEGREES, maxDistance: CARD_IN_VIEW_DISTANCE, drop: CARD_BELOW_GAZE})
@@ -80,26 +85,26 @@ export class SmallWinsQuestUI extends BaseScriptComponent {
   }
 
   private buildCard(): void {
-    const d = VIEW_DISTANCE
+    const d = TEXT_DISTANCE
     this.cardRoot = child(this.cardAnchor, "QuestCard")
     this.cardRoot.createComponent("Component.Canvas")
-    addPanel(this, this.cardRoot, 40, 20)
+    addPanel(this, this.cardRoot, 46, 24)
     const content = child(this.cardRoot, "QuestContent", new vec3(0, 0, 0.6))
 
-    this.offerRoot = flexContainer(content, "QuestOffer", FlexDirection.Column, 38, 19, 0.8)
-    flexText(this.offerRoot, "QuestKicker", "OPTIONAL QUEST", {role: "Caption", distance: d, width: 36, height: 2.4, color: TEXT_SOFT})
-    flexText(this.offerRoot, "QuestTitle", this.questTitle, {role: "Title", distance: d, width: 36, height: 4})
-    flexText(this.offerRoot, "QuestExample", this.questExample, {role: "Body", distance: d, width: 36, height: 2.6, color: TEXT_SOFT})
-    const row = flexContainer(this.offerRoot, "QuestButtons", FlexDirection.Row, 38, 6, 1)
-    flexPlace(row, 38, 6)
-    flexButton(row, "QuestStartButton", "Start", 8, 5.2, () => this.onChoice.invoke("start"), d)
-    flexButton(row, "IgnoreTodayButton", "Ignore for today", 14, 5.2, () => this.onChoice.invoke("ignoreToday"), d)
-    flexButton(row, "IgnoreUntil5Button", "Ignore until 5 pm", 14, 5.2, () => this.onChoice.invoke("ignoreUntil5"), d)
+    this.offerRoot = flexContainer(content, "QuestOffer", FlexDirection.Column, 44, 23, 0.8)
+    flexText(this.offerRoot, "QuestKicker", "OPTIONAL QUEST", {role: "Caption", distance: d, width: 42, height: 3.4, color: TEXT_SOFT})
+    flexText(this.offerRoot, "QuestTitle", this.questTitle, {role: "Title", distance: d, width: 42, height: 5.4})
+    flexText(this.offerRoot, "QuestExample", this.questExample, {role: "Body", distance: d, width: 42, height: 3.4, color: TEXT_SOFT})
+    const row = flexContainer(this.offerRoot, "QuestButtons", FlexDirection.Row, 44, 7.5, 1)
+    flexPlace(row, 44, 7.5)
+    flexButton(row, "QuestStartButton", "Start", 9, 6.8, () => this.onChoice.invoke("start"), d)
+    flexButton(row, "IgnoreTodayButton", "Ignore for today", 16, 6.8, () => this.onChoice.invoke("ignoreToday"), d)
+    flexButton(row, "IgnoreUntil5Button", "Ignore until 5 pm", 16, 6.8, () => this.onChoice.invoke("ignoreUntil5"), d)
 
-    this.startedRoot = flexContainer(content, "QuestStarted", FlexDirection.Column, 38, 19, 1)
-    flexText(this.startedRoot, "QuestStartedTitle", "Quest started", {role: "Title", distance: d, width: 36, height: 4})
-    flexText(this.startedRoot, "QuestStartedBody", this.questTitle + ". The door is open whenever you're ready.", {role: "Body", distance: d, width: 36, height: 5, wrap: true})
-    flexButton(this.startedRoot, "QuestCancelButton", "Cancel quest", 14, 5.2, () => this.onChoice.invoke("cancel"), d)
+    this.startedRoot = flexContainer(content, "QuestStarted", FlexDirection.Column, 44, 23, 1)
+    flexText(this.startedRoot, "QuestStartedTitle", "Quest started", {role: "Title", distance: d, width: 42, height: 5.4})
+    flexText(this.startedRoot, "QuestStartedBody", this.questTitle + ". The door is open whenever you're ready.", {role: "Body", distance: d, width: 42, height: 7.4, wrap: true})
+    flexButton(this.startedRoot, "QuestCancelButton", "Cancel quest", 18, 6.8, () => this.onChoice.invoke("cancel"), d)
     addText(this.startedRoot, "QuestSpacer", "", {width: 1, height: 1})
   }
 }

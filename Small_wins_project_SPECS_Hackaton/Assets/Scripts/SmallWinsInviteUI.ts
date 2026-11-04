@@ -3,10 +3,12 @@ import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
 import {addPanel, child, fadeTree, flexButton, flexContainer, flexPlace, flexText, smooth, tween} from "./SmallWinsUIKit"
 import {faceViewer, keepInView, pointInFront} from "./SmallWinsViewer"
 
-const IN_VIEW_DEGREES = 5
+const IN_VIEW_DEGREES = 4
 const IN_VIEW_DISTANCE = 110
-const INVITE_DISTANCE = 140
+// Text is scaled well past the panel's real distance, so it stays easy to read on the narrow display.
+const INVITE_TEXT_DISTANCE = 230
 const PROMPT_DISTANCE = 85
+const PROMPT_TEXT_DISTANCE = 180
 const PROMPT_DROP = 15
 const FOLLOW_RATE = 2.5
 
@@ -63,27 +65,27 @@ export class SmallWinsInviteUI extends BaseScriptComponent {
 
   private buildInvite(): void {
     this.inviteRoot.createComponent("Component.Canvas")
-    addPanel(this, this.inviteRoot, 40, 24)
-    const col = flexContainer(this.inviteRoot, "InviteColumn", FlexDirection.Column, 37, 22, 0.8)
+    addPanel(this, this.inviteRoot, 52, 32)
+    const col = flexContainer(this.inviteRoot, "InviteColumn", FlexDirection.Column, 49, 30, 0.8)
     col.getTransform().setLocalPosition(new vec3(0, 0, 0.6))
-    const d = INVITE_DISTANCE
-    flexText(col, "InviteLine", this.inviteLine, {role: "Subheadline", distance: d, width: 36, height: 3.4, wrap: true})
-    flexText(col, "RewardLine", this.rewardLine, {role: "Body", distance: d, width: 36, height: 6, wrap: true})
-    flexText(col, "QuestionLine", this.questionLine, {role: "Subheadline", distance: d, width: 36, height: 3.4, wrap: true})
-    const row = flexContainer(col, "InviteButtons", FlexDirection.Row, 36, 6, 2)
-    flexPlace(row, 36, 6)
-    flexButton(row, "YesButton", "Yes", 12, 5.4, () => this.answer(true), d)
-    flexButton(row, "NoButton", "No", 12, 5.4, () => this.answer(false), d)
+    const d = INVITE_TEXT_DISTANCE
+    flexText(col, "InviteLine", this.inviteLine, {role: "Subheadline", distance: d, width: 48, height: 4.6, wrap: true})
+    flexText(col, "RewardLine", this.rewardLine, {role: "Body", distance: d, width: 48, height: 9.4, wrap: true})
+    flexText(col, "QuestionLine", this.questionLine, {role: "Subheadline", distance: d, width: 48, height: 4.6, wrap: true})
+    const row = flexContainer(col, "InviteButtons", FlexDirection.Row, 48, 8, 2)
+    flexPlace(row, 48, 8)
+    flexButton(row, "YesButton", "Yes", 16, 7, () => this.answer(true), d)
+    flexButton(row, "NoButton", "No", 16, 7, () => this.answer(false), d)
   }
 
   private buildPrompt(): void {
     this.promptRoot.createComponent("Component.Canvas")
-    addPanel(this, this.promptRoot, 30, 15)
-    const col = flexContainer(this.promptRoot, "PromptColumn", FlexDirection.Column, 28, 14, 1)
+    addPanel(this, this.promptRoot, 34, 17)
+    const col = flexContainer(this.promptRoot, "PromptColumn", FlexDirection.Column, 32, 16, 1)
     col.getTransform().setLocalPosition(new vec3(0, 0, 0.6))
-    const d = PROMPT_DISTANCE
-    flexText(col, "PromptLine", this.promptLine, {role: "Subheadline", distance: d, width: 27, height: 6.5, wrap: true})
-    flexButton(col, "ReadyButton", "I'm ready", 14, 4.4, () => this.ready(), d)
+    const d = PROMPT_TEXT_DISTANCE
+    flexText(col, "PromptLine", this.promptLine, {role: "Subheadline", distance: d, width: 31, height: 8, wrap: true})
+    flexButton(col, "ReadyButton", "I'm ready", 16, 5.5, () => this.ready(), d)
   }
 
   /** Fades on either answer. No leaves the room quiet. */

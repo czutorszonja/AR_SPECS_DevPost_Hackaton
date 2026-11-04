@@ -6,6 +6,9 @@ import {SmallWinsState, TASK_LAUNDRY, TASK_PRESETS} from "../Scripts/SmallWinsSt
 import {viewerPose} from "../Scripts/SmallWinsViewer"
 import {shown, SmallWinsLeafInteractor, so, textOf, worldPos} from "./SmallWinsLeafHelpers"
 
+// Changes rebuild the page a moment later. Pressing a button as it is replaced would never complete.
+const PAGE_SETTLE_MS = 800
+
 /** Done criterion 5: Raise hand shows the hand and tab, and the notebook lists, adds, edits, removes and shows stickers. */
 @component
 export class SmallWinsNotebookScenario extends Scenario {
@@ -42,59 +45,64 @@ export class SmallWinsNotebookScenario extends Scenario {
 
     // Nothing earned yet.
     await hand.tap("StickersTab")
+    await sleep(PAGE_SETTLE_MS)
     expect(shown("StickersEmpty")).toBe(true)
     await hand.tap("TodayTab")
-    await sleep(200)
+    await sleep(PAGE_SETTLE_MS)
 
     // Tick off.
     await hand.tap("TaskTick0")
     expect(state.getTask(TASK_LAUNDRY).done).toBe(true)
     expect(state.stickers.length).toBe(1)
-    await sleep(200)
+    await sleep(PAGE_SETTLE_MS)
 
     // Add.
     await hand.tap("AddTaskButton")
+    await sleep(PAGE_SETTLE_MS)
     expect(shown("PresetTask0")).toBe(true)
     await hand.tap("PresetTask0")
-    await sleep(200)
+    await sleep(PAGE_SETTLE_MS)
     expect(state.tasks.length).toBe(4)
     expect(textOf("TaskTitle3")).toBe(TASK_PRESETS[0])
 
     // Edit.
     await hand.tap("TaskEdit3")
+    await sleep(PAGE_SETTLE_MS)
     await hand.tap("PresetTask1")
-    await sleep(200)
+    await sleep(PAGE_SETTLE_MS)
     expect(textOf("TaskTitle3")).toBe(TASK_PRESETS[1])
     expect(state.tasks.length).toBe(4)
 
     // Cancelling an edit changes nothing.
     await hand.tap("TaskEdit3")
+    await sleep(PAGE_SETTLE_MS)
     await hand.tap("PickerCancel")
-    await sleep(200)
+    await sleep(PAGE_SETTLE_MS)
     expect(textOf("TaskTitle3")).toBe(TASK_PRESETS[1])
 
     // Remove.
     await hand.tap("TaskRemove3")
-    await sleep(200)
+    await sleep(PAGE_SETTLE_MS)
     expect(state.tasks.length).toBe(3)
     expect(findInteractablesByName("TaskRemove3", undefined, true).length).toBe(0)
 
     // Stickers shows the day's achievements.
     await hand.tap("StickersTab")
+    await sleep(PAGE_SETTLE_MS)
     expect(shown("StickerArt0")).toBe(true)
     expect(textOf("StickerLabel0")).toBe("Do the laundry")
 
     // Unticking takes the sticker back off the page.
     await hand.tap("TodayTab")
-    await sleep(200)
+    await sleep(PAGE_SETTLE_MS)
     await hand.tap("TaskTick0")
     expect(state.stickers.length).toBe(0)
-    await sleep(200)
+    await sleep(PAGE_SETTLE_MS)
 
     // The one reduced motion setting.
     await hand.tap("ReducedMotionButton")
     expect(state.reducedMotion).toBe(true)
-    await sleep(200)
+    await sleep(PAGE_SETTLE_MS)
     expect(textOf("ReducedMotionButtonLabel")).toBe("Reduced motion: On")
 
     // Close puts it away and brings the demo button back.

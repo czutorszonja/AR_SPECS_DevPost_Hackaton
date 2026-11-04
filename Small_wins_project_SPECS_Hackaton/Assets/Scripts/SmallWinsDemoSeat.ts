@@ -4,6 +4,7 @@ import {addButton, child} from "./SmallWinsUIKit"
 import {faceViewer, pointInFront} from "./SmallWinsViewer"
 
 const STAND_DISTANCE = 85
+const STAND_TEXT_DISTANCE = 170
 const STAND_RIGHT = 12
 const STAND_DROP = 17
 const FOLLOW_RATE = 4
@@ -53,7 +54,7 @@ export class SmallWinsDemoSeat extends BaseScriptComponent {
 
     this.standRoot = child(this.sceneObject, "StandUpHud")
     this.standRoot.createComponent("Component.Canvas")
-    addButton(this.standRoot, "StandUpButton", "Stand up (demo)", 18, 4.4, () => this.stand(), STAND_DISTANCE)
+    addButton(this.standRoot, "StandUpButton", "Stand up (demo)", 18, 4.4, () => this.stand(), STAND_TEXT_DISTANCE)
 
     this.createEvent("OnStartEvent").bind(() => this.sofaTap.onTriggerEnd.add(() => this.sit()))
     this.createEvent("UpdateEvent").bind(() => this.onUpdate())

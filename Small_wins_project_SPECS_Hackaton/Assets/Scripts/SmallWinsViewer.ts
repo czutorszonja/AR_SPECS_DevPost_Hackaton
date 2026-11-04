@@ -27,6 +27,14 @@ export function pointInFront(distance: number, right: number, up: number): vec3 
   return pose.position.add(flat.uniformScale(distance)).add(side.uniformScale(right)).add(vec3.up().uniformScale(up))
 }
 
+/** World position fixed to the view itself, including tilt, for controls that hold a corner of the display. */
+export function pointInView(distance: number, right: number, up: number): vec3 {
+  const pose = viewerPose()
+  const side = flatForward(pose.forward).cross(vec3.up()).normalize()
+  const above = side.cross(pose.forward).normalize()
+  return pose.position.add(pose.forward.uniformScale(distance)).add(side.uniformScale(right)).add(above.uniformScale(up))
+}
+
 /** Yaw-only rotation that points an object's +Z at the viewer, so panels stay upright. */
 export function faceViewer(from: vec3): quat {
   const to = viewerPose().position.sub(from)

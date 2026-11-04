@@ -59,6 +59,7 @@ export class SmallWinsMain extends BaseScriptComponent {
     this.addHint(this.dishHint)
     this.addHint(this.laundryHint)
     this.createEvent("OnStartEvent").bind(() => this.wireFlow())
+    this.createEvent("UpdateEvent").bind(() => this.notebook.setCardShowing(this.room.questUI.isCardVisible))
   }
 
   private addHint(anchor: SceneObject): void {

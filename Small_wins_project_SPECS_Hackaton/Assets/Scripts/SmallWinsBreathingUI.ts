@@ -4,6 +4,8 @@ import {addImage, addPanel, addText, child, ButtonHandle, fadeTree, flexButton, 
 import {faceViewer, pointInFront} from "./SmallWinsViewer"
 
 const VIEW_DISTANCE = 100
+// Text is scaled well past the square's real distance, so it stays easy to read on the narrow display.
+const TEXT_DISTANCE = 180
 const DROP_BELOW_EYES = 10
 const SQUARE_CM = 20
 const TRACK = SQUARE_CM / 2 - 1
@@ -80,7 +82,7 @@ export class SmallWinsBreathingUI extends BaseScriptComponent {
     this.square = child(this.sceneObject, "BreathingSquare")
     this.square.createComponent("Component.Canvas")
     addImage(this.square, "SquareFrame", TEX.square, SQUARE_CM)
-    const d = VIEW_DISTANCE
+    const d = TEXT_DISTANCE
     this.introRoot = child(this.square, "BreathingIntroRoot", new vec3(0, SQUARE_CM / 2 + 3, 0.1))
     addPanel(this, this.introRoot, 34, 3.8)
     addText(this.introRoot, "BreathingIntro", "Follow the dot. Four counts on each side.", {role: "Body", distance: d, width: 33, height: 3.8})
@@ -109,7 +111,7 @@ export class SmallWinsBreathingUI extends BaseScriptComponent {
     b.getSceneObject().getTransform().setLocalPosition(new vec3(8, 1, 0.3))
     const messageRoot = child(this.rewardRoot, "BreathingRewardMessageRoot", new vec3(0, -5.5, 0.1))
     addPanel(this, messageRoot, 36, 4.6)
-    addText(messageRoot, "BreathingRewardMessage", "Breathe normally. Take your time.", {role: "Headline", distance: VIEW_DISTANCE, width: 35, height: 4.6})
+    addText(messageRoot, "BreathingRewardMessage", "Breathe normally. Take your time.", {role: "Headline", distance: TEXT_DISTANCE, width: 35, height: 4.6})
       .getSceneObject()
       .getTransform()
       .setLocalPosition(new vec3(0, 0, 0.6))
