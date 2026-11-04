@@ -12,6 +12,7 @@ import {SmallWinsNotebookScenario} from "./SmallWinsNotebookScenario"
 import {SmallWinsReachScenario} from "./SmallWinsReachScenario"
 import {SmallWinsReducedMotionScenario} from "./SmallWinsReducedMotionScenario"
 import {SmallWinsRoomScenario} from "./SmallWinsRoomScenario"
+import {SmallWinsSeatScenario} from "./SmallWinsSeatScenario"
 import {SmallWinsUnplannedScenario} from "./SmallWinsUnplannedScenario"
 
 @component
@@ -26,6 +27,7 @@ export class LeafIndex extends BaseScriptComponent {
     {id: "c3-breathing", typename: SmallWinsBreathingScenario.getTypeName()},
     {id: "c3-breathing-full-64s", typename: SmallWinsBreathingFullScenario.getTypeName()},
     {id: "c3-no-thanks", typename: SmallWinsNoThanksScenario.getTypeName()},
+    {id: "c3-sit-and-stand", typename: SmallWinsSeatScenario.getTypeName()},
     {id: "c4-door-quest", typename: SmallWinsDoorScenario.getTypeName()},
     {id: "c4-ignore-today", typename: SmallWinsIgnoreTodayScenario.getTypeName()},
     {id: "c4-ignore-until-5", typename: SmallWinsIgnoreUntil5Scenario.getTypeName()},

@@ -65,9 +65,9 @@
     - '// @input float turnStep = 30 {"hint":"Degrees per press of J or L"}'
     - '// @input float tiltStep = 15 {"hint":"Degrees per press of I or K"}'
     - '// @input float maxTilt = 70 {"hint":"Furthest the view can tilt up or down, in degrees"}'
-    - '// @input vec3 boundsMin = {-395,-140,-100} {"hint":"Lowest corner the viewer can reach, in world cm"}'
-    - '// @input vec3 boundsMax = {227,70,360} {"hint":"Highest corner the viewer can reach, in world cm"}'
+    - '// @input vec3 boundsMin = {-372,-140,-100} {"hint":"Lowest corner the viewer can reach, in world cm"}'
+    - '// @input vec3 boundsMax = {526,110,846} {"hint":"Highest corner the viewer can reach, in world cm"}'
     - "// @input vec3 wallMin = {-420,-160,-170} {\"hint\":\"Inside corner of the room's walls, in world cm\"}"
-    - "// @input vec3 wallMax = {250,100,380} {\"hint\":\"Opposite inside corner of the room's walls, in world cm\"}"
+    - "// @input vec3 wallMax = {572,140,890} {\"hint\":\"Opposite inside corner of the room's walls, in world cm\"}"
     - '// @input vec3 worktopMin = {-172,-160,-170} {"hint":"Lowest corner of the kitchen run, in world cm"}'
     - '// @input vec3 worktopMax = {172,-68,-108} {"hint":"Highest corner of the kitchen run, in world cm"}'

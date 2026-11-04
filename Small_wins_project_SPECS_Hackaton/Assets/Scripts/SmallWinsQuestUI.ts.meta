@@ -29,6 +29,7 @@
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
     cardAnchor: false
+    hintAction: false
     hintAnchor: false
     hintLine: false
     questExample: false
@@ -47,6 +48,7 @@
       questTitle: Find 3 yellow things
       questExample: or 3 unique leaves
       hintLine: A little quest is waiting outside
+      hintAction: Tap the door to see it
   ScriptTypes:
     -
       {}
@@ -56,3 +58,4 @@
     - '// @input string questTitle = "Find 3 yellow things" {"hint":"The quest on offer"}'
     - '// @input string questExample = "or 3 unique leaves" {"hint":"Another example of a quest"}'
     - '// @input string hintLine = "A little quest is waiting outside" {"hint":"The sign you see from across the room"}'
+    - '// @input string hintAction = "Tap the door to see it" {"hint":"Tells you how to take it up"}'

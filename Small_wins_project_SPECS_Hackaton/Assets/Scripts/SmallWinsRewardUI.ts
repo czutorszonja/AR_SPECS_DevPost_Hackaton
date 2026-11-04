@@ -7,7 +7,7 @@ import {keepInView} from "./SmallWinsViewer"
 const STAR_ARC_START = -0.3
 const STAR_ARC = Math.PI + 0.6
 
-const PLATE_CM = 16
+const PLATE_CM = 20
 const SLOT_CM = 7
 const SLOT_STEP = 8
 const MESSAGE_Y = -14
@@ -22,11 +22,12 @@ const IN_VIEW_DISTANCE = 110
 const CONTENT_DROP = 10
 
 // Seconds from the start of a normal reward.
-const POP_END = 1.0
-const MESSAGE_IN = 0.4
-const READ_END = 6.0
-const SHRINK_END = READ_END + 0.6
-const HOLD_END = SHRINK_END + 2.0
+const POP_END = 0.7
+const MESSAGE_START = 0.5
+const MESSAGE_IN = 0.35
+const SHRINK_START = 0.9
+const SHRINK_END = 1.3
+const HOLD_END = 4.6
 const FADE_END = HOLD_END + 0.5
 
 // Reduced motion: the message appears gently, the sticker fades into place, the 2 second hold stays.
@@ -185,32 +186,24 @@ export class SmallWinsRewardUI extends BaseScriptComponent {
   }
 
   private updateFull(t: number): boolean {
-    if (t < POP_END) {
+    // Pops big, shrinks straight into its place, then rests there with the message.
+    if (t < SHRINK_START) {
       this.applyPlate(0, 0, PLATE_CM * popScale(t))
-      this.updateSparkle(t)
-    } else if (t < READ_END) {
-      this.applyPlate(0, 0, PLATE_CM)
-      this.updateSparkle(t)
+    } else if (t < SHRINK_END) {
+      const k = smooth((t - SHRINK_START) / (SHRINK_END - SHRINK_START))
+      const target = this.slotPosition()
+      this.applyPlate(target.x * k, target.y * k, PLATE_CM + (SLOT_CM - PLATE_CM) * k)
     } else {
-      setImageAlpha(this.ring, 0)
-      this.stars.forEach((s) => setImageAlpha(s, 0))
+      this.applyPlate(0, 0, 0)
+      this.showLanded(true)
     }
-    if (t >= POP_END && t < READ_END) {
-      const a = smooth((t - POP_END) / MESSAGE_IN)
+    this.updateSparkle(t)
+    if (t >= MESSAGE_START && t < HOLD_END) {
+      const a = smooth((t - MESSAGE_START) / MESSAGE_IN)
       fadeTree(this.messageRoot, a)
       fadeTree(this.stripRoot, a)
     }
-    if (t >= READ_END && t < SHRINK_END) {
-      const k = smooth((t - READ_END) / (SHRINK_END - READ_END))
-      const target = this.slotPosition()
-      this.applyPlate(target.x * k, target.y * k, PLATE_CM + (SLOT_CM - PLATE_CM) * k)
-    } else if (t >= SHRINK_END && t < HOLD_END) {
-      this.applyPlate(0, 0, 0)
-      this.showLanded(true)
-    }
     if (t >= HOLD_END) {
-      this.applyPlate(0, 0, 0)
-      this.showLanded(true)
       const a = 1 - clamp01((t - HOLD_END) / (FADE_END - HOLD_END))
       fadeTree(this.messageRoot, a)
       fadeTree(this.stripRoot, a)
@@ -238,12 +231,13 @@ export class SmallWinsRewardUI extends BaseScriptComponent {
     return t >= CALM_FADE_END
   }
 
-  /** A gold ring and a burst of stars, which keep twinkling above the sticker while you read. */
+  /** A gold ring around the pop, and a burst of stars that twinkle and fade while you read. */
   private updateSparkle(t: number): void {
     const k = Math.min(1, t / POP_END)
     const ringSize = PLATE_CM * (0.7 + k * 0.6)
     sizeImage(this.ring, ringSize, ringSize)
-    setImageAlpha(this.ring, t < POP_END ? Math.sin(k * Math.PI * 0.5) : 0.55 + 0.35 * Math.sin(t * 3))
+    setImageAlpha(this.ring, t < SHRINK_START ? Math.sin(k * Math.PI * 0.5) : 0)
+    const fade = t < HOLD_END ? 1 - smooth((t - SHRINK_END) / (HOLD_END - SHRINK_END)) : 0
     this.stars.forEach((star, i) => {
       const angle = STAR_ARC_START + (i / (this.stars.length - 1)) * STAR_ARC + (t - POP_END) * 0.06
       const radius = 9 + k * (7 + (i % 3) * 5)
@@ -251,7 +245,7 @@ export class SmallWinsRewardUI extends BaseScriptComponent {
       const twinkle = 0.5 + 0.5 * Math.sin(t * 4 + i * 1.7)
       const size = starSize(i) * (0.75 + 0.45 * twinkle)
       sizeImage(star, size, size)
-      setImageAlpha(star, 0.45 + 0.55 * twinkle)
+      setImageAlpha(star, (0.45 + 0.55 * twinkle) * fade)
     })
   }
 

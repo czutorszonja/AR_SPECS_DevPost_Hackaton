@@ -4,7 +4,7 @@ import {addImage, addPanel, addText, child, flexButton, flexContainer, flexPlace
 import {keepInView} from "./SmallWinsViewer"
 
 const VIEW_DISTANCE = 130
-const HINT_TEXT_DISTANCE = 300
+const HINT_TEXT_DISTANCE = 480
 
 // The card rides low in view, leaving the top of the doorway clear to look through.
 const CARD_IN_VIEW_DEGREES = 5
@@ -38,6 +38,10 @@ export class SmallWinsQuestUI extends BaseScriptComponent {
   @hint("The sign you see from across the room")
   hintLine: string = "A little quest is waiting outside"
 
+  @input
+  @hint("Tells you how to take it up")
+  hintAction: string = "Tap the door to see it"
+
   private hintRoot: SceneObject
   private offerRoot: SceneObject
   private startedRoot: SceneObject
@@ -45,12 +49,12 @@ export class SmallWinsQuestUI extends BaseScriptComponent {
 
   onAwake() {
     this.hintRoot = child(this.hintAnchor, "QuestHint")
-    const sign = child(this.hintRoot, "QuestHintSign", new vec3(0, 12, 1))
-    addImage(sign, "QuestHintOutline", TEX.outline, 26)
-    addImage(sign, "QuestHintStar", TEX.star, 15).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
-    const label = child(this.hintRoot, "QuestHintLabel", new vec3(0, -12, 1))
-    addPanel(this, label, 72, 13)
-    addText(label, "QuestHintText", this.hintLine, {role: "Title", distance: HINT_TEXT_DISTANCE, width: 70, height: 13}).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.6))
+    const sign = child(this.hintRoot, "QuestHintSign", new vec3(0, 36, 1))
+    addImage(sign, "QuestHintOutline", TEX.outline, 42)
+    addImage(sign, "QuestHintStar", TEX.star, 25).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
+    const label = child(this.hintRoot, "QuestHintLabel", new vec3(0, -6, 1))
+    addPanel(this, label, 104, 34)
+    addText(label, "QuestHintText", this.hintLine + "\n" + this.hintAction, {role: "Title", distance: HINT_TEXT_DISTANCE, width: 100, height: 32, wrap: true}).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.6))
     this.buildCard()
     const hide = this.createEvent("DelayedCallbackEvent")
     hide.bind(() => {

@@ -30,13 +30,15 @@ export function doorAngle(): number {
   return Math.abs(so("EntryDoorHinge").getTransform().getLocalRotation().toEulerAngles().y)
 }
 
-export async function walkUpToTheDoor(): Promise<void> {
+export async function openTheDoor(hand: SmallWinsLeafInteractor): Promise<void> {
   standAt(closeToDoor(), doorCentre())
+  await sleep(200)
+  await hand.tap("EntryDoorTapTarget")
   await waitFor("the card", () => shown("QuestCard"), 2000)
   await sleep(1300)
 }
 
-/** Done criterion 4: a sign when you look at the door, then it opens as you approach, with the quest and its options. */
+/** Done criterion 4: a sign when you look at the door, then it opens when tapped, with the quest and its options. */
 @component
 export class SmallWinsDoorScenario extends Scenario {
   async run(): Promise<void> {
@@ -53,9 +55,14 @@ export class SmallWinsDoorScenario extends Scenario {
     await sleep(200)
     expect(shown("QuestHint")).toBe(false)
 
-    // Walking within 1.5 m animates the door open, part way first.
+    // Walking up doesn't open it: the sign says to tap it, and that animates the door open, part way first.
     standAt(closeToDoor(), doorCentre())
-    await sleep(350)
+    await sleep(600)
+    expect(doorAngle()).toBeLessThan(0.05)
+    expect(shown("QuestHint")).toBe(true)
+    expect(textOf("QuestHintText").includes("Tap the door")).toBe(true)
+    await hand.tap("EntryDoorTapTarget")
+    await sleep(100)
     const partWay = doorAngle()
     expect(partWay).toBeGreaterThan(0.05)
     await sleep(1100)
@@ -102,11 +109,15 @@ export class SmallWinsDoorScenario extends Scenario {
     await sleep(200)
     expect(shown("QuestCard")).toBe(false)
 
-    // Walking away closes the door again.
+    // Cancelling closes the door again, and the sign doesn't come back. A tap still opens it.
     standAt(acrossTheRoom(), doorCentre())
     await sleep(1400)
     expect(doorAngle()).toBeLessThan(0.05)
     expect(shown("QuestHint")).toBe(false)
+    await hand.tap("EntryDoorTapTarget")
+    await sleep(1300)
+    expect(doorAngle() * (180 / Math.PI)).toBeGreaterThan(80)
+    expect(shown("QuestCard")).toBe(false)
     setViewerOverride(null)
   }
 }

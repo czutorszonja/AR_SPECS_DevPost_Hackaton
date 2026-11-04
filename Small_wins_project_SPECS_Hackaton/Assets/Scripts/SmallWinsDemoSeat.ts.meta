@@ -1,0 +1,61 @@
+- !<AssetImportMetadata/c8a5286c-9baa-4d5d-83b9-47ef323049df>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 19a0993f-f9ca-494c-b817-694ab316e237
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 19a0993f-f9ca-494c-b817-694ab316e237
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> bb324715-3c4b-487e-9185-1ba71b99efd5
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/bb324715-3c4b-487e-9185-1ba71b99efd5>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: 11ae0cde-08f5-47b3-85a6-e76fe6d16523
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    navigation: false
+    seatEye: false
+    signPosition: false
+    sofaCentre: false
+    sofaSize: false
+    standEye: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - navigation: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      seatEye: !<Vec3> {x: 76.000000, y: -45.000000, z: 645.000000}
+      standEye: !<Vec3> {x: 76.000000, y: 0.000000, z: 470.000000}
+      signPosition: !<Vec3> {x: 76.000000, y: -52.000000, z: 650.000000}
+      sofaCentre: !<Vec3> {x: 76.000000, y: -122.000000, z: 650.000000}
+      sofaSize: !<Vec3> {x: 190.000000, y: 76.000000, z: 88.000000}
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input AssignableType_1 navigation {"hint":"The preview navigation, which moves the viewer"}'
+    - '// @input vec3 seatEye = {76,-45,645} {"hint":"Where your eyes are when sitting on the sofa, in world cm"}'
+    - '// @input vec3 standEye = {76,0,430} {"hint":"Where you end up after standing, in world cm"}'
+    - '// @input vec3 signPosition = {76,-52,650} {"hint":"Where the Sit button floats, above the sofa back, in world cm"}'
+    - '// @input vec3 sofaCentre = {76,-122,650} {"hint":"The middle of the sofa, in world cm"}'
+    - '// @input vec3 sofaSize = {190,76,88} {"hint":"Size of the area you can tap on the sofa, in cm"}'

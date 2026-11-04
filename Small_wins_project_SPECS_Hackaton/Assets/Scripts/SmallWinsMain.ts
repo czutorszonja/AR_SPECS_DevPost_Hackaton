@@ -62,8 +62,8 @@ export class SmallWinsMain extends BaseScriptComponent {
   }
 
   private addHint(anchor: SceneObject): void {
-    addImage(anchor, "StickerHintOutline", TEX.outline, 16)
-    addImage(anchor, "StickerHintStar", TEX.star, 7).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
+    addImage(anchor, "StickerHintOutline", TEX.outline, 30)
+    addImage(anchor, "StickerHintStar", TEX.star, 15).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
   }
 
   private wireFlow(): void {

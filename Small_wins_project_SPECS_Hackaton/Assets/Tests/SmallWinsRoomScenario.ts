@@ -13,9 +13,9 @@ export class SmallWinsRoomScenario extends Scenario {
       expect(shown(part), `${part} should be visible`).toBe(true)
     }
 
-    // About 6.7 m x 5.5 m, open plan: walls measured from each other.
-    expect(worldPos("WallRight").x - worldPos("WallDoorSideA").x).toBeCloseTo(674, 0)
-    expect(worldPos("WallBehindSofa").z - worldPos("WallKitchen").z).toBeCloseTo(554, 0)
+    // About 10 m x 10.6 m, open plan, so both chores fit in view at once from the middle of the room.
+    expect(worldPos("WallRight").x - worldPos("WallDoorSideA").x).toBeCloseTo(996, 0)
+    expect(worldPos("WallBehindSofa").z - worldPos("WallKitchen").z).toBeCloseTo(1064, 0)
 
     // The kitchen and the sofa are both in the one room, with the door on another wall.
     const door = worldPos("EntryDoorHinge")
@@ -40,7 +40,7 @@ export class SmallWinsRoomScenario extends Scenario {
     const flat = new vec3(basket.x - washer.x, 0, basket.z - washer.z).length
     expect(flat).toBeGreaterThan(125)
     expect(flat).toBeLessThan(175)
-    expect(worldPos("WallRight").x - basket.x).toBeLessThan(45)
+    expect(worldPos("PantryCupboard").x - 40 - basket.x).toBeLessThan(45)
     expect(basket.z - worldPos("WallKitchen").z).toBeLessThan(45)
     expect(shown("ClothesPile")).toBe(true)
     expect(worldPos("ClothesPile").y).toBeGreaterThan(basket.y)

@@ -2,7 +2,8 @@ import {createIKInteractor} from "Leaf.lspkg/Interactors/interactor/ik/visualize
 import {findInteractablesByName} from "Leaf.lspkg/Interactors/InteractableUtils"
 import {Scenario} from "Leaf.lspkg/Scenarios/scenario/Scenario"
 import {sleep} from "Leaf.lspkg/Utils/common/Utils"
-import {shown, waitFor} from "./SmallWinsLeafHelpers"
+import {SmallWinsDemoNavigation} from "../Scripts/SmallWinsDemoNavigation"
+import {shown, so, waitFor} from "./SmallWinsLeafHelpers"
 
 /** Reach check: a simulated arm and head reaching for the controls, as a person standing there would. */
 @component
@@ -10,7 +11,10 @@ export class SmallWinsReachScenario extends Scenario {
   private readonly body = createIKInteractor()
 
   async run(): Promise<void> {
-    await sleep(1500)
+    // The simulated body stands at the scene origin, so the viewer walks over to stand in it.
+    const navigation = so("ViewerRig (preview navigation)").getComponent(SmallWinsDemoNavigation.getTypeName()) as SmallWinsDemoNavigation
+    navigation.standAt(vec3.zero())
+    await sleep(2500)
     const raise = findInteractablesByName("RaiseHandButton", undefined, true)[0]
     await this.body.trigger(raise)
     await waitFor("the hand", () => shown("NotebookTab"), 3000)

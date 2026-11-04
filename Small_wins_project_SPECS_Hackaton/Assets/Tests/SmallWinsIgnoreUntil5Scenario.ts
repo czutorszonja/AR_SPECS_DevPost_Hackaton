@@ -3,7 +3,7 @@ import {expect} from "Leaf.lspkg/Utils/common/Expect"
 import {sleep} from "Leaf.lspkg/Utils/common/Utils"
 import {setViewerOverride} from "../Scripts/SmallWinsViewer"
 import {shown, SmallWinsLeafInteractor} from "./SmallWinsLeafHelpers"
-import {room, walkUpToTheDoor} from "./SmallWinsDoorScenario"
+import {room, openTheDoor} from "./SmallWinsDoorScenario"
 
 /** Ignore until 5 pm just hides it in the demo, without waiting for a real clock. */
 @component
@@ -11,7 +11,7 @@ export class SmallWinsIgnoreUntil5Scenario extends Scenario {
   async run(): Promise<void> {
     const hand = new SmallWinsLeafInteractor()
     await sleep(1200)
-    await walkUpToTheDoor()
+    await openTheDoor(hand)
     await hand.tap("IgnoreUntil5Button")
     expect(room().questState).toBe("ignoredUntil5")
     await sleep(200)

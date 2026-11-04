@@ -1,11 +1,15 @@
+import {InteractionManager} from "SpectaclesInteractionKit.lspkg/Core/InteractionManager/InteractionManager"
+import {InteractorInputType} from "SpectaclesInteractionKit.lspkg/Core/Interactor/Interactor"
 import {setViewLimits} from "./SmallWinsViewer"
 
 const DEG = Math.PI / 180
 const EASE_RATE = 10
+const SIT_RATE = 4
+const MOUSE_REACH = 1500
 
 /**
- * Preview-only help for walking the demo room: J and L turn, I and K tilt, and the viewer stays
- * inside the walls. On real glasses you turn your own head and walk your own home, so it switches off.
+ * Preview-only help for walking the demo room: J and L turn, I and K tilt, the viewer stays inside
+ * the walls, and can sit down. On real glasses you do all of this yourself, so it switches off.
  */
 @component
 export class SmallWinsDemoNavigation extends BaseScriptComponent {
@@ -27,11 +31,11 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
 
   @input
   @hint("Lowest corner the viewer can reach, in world cm")
-  boundsMin: vec3 = new vec3(-395, -140, -100)
+  boundsMin: vec3 = new vec3(-372, -140, -100)
 
   @input
   @hint("Highest corner the viewer can reach, in world cm")
-  boundsMax: vec3 = new vec3(227, 70, 360)
+  boundsMax: vec3 = new vec3(526, 110, 846)
 
   @input
   @hint("Inside corner of the room's walls, in world cm")
@@ -39,7 +43,7 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
 
   @input
   @hint("Opposite inside corner of the room's walls, in world cm")
-  wallMax: vec3 = new vec3(250, 100, 380)
+  wallMax: vec3 = new vec3(572, 140, 890)
 
   @input
   @hint("Lowest corner of the kitchen run, in world cm")
@@ -55,12 +59,57 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
   private tilt = 0
   private eye: vec3
   private lastLocal: vec3
+  private startEye: vec3
+  private moveTarget: vec3 | null = null
+  private seated = false
+
+  get isSeated(): boolean {
+    return this.seated
+  }
+
+  /** Eases the viewer to a seat, facing the way they'd face sitting there. They stay put until they stand. */
+  sitAt(eye: vec3): void {
+    this.seated = true
+    this.moveTarget = eye
+    this.faceAhead()
+  }
+
+  standAt(eye: vec3): void {
+    this.seated = false
+    this.moveTarget = eye
+  }
+
+  /** Turns to face -Z, allowing for any turn already made with the preview's own camera controls. */
+  private faceAhead(): void {
+    const look = this.viewerCamera.getTransform().getLocalRotation().multiplyVec3(new vec3(0, 0, -1))
+    let wanted = Math.atan2(look.x, -look.z) / DEG
+    while (wanted - this.yaw > 180) wanted -= 360
+    while (wanted - this.yaw < -180) wanted += 360
+    this.targetYaw = wanted
+    this.targetTilt = 0
+  }
 
   onAwake() {
     if (!global.deviceInfoSystem.isEditor()) return
     setViewLimits(this.wallMin, this.wallMax, this.worktopMin, this.worktopMax)
+    this.createEvent("OnStartEvent").bind(() => this.extendMouseReach())
     this.createEvent("KeyPressEvent").bind((e) => this.onKey(e.key))
     this.createEvent("LateUpdateEvent").bind(() => this.updateRig())
+  }
+
+  /**
+   * The mouse pointer stops at 500 cm, which is less than the width of this demo room, and SIK has no
+   * setting for it. Hands keep their usual reach: this only lets the preview's mouse cross the room.
+   */
+  private extendMouseReach(): void {
+    const mice = InteractionManager.getInstance().getInteractorsByType(InteractorInputType.Mouse) as unknown as {
+      _maxRaycastDistance: number
+      mouseTargetProvider: {config: {maxRayDistance: number}}
+    }[]
+    for (const mouse of mice) {
+      mouse._maxRaycastDistance = MOUSE_REACH
+      mouse.mouseTargetProvider.config.maxRayDistance = MOUSE_REACH
+    }
   }
 
   private onKey(key: Keys): void {
@@ -76,6 +125,17 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
     const local = camera.getLocalPosition()
     if (!this.eye) {
       this.eye = camera.getWorldPosition()
+      this.startEye = rig.getWorldPosition()
+      this.lastLocal = local
+    }
+
+    // The preview's Reset button puts its camera back, so go back to the start too.
+    if (local.length < 0.01 && this.lastLocal.length > 1) {
+      this.eye = this.startEye
+      this.seated = false
+      this.moveTarget = null
+      this.yaw = this.targetYaw = 0
+      this.tilt = this.targetTilt = 0
       this.lastLocal = local
     }
 
@@ -85,8 +145,16 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
     const facing = quat.fromEulerVec(new vec3(0, this.yaw * DEG, 0))
     const rotation = facing.multiply(quat.fromEulerVec(new vec3(this.tilt * DEG, 0, 0)))
 
-    // Walk where you face on the level, whatever the tilt, and stop at the walls.
-    this.eye = this.keepInside(this.eye.add(facing.multiplyVec3(local.sub(this.lastLocal))))
+    if (this.moveTarget) {
+      this.eye = vec3.lerp(this.eye, this.moveTarget, Math.min(1, getDeltaTime() * SIT_RATE))
+      if (this.eye.distance(this.moveTarget) < 0.5) {
+        this.eye = this.moveTarget
+        this.moveTarget = null
+      }
+    } else if (!this.seated) {
+      // Walk where you face on the level, whatever the tilt, and stop at the walls.
+      this.eye = this.keepInside(this.eye.add(facing.multiplyVec3(local.sub(this.lastLocal))))
+    }
     this.lastLocal = local
 
     rig.setWorldRotation(rotation)

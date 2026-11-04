@@ -5,7 +5,7 @@ import {setViewerOverride} from "../Scripts/SmallWinsViewer"
 import {shown, SmallWinsLeafInteractor, so, viewAngle, waitFor, worldPos} from "./SmallWinsLeafHelpers"
 
 const IN_VIEW_DEGREES = 15
-const MIDDLE_OF_ROOM = new vec3(-80, 0, 100)
+const MIDDLE_OF_ROOM = new vec3(76, 0, 360)
 
 function messageIsSolid(): boolean {
   return shown("RewardMessage") && (so("RewardMessage").getComponent("Component.Text") as Text).textFill.color.a > 0.9

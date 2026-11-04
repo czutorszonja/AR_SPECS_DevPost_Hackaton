@@ -33,7 +33,6 @@
     entryDoorHinge: false
     hintGazeDegrees: false
     openAngle: false
-    openDistance: false
     questUI: false
     washerHinge: false
   ScriptTypesHidden:
@@ -49,7 +48,6 @@
       washerHinge: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       entryDoorHinge: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       questUI: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
-      openDistance: !<float> 150.000000
       openAngle: !<float> 100.000000
       hintGazeDegrees: !<float> 35.000000
       cardGazeDegrees: !<float> 60.000000
@@ -61,7 +59,6 @@
     - // @input SceneObject washerHinge
     - // @input SceneObject entryDoorHinge
     - // @input AssignableType_1 questUI
-    - '// @input float openDistance = 150 {"hint":"Walking closer than this opens the door, in cm"}'
     - '// @input float openAngle = 100 {"hint":"How far the door swings open, in degrees"}'
     - '// @input float hintGazeDegrees = 35 {"hint":"The sign shows when you look within this angle of the door"}'
     - '// @input float cardGazeDegrees = 60 {"hint":"The card stays while you look within this angle of the door"}'

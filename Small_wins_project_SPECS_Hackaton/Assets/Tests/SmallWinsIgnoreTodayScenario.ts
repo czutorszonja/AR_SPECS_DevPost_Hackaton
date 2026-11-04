@@ -3,7 +3,7 @@ import {expect} from "Leaf.lspkg/Utils/common/Expect"
 import {sleep} from "Leaf.lspkg/Utils/common/Utils"
 import {setViewerOverride} from "../Scripts/SmallWinsViewer"
 import {shown, SmallWinsLeafInteractor} from "./SmallWinsLeafHelpers"
-import {room, doorCentre, standAt, acrossTheRoom, walkUpToTheDoor} from "./SmallWinsDoorScenario"
+import {room, doorCentre, standAt, acrossTheRoom, openTheDoor} from "./SmallWinsDoorScenario"
 
 /** Ignore for today hides the card and the sign for the day. */
 @component
@@ -11,7 +11,7 @@ export class SmallWinsIgnoreTodayScenario extends Scenario {
   async run(): Promise<void> {
     const hand = new SmallWinsLeafInteractor()
     await sleep(1200)
-    await walkUpToTheDoor()
+    await openTheDoor(hand)
     await hand.tap("IgnoreTodayButton")
     expect(room().questState).toBe("ignoredToday")
     await sleep(200)
