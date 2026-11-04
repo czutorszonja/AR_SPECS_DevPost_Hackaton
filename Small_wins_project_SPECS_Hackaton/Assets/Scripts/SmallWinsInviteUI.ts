@@ -3,7 +3,7 @@ import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
 import {addPanel, child, fadeTree, flexButton, flexContainer, flexPlace, flexText, smooth, tween} from "./SmallWinsUIKit"
 import {faceViewer, keepInView, pointInFront} from "./SmallWinsViewer"
 
-const IN_VIEW_DEGREES = 7
+const IN_VIEW_DEGREES = 5
 const IN_VIEW_DISTANCE = 110
 const INVITE_DISTANCE = 140
 const PROMPT_DISTANCE = 85

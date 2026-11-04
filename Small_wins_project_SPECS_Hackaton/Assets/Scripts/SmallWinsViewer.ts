@@ -38,7 +38,7 @@ export function faceViewer(from: vec3): quat {
 export interface InViewOptions {
   /** How far off the line of sight it may sit before it starts to move, in degrees. */
   maxDegrees: number
-  /** It comes closer than this so it stays readable, in cm. */
+  /** How far away it settles when it moves, and the furthest it may stay, in cm. */
   maxDistance: number
   /** The middle of the content, this far below the object's origin, in cm. Negative is above. */
   drop?: number
@@ -77,7 +77,8 @@ export function keepInView(t: Transform, options: InViewOptions): void {
   if (angle <= limit && distance <= options.maxDistance) return
 
   const aim = angle > limit ? towards(pose.forward, direction, angle, limit) : direction
-  const reach = Math.max(MIN_DISTANCE, Math.min(distance, options.maxDistance, clearDistance(pose.position, aim) - WALL_GAP))
+  // Always settle at a set distance: keeping the current one would creep closer on every turn.
+  const reach = Math.max(MIN_DISTANCE, Math.min(options.maxDistance, clearDistance(pose.position, aim) - WALL_GAP))
   const target = pose.position.add(aim.uniformScale(reach)).add(offset)
   const k = options.snap ? 1 : Math.min(1, getDeltaTime() * FOLLOW_RATE)
   const next = vec3.lerp(position, target, k)

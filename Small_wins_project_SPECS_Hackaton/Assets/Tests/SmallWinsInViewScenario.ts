@@ -51,6 +51,14 @@ export class SmallWinsInViewScenario extends Scenario {
     setViewerOverride({position: MIDDLE_OF_ROOM, forward: new vec3(0, 0, 1)})
     await sleep(1800)
     expect(viewAngle(worldPos("MeTimeInvitation"))).toBeLessThan(IN_VIEW_DEGREES)
+
+    // However much you turn, it stays at a comfortable distance instead of creeping up to your face.
+    for (const forward of [new vec3(1, 0, 0), new vec3(0, 0, -1), new vec3(-1, 0, 0), new vec3(0, 0, 1)]) {
+      setViewerOverride({position: MIDDLE_OF_ROOM, forward})
+      await sleep(900)
+    }
+    await sleep(1500)
+    expect(worldPos("MeTimeInvitation").distance(MIDDLE_OF_ROOM)).toBeGreaterThan(90)
     setViewerOverride(null)
   }
 }

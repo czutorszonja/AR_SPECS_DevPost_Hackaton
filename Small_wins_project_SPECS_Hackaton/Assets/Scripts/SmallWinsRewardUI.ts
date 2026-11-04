@@ -14,10 +14,10 @@ const MESSAGE_Y = -14
 const STRIP_Y = -24
 const MAX_SLOTS = 5
 const STAR_COUNT = 14
-const TEXT_DISTANCE = 125
+const TEXT_DISTANCE = 165
 
 // Stays where it is while you can see it, and eases into view when you can't.
-const IN_VIEW_DEGREES = 7
+const IN_VIEW_DEGREES = 5
 const IN_VIEW_DISTANCE = 110
 const CONTENT_DROP = 10
 
@@ -89,11 +89,11 @@ export class SmallWinsRewardUI extends BaseScriptComponent {
     }
 
     this.messageRoot = child(this.sceneObject, "RewardMessageRoot", new vec3(0, MESSAGE_Y, 0.2))
-    addPanel(this, this.messageRoot, 46, 7.5)
+    addPanel(this, this.messageRoot, 38, 7.5)
     this.messageText = addText(this.messageRoot, "RewardMessage", "", {
       role: "Title",
       distance: TEXT_DISTANCE,
-      width: 46,
+      width: 37,
       height: 7.5,
     })
     this.messageText.getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.7))

@@ -35,7 +35,7 @@ export function imageAlpha(name: string): number {
 
 /** Stands about a metre back from an anchor on the wall, looking straight at it. */
 export function faceAnchor(name: string): void {
-  setViewerOverride({position: worldPos(name).add(new vec3(0, 0, 100)), forward: new vec3(0, 0, -1)})
+  setViewerOverride({position: worldPos(name).add(new vec3(0, -5, 100)), forward: new vec3(0, 0, -1)})
 }
 
 /** Degrees between where the viewer looks and a point. The display is only about 36 degrees across. */

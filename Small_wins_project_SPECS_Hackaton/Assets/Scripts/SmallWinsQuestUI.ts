@@ -4,10 +4,10 @@ import {addImage, addPanel, addText, child, flexButton, flexContainer, flexPlace
 import {keepInView} from "./SmallWinsViewer"
 
 const VIEW_DISTANCE = 130
-const HINT_TEXT_DISTANCE = 130
+const HINT_TEXT_DISTANCE = 300
 
 // The card rides low in view, leaving the top of the doorway clear to look through.
-const CARD_IN_VIEW_DEGREES = 6
+const CARD_IN_VIEW_DEGREES = 5
 const CARD_IN_VIEW_DISTANCE = 115
 const CARD_BELOW_GAZE = -14
 
@@ -48,9 +48,9 @@ export class SmallWinsQuestUI extends BaseScriptComponent {
     const sign = child(this.hintRoot, "QuestHintSign", new vec3(0, 12, 1))
     addImage(sign, "QuestHintOutline", TEX.outline, 26)
     addImage(sign, "QuestHintStar", TEX.star, 15).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
-    const label = child(this.hintRoot, "QuestHintLabel", new vec3(0, -9, 1))
-    addPanel(this, label, 46, 8)
-    addText(label, "QuestHintText", this.hintLine, {role: "Title", distance: HINT_TEXT_DISTANCE, width: 44, height: 8}).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.6))
+    const label = child(this.hintRoot, "QuestHintLabel", new vec3(0, -12, 1))
+    addPanel(this, label, 72, 13)
+    addText(label, "QuestHintText", this.hintLine, {role: "Title", distance: HINT_TEXT_DISTANCE, width: 70, height: 13}).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.6))
     this.buildCard()
     const hide = this.createEvent("DelayedCallbackEvent")
     hide.bind(() => {
