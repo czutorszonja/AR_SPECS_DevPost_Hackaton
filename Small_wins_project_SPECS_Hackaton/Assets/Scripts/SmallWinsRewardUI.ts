@@ -1,20 +1,31 @@
 import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
 import {SmallWinsState, StickerArt} from "./SmallWinsState"
 import {addImage, addPanel, addText, child, clamp01, fadeTree, setImageAlpha, setImageTexture, sizeImage, smooth, stickerTexture, TEX} from "./SmallWinsUIKit"
+import {keepInView} from "./SmallWinsViewer"
 
-const PLATE_CM = 10
-const SLOT_CM = 5
-const SLOT_STEP = 6
-const MESSAGE_Y = -8.5
-const STRIP_Y = -15.5
+// The stars fan out above the sticker, leaving the message below it clear.
+const STAR_ARC_START = -0.3
+const STAR_ARC = Math.PI + 0.6
+
+const PLATE_CM = 16
+const SLOT_CM = 7
+const SLOT_STEP = 8
+const MESSAGE_Y = -14
+const STRIP_Y = -24
 const MAX_SLOTS = 5
-const VIEW_DISTANCE = 140
+const STAR_COUNT = 14
+const TEXT_DISTANCE = 125
+
+// Stays where it is while you can see it, and eases into view when you can't.
+const IN_VIEW_DEGREES = 7
+const IN_VIEW_DISTANCE = 110
+const CONTENT_DROP = 10
 
 // Seconds from the start of a normal reward.
 const POP_END = 1.0
 const MESSAGE_IN = 0.4
-const READ_END = 3.6
-const SHRINK_END = 4.2
+const READ_END = 6.0
+const SHRINK_END = READ_END + 0.6
 const HOLD_END = SHRINK_END + 2.0
 const FADE_END = HOLD_END + 0.5
 
@@ -71,26 +82,26 @@ export class SmallWinsRewardUI extends BaseScriptComponent {
 
   private buildVisuals(): void {
     this.stripRoot = child(this.sceneObject, "RewardStrip", new vec3(0, STRIP_Y, 0))
-    addPanel(this, this.stripRoot, SLOT_STEP * 2 + 1, 6.5)
+    addPanel(this, this.stripRoot, SLOT_STEP * 2 + 1, 8.5)
     for (let i = 0; i < MAX_SLOTS; i++) {
       this.slots.push(addImage(this.stripRoot, "StripSlot" + i, TEX.outline, SLOT_CM))
       this.slots[i].getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.7))
     }
 
     this.messageRoot = child(this.sceneObject, "RewardMessageRoot", new vec3(0, MESSAGE_Y, 0.2))
-    addPanel(this, this.messageRoot, 32, 4.4)
+    addPanel(this, this.messageRoot, 46, 7.5)
     this.messageText = addText(this.messageRoot, "RewardMessage", "", {
-      role: "Headline",
-      distance: VIEW_DISTANCE,
-      width: 32,
-      height: 4.4,
+      role: "Title",
+      distance: TEXT_DISTANCE,
+      width: 46,
+      height: 7.5,
     })
     this.messageText.getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.7))
 
     this.ring = addImage(this.sceneObject, "RewardRing", TEX.ring, PLATE_CM)
     this.ring.getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.8))
-    for (let i = 0; i < 6; i++) {
-      const star = addImage(this.sceneObject, "RewardStar" + i, TEX.star, 2.6)
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const star = addImage(this.sceneObject, "RewardStar" + i, TEX.star, starSize(i))
       star.getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.9))
       this.stars.push(star)
     }
@@ -108,6 +119,7 @@ export class SmallWinsRewardUI extends BaseScriptComponent {
     this.calm = SmallWinsState.instance.reducedMotion
     this.getTransform().setWorldPosition(this.active.anchor.getTransform().getWorldPosition())
     this.getTransform().setWorldRotation(this.active.anchor.getTransform().getWorldRotation())
+    this.followView(true)
     this.setVisible(true)
     setImageTexture(this.plate, stickerTexture(this.active.art))
     this.messageText.text = this.active.message
@@ -135,7 +147,11 @@ export class SmallWinsRewardUI extends BaseScriptComponent {
       setImageTexture(this.slots[i], i === this.landingSlot || !stickers[i] ? TEX.outline : stickerTexture(stickers[i].art))
     }
     const plate = this.stripRoot.getComponent("ScriptComponent") as unknown as {size: vec2}
-    plate.size = new vec2(this.slotCount * SLOT_STEP + 1, 6.5)
+    plate.size = new vec2(this.slotCount * SLOT_STEP + 1, 8.5)
+  }
+
+  private followView(snap: boolean): void {
+    keepInView(this.getTransform(), {maxDegrees: IN_VIEW_DEGREES, maxDistance: IN_VIEW_DISTANCE, drop: CONTENT_DROP, snap})
   }
 
   private slotPosition(): vec3 {
@@ -158,6 +174,7 @@ export class SmallWinsRewardUI extends BaseScriptComponent {
   private onUpdate(): void {
     if (!this.active) return
     this.elapsed += getDeltaTime()
+    this.followView(false)
     const finished = this.calm ? this.updateCalm(this.elapsed) : this.updateFull(this.elapsed)
     if (finished) {
       const anchor = this.active.anchor
@@ -173,6 +190,8 @@ export class SmallWinsRewardUI extends BaseScriptComponent {
       this.updateSparkle(t)
     } else if (t < READ_END) {
       this.applyPlate(0, 0, PLATE_CM)
+      this.updateSparkle(t)
+    } else {
       setImageAlpha(this.ring, 0)
       this.stars.forEach((s) => setImageAlpha(s, 0))
     }
@@ -219,22 +238,31 @@ export class SmallWinsRewardUI extends BaseScriptComponent {
     return t >= CALM_FADE_END
   }
 
-  /** Gold ring and six small stars, all staying within a handspan (20 cm) of the sticker. */
+  /** A gold ring and a burst of stars, which keep twinkling above the sticker while you read. */
   private updateSparkle(t: number): void {
-    const k = t / POP_END
-    sizeImage(this.ring, PLATE_CM * (0.7 + k * 0.9), PLATE_CM * (0.7 + k * 0.9))
-    setImageAlpha(this.ring, Math.sin(k * Math.PI))
+    const k = Math.min(1, t / POP_END)
+    const ringSize = PLATE_CM * (0.7 + k * 0.6)
+    sizeImage(this.ring, ringSize, ringSize)
+    setImageAlpha(this.ring, t < POP_END ? Math.sin(k * Math.PI * 0.5) : 0.55 + 0.35 * Math.sin(t * 3))
     this.stars.forEach((star, i) => {
-      const angle = (i / this.stars.length) * Math.PI * 2 + 0.4
-      const radius = 6 + k * (8 + (i % 2) * 3)
+      const angle = STAR_ARC_START + (i / (this.stars.length - 1)) * STAR_ARC + (t - POP_END) * 0.06
+      const radius = 9 + k * (7 + (i % 3) * 5)
       star.getSceneObject().getTransform().setLocalPosition(new vec3(Math.cos(angle) * radius, Math.sin(angle) * radius, 0.9))
-      setImageAlpha(star, Math.sin(k * Math.PI))
+      const twinkle = 0.5 + 0.5 * Math.sin(t * 4 + i * 1.7)
+      const size = starSize(i) * (0.75 + 0.45 * twinkle)
+      sizeImage(star, size, size)
+      setImageAlpha(star, 0.45 + 0.55 * twinkle)
     })
   }
 
   private setVisible(visible: boolean): void {
     for (let i = 0; i < this.sceneObject.getChildrenCount(); i++) this.sceneObject.getChild(i).enabled = visible
   }
+}
+
+/** Stars of three sizes, so the burst doesn't look stamped out. */
+function starSize(i: number): number {
+  return [3, 5.5, 4][i % 3]
 }
 
 /** One soft bounce: up past full size, a small dip, then settle. */

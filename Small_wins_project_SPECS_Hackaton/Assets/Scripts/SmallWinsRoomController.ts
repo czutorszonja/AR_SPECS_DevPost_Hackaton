@@ -1,4 +1,4 @@
-import {addImage, smooth, TEX, tween} from "./SmallWinsUIKit"
+import {smooth, tween} from "./SmallWinsUIKit"
 import {QuestChoice, SmallWinsQuestUI} from "./SmallWinsQuestUI"
 import {viewerPose} from "./SmallWinsViewer"
 
@@ -12,9 +12,6 @@ export class SmallWinsRoomController extends BaseScriptComponent {
   @input dishwasherHinge: SceneObject
   @input washerHinge: SceneObject
   @input entryDoorHinge: SceneObject
-  @input
-  @hint("The simple backdrop seen through the door")
-  doorView: SceneObject
   @input questUI: SmallWinsQuestUI
 
   @input
@@ -41,7 +38,6 @@ export class SmallWinsRoomController extends BaseScriptComponent {
   private cancelDoorTween: (() => void) | null = null
 
   onAwake() {
-    addImage(this.doorView, "OutsideView", TEX.outside, 420, 490)
     this.doorCentre = this.entryDoorHinge.getTransform().getWorldPosition().add(new vec3(0, 0, 44))
     this.createEvent("OnStartEvent").bind(() => {
       this.questUI.onChoice.add((choice) => this.onQuestChoice(choice))

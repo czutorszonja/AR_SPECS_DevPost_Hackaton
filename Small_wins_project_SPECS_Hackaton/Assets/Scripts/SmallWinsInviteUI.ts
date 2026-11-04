@@ -1,8 +1,10 @@
 import {FlexDirection} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexTypes"
 import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
 import {addPanel, child, fadeTree, flexButton, flexContainer, flexPlace, flexText, smooth, tween} from "./SmallWinsUIKit"
-import {faceViewer, pointInFront} from "./SmallWinsViewer"
+import {faceViewer, keepInView, pointInFront} from "./SmallWinsViewer"
 
+const IN_VIEW_DEGREES = 7
+const IN_VIEW_DISTANCE = 110
 const INVITE_DISTANCE = 140
 const PROMPT_DISTANCE = 85
 const PROMPT_DROP = 15
@@ -54,6 +56,7 @@ export class SmallWinsInviteUI extends BaseScriptComponent {
     const t = this.inviteRoot.getTransform()
     t.setWorldPosition(anchor.getTransform().getWorldPosition().add(new vec3(0, 6, 0.5)))
     t.setWorldRotation(anchor.getTransform().getWorldRotation())
+    keepInView(t, {maxDegrees: IN_VIEW_DEGREES, maxDistance: IN_VIEW_DISTANCE, snap: true})
     this.inviteRoot.enabled = true
     tween(this, 0.4, (k) => fadeTree(this.inviteRoot, smooth(k)))
   }
@@ -113,6 +116,7 @@ export class SmallWinsInviteUI extends BaseScriptComponent {
 
   /** Stays low in view and eases after you, never stuck to your face. */
   private followViewer(): void {
+    if (this.inviteRoot.enabled) keepInView(this.inviteRoot.getTransform(), {maxDegrees: IN_VIEW_DEGREES, maxDistance: IN_VIEW_DISTANCE})
     if (!this.following) return
     const t = this.promptRoot.getTransform()
     const k = Math.min(1, getDeltaTime() * FOLLOW_RATE)

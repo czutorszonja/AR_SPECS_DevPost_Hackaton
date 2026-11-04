@@ -49,6 +49,6 @@ export class SmallWinsRoomScenario extends Scenario {
     expect(shown("HintDishes")).toBe(true)
     expect(shown("HintLaundry")).toBe(true)
     expect(worldPos("HintDishes").distance(sink)).toBeLessThan(75)
-    expect(worldPos("HintLaundry").distance(basket)).toBeLessThan(75)
+    expect(worldPos("HintLaundry").distance(worldPos("ClothesPile"))).toBeLessThan(75)
   }
 }

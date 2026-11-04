@@ -1,8 +1,15 @@
 import {FlexDirection} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexTypes"
 import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
 import {addImage, addPanel, addText, child, flexButton, flexContainer, flexPlace, flexText, TEX, TEXT_SOFT} from "./SmallWinsUIKit"
+import {keepInView} from "./SmallWinsViewer"
 
 const VIEW_DISTANCE = 130
+const HINT_TEXT_DISTANCE = 130
+
+// The card rides low in view, leaving the top of the doorway clear to look through.
+const CARD_IN_VIEW_DEGREES = 6
+const CARD_IN_VIEW_DISTANCE = 115
+const CARD_BELOW_GAZE = -14
 
 export type QuestChoice = "start" | "ignoreToday" | "ignoreUntil5" | "cancel"
 
@@ -27,6 +34,10 @@ export class SmallWinsQuestUI extends BaseScriptComponent {
   @hint("Another example of a quest")
   questExample: string = "or 3 unique leaves"
 
+  @input
+  @hint("The sign you see from across the room")
+  hintLine: string = "A little quest is waiting outside"
+
   private hintRoot: SceneObject
   private offerRoot: SceneObject
   private startedRoot: SceneObject
@@ -34,8 +45,12 @@ export class SmallWinsQuestUI extends BaseScriptComponent {
 
   onAwake() {
     this.hintRoot = child(this.hintAnchor, "QuestHint")
-    addImage(this.hintRoot, "QuestHintOutline", TEX.outline, 16)
-    addImage(this.hintRoot, "QuestHintStar", TEX.star, 8).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
+    const sign = child(this.hintRoot, "QuestHintSign", new vec3(0, 12, 1))
+    addImage(sign, "QuestHintOutline", TEX.outline, 26)
+    addImage(sign, "QuestHintStar", TEX.star, 15).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
+    const label = child(this.hintRoot, "QuestHintLabel", new vec3(0, -9, 1))
+    addPanel(this, label, 46, 8)
+    addText(label, "QuestHintText", this.hintLine, {role: "Title", distance: HINT_TEXT_DISTANCE, width: 44, height: 8}).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.6))
     this.buildCard()
     const hide = this.createEvent("DelayedCallbackEvent")
     hide.bind(() => {
@@ -52,6 +67,7 @@ export class SmallWinsQuestUI extends BaseScriptComponent {
 
   setCardVisible(visible: boolean): void {
     this.cardRoot.enabled = visible
+    if (visible) keepInView(this.cardRoot.getTransform(), {maxDegrees: CARD_IN_VIEW_DEGREES, maxDistance: CARD_IN_VIEW_DISTANCE, drop: CARD_BELOW_GAZE})
   }
 
   showStarted(started: boolean): void {

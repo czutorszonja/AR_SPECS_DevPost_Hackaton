@@ -62,8 +62,8 @@ export class SmallWinsMain extends BaseScriptComponent {
   }
 
   private addHint(anchor: SceneObject): void {
-    addImage(anchor, "StickerHintOutline", TEX.outline, 10)
-    addImage(anchor, "StickerHintStar", TEX.star, 4).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
+    addImage(anchor, "StickerHintOutline", TEX.outline, 16)
+    addImage(anchor, "StickerHintStar", TEX.star, 7).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
   }
 
   private wireFlow(): void {
@@ -77,7 +77,10 @@ export class SmallWinsMain extends BaseScriptComponent {
         this.resolveChore(TASK_LAUNDRY, "clothes", this.laundryMessage, this.laundryRewardAnchor)
       })
     })
-    this.reward.onRewardFinished.add((anchor) => this.maybeInvite(anchor))
+    this.reward.onRewardFinished.add((anchor) => {
+      if (!this.reward.isPlaying) this.notebook.setHudHidden(false)
+      this.maybeInvite(anchor)
+    })
     this.invite.onDeclined.add(() => this.notebook.setHudHidden(false))
     this.invite.onReady.add(() => this.breathing.begin())
     this.breathing.onFinished.add(() => {
@@ -99,8 +102,13 @@ export class SmallWinsMain extends BaseScriptComponent {
 
   /** Only tasks you planned earn a sticker, so a task removed from the notebook passes quietly. */
   private resolveChore(taskId: string, art: StickerArt, message: string, anchor: SceneObject): void {
-    if (SmallWinsState.instance.completeTask(taskId)) this.reward.play(anchor, art, message)
-    else this.maybeInvite(anchor)
+    if (SmallWinsState.instance.completeTask(taskId)) {
+      // The demo button sits low in view, right where the reward lands, so it steps aside.
+      this.notebook.setHudHidden(true)
+      this.reward.play(anchor, art, message)
+    } else {
+      this.maybeInvite(anchor)
+    }
   }
 
   private maybeInvite(anchor: SceneObject): void {

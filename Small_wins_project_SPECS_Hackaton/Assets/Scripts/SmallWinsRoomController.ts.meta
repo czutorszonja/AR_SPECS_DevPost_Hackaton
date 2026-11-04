@@ -30,7 +30,6 @@
   ScriptInputsHidden:
     cardGazeDegrees: false
     dishwasherHinge: false
-    doorView: false
     entryDoorHinge: false
     hintGazeDegrees: false
     openAngle: false
@@ -49,7 +48,6 @@
     - dishwasherHinge: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       washerHinge: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       entryDoorHinge: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
-      doorView: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       questUI: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
       openDistance: !<float> 150.000000
       openAngle: !<float> 100.000000
@@ -62,7 +60,6 @@
     - // @input SceneObject dishwasherHinge
     - // @input SceneObject washerHinge
     - // @input SceneObject entryDoorHinge
-    - '// @input SceneObject doorView {"hint":"The simple backdrop seen through the door"}'
     - // @input AssignableType_1 questUI
     - '// @input float openDistance = 150 {"hint":"Walking closer than this opens the door, in cm"}'
     - '// @input float openAngle = 100 {"hint":"How far the door swings open, in degrees"}'

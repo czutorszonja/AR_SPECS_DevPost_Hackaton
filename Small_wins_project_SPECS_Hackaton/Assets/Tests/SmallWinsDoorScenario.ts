@@ -3,7 +3,7 @@ import {expect} from "Leaf.lspkg/Utils/common/Expect"
 import {sleep} from "Leaf.lspkg/Utils/common/Utils"
 import {SmallWinsRoomController} from "../Scripts/SmallWinsRoomController"
 import {setViewerOverride} from "../Scripts/SmallWinsViewer"
-import {shown, SmallWinsLeafInteractor, so, textOf, waitFor, worldPos} from "./SmallWinsLeafHelpers"
+import {shown, SmallWinsLeafInteractor, so, textOf, viewAngle, waitFor, worldPos} from "./SmallWinsLeafHelpers"
 
 export function room(): SmallWinsRoomController {
   return so("Room (virtual stand-in for a real home)").getComponent(SmallWinsRoomController.getTypeName()) as SmallWinsRoomController
@@ -63,15 +63,21 @@ export class SmallWinsDoorScenario extends Scenario {
     expect(doorAngle() * (180 / Math.PI)).toBeGreaterThan(80)
     expect(shown("OutsideView")).toBe(true)
 
-    // The card offers the quest and both ways of leaving it, beside the frame so the view stays clear.
+    // The sign reads as an invitation from across the room.
+    expect(textOf("QuestHintText").includes("quest")).toBe(true)
+
+    // The card offers the quest and both ways of leaving it, in view and low enough to see out over it.
     expect(shown("QuestCard")).toBe(true)
     expect(shown("QuestHint")).toBe(false)
     expect(textOf("QuestTitle")).toBe("Find 3 yellow things")
     expect(shown("QuestStartButton")).toBe(true)
     expect(shown("IgnoreTodayButton")).toBe(true)
     expect(shown("IgnoreUntil5Button")).toBe(true)
+    await waitFor("the card to come into view", () => viewAngle(worldPos("QuestCard")) < 15, 3000)
     const card = worldPos("QuestCard")
-    expect(Math.abs(card.z - doorCentre().z)).toBeGreaterThan(44)
+    const eye = closeToDoor()
+    const gazeAtCard = eye.add(doorCentre().sub(eye).normalize().uniformScale(card.distance(eye)))
+    expect(card.y).toBeLessThan(gazeAtCard.y)
 
     // It stays whenever you look at the door.
     standAt(closeToDoor(), closeToDoor().add(new vec3(100, 0, 0)))

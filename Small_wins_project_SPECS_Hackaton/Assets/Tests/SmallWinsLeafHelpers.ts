@@ -1,6 +1,7 @@
 import {DefaultLeafInteractor} from "Leaf.lspkg/Interactors/interactor/DefaultLeafInteractor"
 import {findInteractablesByName} from "Leaf.lspkg/Interactors/InteractableUtils"
 import {findSceneObjectByName, nextFrame, sleep} from "Leaf.lspkg/Utils/common/Utils"
+import {setViewerOverride, viewerPose} from "../Scripts/SmallWinsViewer"
 
 const STEER_GAIN = 0.15
 const CARRY_MS = 1500
@@ -30,6 +31,18 @@ export function imageTexture(name: string): Texture {
 
 export function imageAlpha(name: string): number {
   return (so(name).getComponent("Component.Image") as Image).mainPass.baseColor.a
+}
+
+/** Stands about a metre back from an anchor on the wall, looking straight at it. */
+export function faceAnchor(name: string): void {
+  setViewerOverride({position: worldPos(name).add(new vec3(0, 0, 100)), forward: new vec3(0, 0, -1)})
+}
+
+/** Degrees between where the viewer looks and a point. The display is only about 36 degrees across. */
+export function viewAngle(point: vec3): number {
+  const pose = viewerPose()
+  const direction = point.sub(pose.position).normalize()
+  return Math.acos(Math.max(-1, Math.min(1, direction.dot(pose.forward)))) * (180 / Math.PI)
 }
 
 /** Polls instead of sleeping for a fixed time, so a slow frame doesn't fail a test. */
@@ -91,10 +104,12 @@ export class SmallWinsLeafInteractor extends DefaultLeafInteractor {
   /** Both chores, then waits for the me-time invitation they lead to. */
   async doBothChores(): Promise<void> {
     await sleep(1200)
+    faceAnchor("DishRewardAnchor")
     await this.loadDishes()
-    await waitFor("the dishes reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 12000)
+    await waitFor("the dishes reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 14000)
+    faceAnchor("LaundryRewardAnchor")
     await this.loadLaundry()
-    await waitFor("the me-time invitation", () => shown("MeTimeInvitation"), 15000)
+    await waitFor("the me-time invitation", () => shown("MeTimeInvitation"), 18000)
     await sleep(500)
   }
 }

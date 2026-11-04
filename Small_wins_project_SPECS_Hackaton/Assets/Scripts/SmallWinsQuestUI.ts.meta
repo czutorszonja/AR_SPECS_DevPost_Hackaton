@@ -30,6 +30,7 @@
   ScriptInputsHidden:
     cardAnchor: false
     hintAnchor: false
+    hintLine: false
     questExample: false
     questTitle: false
   ScriptTypesHidden:
@@ -45,6 +46,7 @@
       cardAnchor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       questTitle: Find 3 yellow things
       questExample: or 3 unique leaves
+      hintLine: A little quest is waiting outside
   ScriptTypes:
     -
       {}
@@ -53,3 +55,4 @@
     - '// @input SceneObject cardAnchor {"hint":"Where the card floats, beside the door frame"}'
     - '// @input string questTitle = "Find 3 yellow things" {"hint":"The quest on offer"}'
     - '// @input string questExample = "or 3 unique leaves" {"hint":"Another example of a quest"}'
+    - '// @input string hintLine = "A little quest is waiting outside" {"hint":"The sign you see from across the room"}'

@@ -1,3 +1,5 @@
+import {setViewLimits} from "./SmallWinsViewer"
+
 const DEG = Math.PI / 180
 const EASE_RATE = 10
 
@@ -31,6 +33,22 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
   @hint("Highest corner the viewer can reach, in world cm")
   boundsMax: vec3 = new vec3(227, 70, 360)
 
+  @input
+  @hint("Inside corner of the room's walls, in world cm")
+  wallMin: vec3 = new vec3(-420, -160, -170)
+
+  @input
+  @hint("Opposite inside corner of the room's walls, in world cm")
+  wallMax: vec3 = new vec3(250, 100, 380)
+
+  @input
+  @hint("Lowest corner of the kitchen run, in world cm")
+  worktopMin: vec3 = new vec3(-172, -160, -170)
+
+  @input
+  @hint("Highest corner of the kitchen run, in world cm")
+  worktopMax: vec3 = new vec3(172, -68, -108)
+
   private targetYaw = 0
   private targetTilt = 0
   private yaw = 0
@@ -40,6 +58,7 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
 
   onAwake() {
     if (!global.deviceInfoSystem.isEditor()) return
+    setViewLimits(this.wallMin, this.wallMax, this.worktopMin, this.worktopMax)
     this.createEvent("KeyPressEvent").bind((e) => this.onKey(e.key))
     this.createEvent("LateUpdateEvent").bind(() => this.updateRig())
   }

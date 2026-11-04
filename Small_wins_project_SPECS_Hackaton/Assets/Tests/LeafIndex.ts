@@ -6,6 +6,7 @@ import {SmallWinsChoresScenario} from "./SmallWinsChoresScenario"
 import {SmallWinsDoorScenario} from "./SmallWinsDoorScenario"
 import {SmallWinsIgnoreTodayScenario} from "./SmallWinsIgnoreTodayScenario"
 import {SmallWinsIgnoreUntil5Scenario} from "./SmallWinsIgnoreUntil5Scenario"
+import {SmallWinsInViewScenario} from "./SmallWinsInViewScenario"
 import {SmallWinsNoThanksScenario} from "./SmallWinsNoThanksScenario"
 import {SmallWinsNotebookScenario} from "./SmallWinsNotebookScenario"
 import {SmallWinsReachScenario} from "./SmallWinsReachScenario"
@@ -19,6 +20,7 @@ export class LeafIndex extends BaseScriptComponent {
   static scenariosIndex: ScenarioMetadata[] = [
     {id: "c1-room", typename: SmallWinsRoomScenario.getTypeName()},
     {id: "c2-chores-rewards", typename: SmallWinsChoresScenario.getTypeName()},
+    {id: "c2-messages-in-view", typename: SmallWinsInViewScenario.getTypeName()},
     {id: "c2-reduced-motion", typename: SmallWinsReducedMotionScenario.getTypeName()},
     {id: "c2-unplanned-task", typename: SmallWinsUnplannedScenario.getTypeName()},
     {id: "c3-breathing", typename: SmallWinsBreathingScenario.getTypeName()},
