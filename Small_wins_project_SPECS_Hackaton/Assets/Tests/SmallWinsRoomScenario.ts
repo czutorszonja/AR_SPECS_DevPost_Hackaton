@@ -13,9 +13,9 @@ export class SmallWinsRoomScenario extends Scenario {
       expect(shown(part), `${part} should be visible`).toBe(true)
     }
 
-    // About 5 m x 4 m, open plan: walls measured from each other.
-    expect(worldPos("WallRight").x - worldPos("WallDoorSideA").x).toBeCloseTo(504, 0)
-    expect(worldPos("WallBehindSofa").z - worldPos("WallKitchen").z).toBeCloseTo(404, 0)
+    // About 6.7 m x 5.5 m, open plan: walls measured from each other.
+    expect(worldPos("WallRight").x - worldPos("WallDoorSideA").x).toBeCloseTo(674, 0)
+    expect(worldPos("WallBehindSofa").z - worldPos("WallKitchen").z).toBeCloseTo(554, 0)
 
     // The kitchen and the sofa are both in the one room, with the door on another wall.
     const door = worldPos("EntryDoorHinge")

@@ -41,7 +41,7 @@ export class SmallWinsRoomController extends BaseScriptComponent {
   private cancelDoorTween: (() => void) | null = null
 
   onAwake() {
-    addImage(this.doorView, "OutsideView", TEX.outside, 200, 233)
+    addImage(this.doorView, "OutsideView", TEX.outside, 420, 490)
     this.doorCentre = this.entryDoorHinge.getTransform().getWorldPosition().add(new vec3(0, 0, 44))
     this.createEvent("OnStartEvent").bind(() => {
       this.questUI.onChoice.add((choice) => this.onQuestChoice(choice))

@@ -1,13 +1,13 @@
 - !<Scene/0a1ccb1a-fe88-4fbb-9883-e3af3c75fd99>
   PackagePath: ""
   objects:
-    - !<own> 00000000-0000-0065-0000-000000000064
     - !<own> 0005641c-028d-459a-0000-000000014b4d
     - !<own> f5d74682-203a-4970-81ea-9fa7b88c96bb
     - !<own> 03293a0c-c390-4252-8d02-da7f15ef8a6d
     - !<own> 8bd1737b-ba62-4a34-9a33-cb3f38f6e218
     - !<own> 5c91af05-6b78-47e2-b201-c4e0bf29e743
     - !<own> cba33861-ff85-48f4-8e82-3e6b06a87516
+    - !<own> 4111a729-65a1-4cf6-995e-e61cf8d491db
   layers: !<Layers/267ee9a7-aff2-4f9d-9a49-f71214747d03>
     userLayers:
       - id: 1
@@ -75,7 +75,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -300.000000, y: -44.000000, z: 105.000000}
+    Position: {x: -560.000000, y: -60.000000, z: 105.000000}
     Rotation: {x: 0.000000, y: 90.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -249,7 +249,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -250.000000, y: -55.000000, z: 61.000000}
+    Position: {x: -420.000000, y: -55.000000, z: 61.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -375,6 +375,26 @@
     []
   Components:
     []
+- !<RenderMeshVisual/05304200-da94-4748-a0aa-0c20a85e99da>
+  PrefabRemaps:
+    []
+  Name: Render Mesh Visual
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Materials:
+    - !<reference> f4613101-2745-4d04-ae53-9586fee0d724
+  Mesh: !<reference> 208e1f66-f908-4474-bf4f-3b4b9f6e24f0
+  Skin: !<reference> 00000000-0000-0000-0000-000000000000
+  BlendShapesEnabled: true
+  BlendNormals: false
+  BlendShapes:
+    {}
 - !<ScriptComponent/060a3b6d-7ce5-42e3-a24c-33b63c640699>
   PrefabRemaps:
     []
@@ -735,6 +755,9 @@
     - !<own> e4d1dfbf-abfb-4a7f-8cf0-28c193a82be4
     - !<own> 5d2f2476-11a4-4fc0-9222-8f692651c3f6
     - !<own> dde4dd93-b53a-49df-9c16-74653af1da0f
+    - !<own> 9188185a-e8ae-4ff6-aee5-890fd7029efe
+    - !<own> 7d552b40-e995-4d80-a2e4-f2b039587ad9
+    - !<own> 5f7ac274-85dc-4db9-8435-4a9c7f0fb39e
   Components:
     []
 - !<SceneObject/0e778a10-bd57-4a2a-b20a-b6f4326e8058>
@@ -824,9 +847,9 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: -30.000000, z: 272.000000}
+    Position: {x: -85.000000, y: -30.000000, z: 422.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 500.000000, y: 260.000000, z: 4.000000}
+    Scale: {x: 670.000000, y: 260.000000, z: 4.000000}
     HasSegmentScaleCompensation: false
   Children:
     []
@@ -839,7 +862,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -244.000000, y: 72.000000, z: 105.000000}
+    Position: {x: -414.000000, y: 72.000000, z: 105.000000}
     Rotation: {x: 0.000000, y: 90.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -911,9 +934,9 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -252.000000, y: -30.000000, z: 210.000000}
+    Position: {x: -422.000000, y: -30.000000, z: 285.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 4.000000, y: 260.000000, z: 120.000000}
+    Scale: {x: 4.000000, y: 260.000000, z: 270.000000}
     HasSegmentScaleCompensation: false
   Children:
     []
@@ -1066,7 +1089,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -252.000000, y: 75.000000, z: 105.000000}
+    Position: {x: -422.000000, y: 75.000000, z: 105.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 4.000000, y: 50.000000, z: 90.000000}
     HasSegmentScaleCompensation: false
@@ -1228,9 +1251,9 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: -161.000000, z: 70.000000}
+    Position: {x: -85.000000, y: -161.000000, z: 145.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 500.000000, y: 2.000000, z: 400.000000}
+    Scale: {x: 670.000000, y: 2.000000, z: 550.000000}
     HasSegmentScaleCompensation: false
   Children:
     []
@@ -1519,7 +1542,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -232.000000, y: -15.000000, z: 172.000000}
+    Position: {x: -402.000000, y: -15.000000, z: 172.000000}
     Rotation: {x: 0.000000, y: 115.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -1798,7 +1821,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 120.000000, y: -159.600006, z: 150.000000}
+    Position: {x: 120.000000, y: -159.600006, z: 300.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 220.000000, y: 1.000000, z: 130.000000}
     HasSegmentScaleCompensation: false
@@ -1841,6 +1864,21 @@
     - !<own> 7aa85bd8-d423-42cd-b190-473711e94929
   Components:
     []
+- !<SceneObject/4111a729-65a1-4cf6-995e-e61cf8d491db>
+  PrefabRemaps:
+    []
+  Name: ViewerRig (preview navigation)
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    - !<own> 00000000-0000-0065-0000-000000000064
+  Components:
+    - !<own> 4cc64ae2-65a3-4a3d-b294-4ca9548c74ea
 - !<SceneObject/421c3378-3246-429d-bd2f-4ee81f6751a7>
   PrefabRemaps:
     []
@@ -1906,6 +1944,26 @@
     - !<own> 9eeb9f24-5cbc-47c2-83e9-12feb9eb69a6
   Components:
     []
+- !<RenderMeshVisual/46bd42fd-3303-45e0-b2f5-fbf7823f6957>
+  PrefabRemaps:
+    []
+  Name: Render Mesh Visual
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Materials:
+    - !<reference> 5e48dec7-d2c2-43b7-9605-2659404e49c3
+  Mesh: !<reference> 208e1f66-f908-4474-bf4f-3b4b9f6e24f0
+  Skin: !<reference> 00000000-0000-0000-0000-000000000000
+  BlendShapesEnabled: true
+  BlendNormals: false
+  BlendShapes:
+    {}
 - !<SceneObject/46ea93d6-d161-4453-9064-6ac11e1d6523>
   PrefabRemaps:
     []
@@ -2018,6 +2076,30 @@
     []
   Components:
     - !<own> 5f153ad7-2baa-4fd9-a298-0dcfad86da3b
+- !<ScriptComponent/4cc64ae2-65a3-4a3d-b294-4ca9548c74ea>
+  PrefabRemaps:
+    []
+  Name: SmallWinsDemoNavigation
+  Enabled: true
+  ScriptAsset: !<reference> 527b5164-a659-4e16-aab1-d9dc393b6128
+  ScriptInputsDefault:
+    turnStep: true
+    tiltStep: true
+    maxTilt: true
+    boundsMax: true
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      viewerCamera: !<reference.SceneObject> 00000000-0000-0065-0000-000000000064
+      turnStep: !<float> 30.000000
+      tiltStep: !<float> 15.000000
+      maxTilt: !<float> 70.000000
+      boundsMin: !<Vec3> {x: -372.000000, y: -140.000000, z: -100.000000}
+      boundsMax: !<Vec3> {x: 227.000000, y: 70.000000, z: 360.000000}
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/4d0edda7-5408-449c-8c4e-0288e9bfbb0d>
   PrefabRemaps:
     []
@@ -2174,7 +2256,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -247.000000, y: -55.000000, z: 153.000000}
+    Position: {x: -417.000000, y: -55.000000, z: 153.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 8.000000, y: 214.000000, z: 6.000000}
     HasSegmentScaleCompensation: false
@@ -2367,7 +2449,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 120.000000, y: -160.000000, z: 135.000000}
+    Position: {x: 120.000000, y: -160.000000, z: 285.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -2434,6 +2516,21 @@
   ScriptTypes:
     "":
       {}
+- !<SceneObject/5f7ac274-85dc-4db9-8435-4a9c7f0fb39e>
+  PrefabRemaps:
+    []
+  Name: LivingPicture
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: -419.399994, y: 15.000000, z: 285.000000}
+    Rotation: {x: 0.000000, y: 90.000000, z: 0.000000}
+    Scale: {x: 70.000000, y: 55.000000, z: 2.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> a9402ba6-6f1a-421e-87c7-d578b08f0ac2
 - !<SceneObject/5fe52ee3-dbff-476a-a465-8c8c56735391>
   PrefabRemaps:
     []
@@ -2452,6 +2549,7 @@
     - !<own> e28bb2bc-07d9-4126-aabc-4752cb28bb18
     - !<own> a29d913b-c736-4270-9fe1-8694f96d98c3
     - !<own> 0389b1d6-b25e-4aab-bfef-3c1e4d2dbea8
+    - !<own> d15a4e41-63dd-44ab-a277-38d714574117
   Components:
     []
 - !<RenderMeshVisual/6089ff97-9a99-4a8e-92f6-0a26ed145479>
@@ -3067,6 +3165,21 @@
     - !<own> 3b4f5057-b516-4d3b-9c8d-14c81af2f505
   Components:
     []
+- !<SceneObject/7d552b40-e995-4d80-a2e4-f2b039587ad9>
+  PrefabRemaps:
+    []
+  Name: RightWindow
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 249.399994, y: 25.000000, z: 215.000000}
+    Rotation: {x: 0.000000, y: -90.000000, z: 0.000000}
+    Scale: {x: 96.000000, y: 96.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 8287e8ff-396c-4b17-a8b9-7f2d547cc001
 - !<SceneObject/7d5b7b1b-54b7-4b22-b3a9-5acba0589d63>
   PrefabRemaps:
     []
@@ -3172,6 +3285,26 @@
     []
   Components:
     - !<own> 4ff477c7-3531-4384-8747-5e6cfca70383
+- !<RenderMeshVisual/8287e8ff-396c-4b17-a8b9-7f2d547cc001>
+  PrefabRemaps:
+    []
+  Name: Render Mesh Visual
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Materials:
+    - !<reference> f4613101-2745-4d04-ae53-9586fee0d724
+  Mesh: !<reference> 208e1f66-f908-4474-bf4f-3b4b9f6e24f0
+  Skin: !<reference> 00000000-0000-0000-0000-000000000000
+  BlendShapesEnabled: true
+  BlendNormals: false
+  BlendShapes:
+    {}
 - !<SceneObject/82a4b4e8-283b-441c-8b94-9fdc50c958f2>
   PrefabRemaps:
     []
@@ -3628,6 +3761,21 @@
     - !<own> 8cb3dd13-6ebf-41e6-9a23-94a69dd96f87
   Components:
     []
+- !<SceneObject/9188185a-e8ae-4ff6-aee5-890fd7029efe>
+  PrefabRemaps:
+    []
+  Name: BackWindow
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: -200.000000, y: 25.000000, z: 419.399994}
+    Rotation: {x: 0.000000, y: 180.000000, z: 0.000000}
+    Scale: {x: 120.000000, y: 120.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 05304200-da94-4748-a0aa-0c20a85e99da
 - !<RenderMeshVisual/92da7e13-084e-4b97-9bbf-6be96096d791>
   PrefabRemaps:
     []
@@ -3671,9 +3819,9 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 101.000000, z: 70.000000}
+    Position: {x: -85.000000, y: 101.000000, z: 145.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 500.000000, y: 2.000000, z: 400.000000}
+    Scale: {x: 670.000000, y: 2.000000, z: 550.000000}
     HasSegmentScaleCompensation: false
   Children:
     []
@@ -3776,9 +3924,9 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 252.000000, y: -30.000000, z: 70.000000}
+    Position: {x: 252.000000, y: -30.000000, z: 145.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 4.000000, y: 260.000000, z: 400.000000}
+    Scale: {x: 4.000000, y: 260.000000, z: 550.000000}
     HasSegmentScaleCompensation: false
   Children:
     []
@@ -3928,7 +4076,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -215.000000, y: -159.600006, z: 105.000000}
+    Position: {x: -385.000000, y: -159.600006, z: 105.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 60.000000, y: 1.000000, z: 90.000000}
     HasSegmentScaleCompensation: false
@@ -4163,6 +4311,26 @@
     - !<own> b6bb9da0-5412-4da9-ab19-44e7b5b8b373
   Components:
     []
+- !<RenderMeshVisual/a9402ba6-6f1a-421e-87c7-d578b08f0ac2>
+  PrefabRemaps:
+    []
+  Name: Render Mesh Visual
+  Enabled: true
+  RenderOrder: 0
+  StretchMode: Stretch
+  VerticalAlignment: Center
+  HorizontalAlignment: Center
+  MeshShadowMode: None
+  ShadowColor: {x: 1.000000, y: 1.000000, z: 1.000000, w: 1.000000}
+  ShadowDensity: 1.000000
+  Materials:
+    - !<reference> b217b05c-cda3-49be-a4df-7018560e1525
+  Mesh: !<reference> 208e1f66-f908-4474-bf4f-3b4b9f6e24f0
+  Skin: !<reference> 00000000-0000-0000-0000-000000000000
+  BlendShapesEnabled: true
+  BlendNormals: false
+  BlendShapes:
+    {}
 - !<SceneObject/a98a7d22-28b9-4357-97cd-1486e721ac5d>
   PrefabRemaps:
     []
@@ -4185,9 +4353,9 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: -30.000000, z: -132.000000}
+    Position: {x: -85.000000, y: -30.000000, z: -132.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 500.000000, y: 260.000000, z: 4.000000}
+    Scale: {x: 670.000000, y: 260.000000, z: 4.000000}
     HasSegmentScaleCompensation: false
   Children:
     []
@@ -4768,7 +4936,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -252.000000, y: -30.000000, z: -35.000000}
+    Position: {x: -422.000000, y: -30.000000, z: -35.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 4.000000, y: 260.000000, z: 190.000000}
     HasSegmentScaleCompensation: false
@@ -4936,6 +5104,21 @@
     - !<own> 0801bb88-a0d7-4838-b920-407b36a2004d
   Components:
     []
+- !<SceneObject/d15a4e41-63dd-44ab-a277-38d714574117>
+  PrefabRemaps:
+    []
+  Name: OutsideGrass
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: -580.000000, y: -161.000000, z: 105.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 316.000000, y: 2.000000, z: 560.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 46bd42fd-3303-45e0-b2f5-fbf7823f6957
 - !<SceneObject/d19ea734-6b98-4346-89be-75e26fefa3a6>
   PrefabRemaps:
     - 182f9adb-3233-4c79-9391-14b14a1fc482: aabd6ec7-b567-40f1-4059-8d542f01578e
@@ -5275,7 +5458,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 105.000000, y: -120.000000, z: 135.000000}
+    Position: {x: 105.000000, y: -120.000000, z: 285.000000}
     Rotation: {x: 0.000000, y: 30.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -5344,7 +5527,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -247.000000, y: 53.000000, z: 105.000000}
+    Position: {x: -417.000000, y: 53.000000, z: 105.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 8.000000, y: 6.000000, z: 102.000000}
     HasSegmentScaleCompensation: false
@@ -5469,7 +5652,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 120.000000, y: -160.000000, z: 225.000000}
+    Position: {x: 120.000000, y: -160.000000, z: 375.000000}
     Rotation: {x: 0.000000, y: 180.000000, z: 0.000000}
     Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
     HasSegmentScaleCompensation: false
@@ -5582,7 +5765,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: -247.000000, y: -55.000000, z: 57.000000}
+    Position: {x: -417.000000, y: -55.000000, z: 57.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 8.000000, y: 214.000000, z: 6.000000}
     HasSegmentScaleCompensation: false
@@ -6038,7 +6221,7 @@
   Enabled: true
   Layers: 1
   LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Position: {x: -170.000000, y: 0.000000, z: 0.000000}
     Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
     Scale: {x: 100.000000, y: 100.000000, z: 100.000000}
     HasSegmentScaleCompensation: false

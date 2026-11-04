@@ -1,0 +1,61 @@
+- !<AssetImportMetadata/2072e5e5-e455-4b84-9ef5-a77dc0be9407>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> 527b5164-a659-4e16-aab1-d9dc393b6128
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> 527b5164-a659-4e16-aab1-d9dc393b6128
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 43709c2f-7517-460e-b783-b0e54a8e266f
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/43709c2f-7517-460e-b783-b0e54a8e266f>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: 5f6df9c0-3034-4440-8d15-c65ea17944f6
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    boundsMax: false
+    boundsMin: false
+    maxTilt: false
+    tiltStep: false
+    turnStep: false
+    viewerCamera: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - viewerCamera: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      turnStep: !<float> 30.000000
+      tiltStep: !<float> 15.000000
+      maxTilt: !<float> 70.000000
+      boundsMin: !<Vec3> {x: -395.000000, y: -140.000000, z: -100.000000}
+      boundsMax: !<Vec3> {x: 227.000000, y: 70.000000, z: 360.000000}
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @input SceneObject viewerCamera {"hint":"The camera, parented to this rig"}'
+    - '// @input float turnStep = 30 {"hint":"Degrees per press of J or L"}'
+    - '// @input float tiltStep = 15 {"hint":"Degrees per press of I or K"}'
+    - '// @input float maxTilt = 70 {"hint":"Furthest the view can tilt up or down, in degrees"}'
+    - '// @input vec3 boundsMin = {-395,-140,-100} {"hint":"Lowest corner the viewer can reach, in world cm"}'
+    - '// @input vec3 boundsMax = {227,70,360} {"hint":"Highest corner the viewer can reach, in world cm"}'
