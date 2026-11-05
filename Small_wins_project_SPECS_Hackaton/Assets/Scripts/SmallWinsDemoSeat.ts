@@ -50,11 +50,11 @@ export class SmallWinsDemoSeat extends BaseScriptComponent {
     this.sitRoot = child(this.sceneObject, "SitDownSign")
     this.sitRoot.createComponent("Component.Canvas")
     this.sitRoot.getTransform().setWorldPosition(this.signPosition)
-    addButton(this.sitRoot, "SitOnSofaButton", "Sit on the sofa (demo)", 56, 14, () => this.sit(), 400)
+    addButton(this.sitRoot, "SitOnSofaButton", "Sit on the sofa (demo)", 80, 24, () => this.sit(), 680)
 
     this.standRoot = child(this.sceneObject, "StandUpHud")
     this.standRoot.createComponent("Component.Canvas")
-    addButton(this.standRoot, "StandUpButton", "Stand up (demo)", 18, 4.4, () => this.stand(), STAND_TEXT_DISTANCE)
+    addButton(this.standRoot, "StandUpButton", "Stand up (demo)", 18, 5, () => this.stand(), STAND_TEXT_DISTANCE)
 
     this.createEvent("OnStartEvent").bind(() => this.sofaTap.onTriggerEnd.add(() => this.sit()))
     this.createEvent("UpdateEvent").bind(() => this.onUpdate())

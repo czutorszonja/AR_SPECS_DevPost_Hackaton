@@ -44,8 +44,12 @@ Look and feel (from the learner's reference photos): an artsy, lived-in flat in 
 - Quest sign: on the door at about eye height, big enough to read from across the room.
 - Quest card: rides low in view when the door is open, leaving the top of the doorway clear to look through.
 - Notebook: opens at a comfortable reading spot about 70 cm in front of you, a little below eye level (default), and stays where you opened it.
+- Me-time exercises (chosen from the notebook): each opens about where the breathing would, in front of where you're looking, and stays put once it starts.
+  - Eye movement calm: a thin track about 1 m in front of you at eye level, with one soft dot. The dot sweeps about 21 cm each way, so it stays well inside the narrow display and you follow it with your eyes, not your head.
+  - Guided drawing: a cream sheet about the size of an A4 page (34 x 24 cm), about 80 cm in front of you and just below eye level, like paper on a desk.
 - Text on cards: large enough to read comfortably at a glance on the narrow display, on every card and button. Panels are sized to fit it.
-- Raise hand button: small, in the bottom-left corner of your view wherever you look, clearly a demo control. It steps aside while a reward, the me-time invitation, the breathing or the quest card is showing.
+- Buttons: sized for a hand, not a mouse. Every button is at least about 3 degrees of your view (about 4 cm at notebook distance), the notebook's main tabs and the exercise choices about 4 degrees, with clear gaps between them, so it's obvious where to point and pinch.
+- Raise hand button: in the bottom-left corner of your view wherever you look, clearly a demo control. It steps aside while a reward, the me-time invitation, the breathing, an exercise or the quest card is showing.
 
 ## Hands and input
 - Laundry: pinch and drag the pile of clothes from the basket into the washing machine, then release.
@@ -54,7 +58,10 @@ Look and feel (from the learner's reference photos): an artsy, lived-in flat in 
 - Breathing: pinch Pause or Finish now, at any time.
 - Sofa (demo): pinch the sofa or "Sit on the sofa" to sit, and "Stand up" to walk again.
 - Door: pinch the door to open it, from anywhere in the room. Walking up to it doesn't open it. Pinch Start, Ignore for today, or Ignore until 5 pm on the quest card.
-- Notebook: pinch "Raise hand" (demo button). An animated hand raises with a page tab beside it, then pinch the tab to open. Inside: Today and Stickers tabs, tick off, add, edit or remove tasks, and a close button.
+- Notebook: pinch "Raise hand" (demo button). An animated hand raises with a page tab beside it, then pinch the tab to open. Inside: Today, Stickers and Me-time tabs, tick off, add, edit or remove tasks, and a close button.
+- Me-time tab: a short list of exercises to choose from, one big tile each: Box breathing, Eye movement calm (EMDR-inspired) and Guided drawing. Pinch one to start it. Nothing is recommended or pushed; the list is just there when you want it.
+- Eye movement calm: pinch Start or Not now. While it runs, Pause and Stop are always there. At the end, pinch how you feel: Calmer, About the same, or Not great.
+- Guided drawing: pinch Start or Not now, then "Next line" when you're ready for the next one, "I'm done" on the last, or Finish at any time.
 - Targets are big and highlight when aimed at.
 - Voice: none.
 
@@ -68,7 +75,9 @@ Look and feel (from the learner's reference photos): an artsy, lived-in flat in 
 - End of breathing, or Finish now: the dot comes home, the square fades, "Breathe normally. Take your time." appears with a sticker of three balanced pebbles and a couple of soft sparkles, saved to today's page. Finishing early earns the sticker too. Then it stays quiet.
 - Quest hint: when you look towards the door, a star and sign say "A little quest is waiting outside. Tap the door to see it." It hides while the door is open.
 - Door and quest card: when you tap the door, it animates open to a view of the outside, a front garden full of yellow flowers with a path to the gate and the quiet street beyond, and the card appears: "Find 3 yellow things," or "3 unique leaves" as another example. The card stays whenever you look at the door until the quest is finished or cancelled on purpose. Ignore for today hides it for the day. Ignore until 5 pm hides it until then, for someone working from home who doesn't need the invitation yet. In the demo it just hides, without waiting for a real clock. Either Ignore, or cancelling, closes the door. Tapping the door also closes it, and it can still be opened afterwards, without the card.
-- Notebook: shows only when you ask for it, hides when you close it. Today lists the tasks you planned: "Do the laundry," "Load the dishwasher," plus the mindfulness moment. Stickers shows the day's achievements.
+- Notebook: shows only when you ask for it, hides when you close it. Today lists the tasks you planned: "Do the laundry," "Load the dishwasher," plus the mindfulness moment. Stickers shows the day's achievements. Me-time lists the exercises, with a quiet line underneath: "Gentle self-help exercises, not a replacement for therapy." Choosing one closes the notebook and starts it. Any exercise ticks off the mindfulness moment and earns its own sticker.
+- Eye movement calm (inspired by the eye movements in EMDR, used here only as a calming exercise): an intro says what it is and isn't, "A calming exercise, not trauma therapy. Stop whenever you like." On Start, the first set asks you to think of a place where you feel calm and follow the dot. The dot glides smoothly left and right, about one pass a second, twelve passes a set, four sets. Between sets it hides for about 6 seconds with "Take a slow breath. Notice how you feel." "Set 1 of 4" shows under the track. Stopping early is always fine and still earns the sticker. At the end it asks how you feel. Calmer or About the same gets a kind line. Not great gets "That's okay. Be gentle with yourself. If hard feelings stay, a therapist can help." The reward is a calm-wave sticker.
+- Guided drawing (art therapy idea): the intro says "Grab a pen and some paper. Today: a leaf," because on real glasses you'd draw on real paper, following the guide. The sheet shows the whole leaf faintly, then a pen dot traces one line at a time and inks it as it goes (stem, left edge, right edge, then the veins), about 3 seconds a line, with "Line 1 of 4: ..." saying what to draw. Nothing is marked or judged. Finishing earns a pencil-and-leaf sticker with an encouraging line.
 - Reduced motion (default: one on/off setting): the message appears gently and the sticker fades into place, keeping the 2-second hold.
 - If something needs attention out of view: rewards and the me-time invitation ease into view, because the display is too narrow to count on you looking at the right patch of wall. The breathing comes to you, wherever you sit, and the door's quest waits until you look at it.
 
@@ -79,6 +88,7 @@ Each one can be checked in Lens Studio's preview.
 3. After both tasks I'm asked if I want some me-time. Saying yes asks me to find somewhere comfortable to sit, and I can sit on the sofa, facing the kitchen, and stand up again. Wherever I am, when I pinch "I'm ready" the box breathing appears in front of me, where the dot moves around the square with the changing words. I can end it whenever, and I earn the pebble sticker.
 4. When I look at the door I can see there's a quest or sticker to earn. When I tap the door, it animates open to the outside, with the option to start "Find 3 yellow things," ignore for today, or ignore until 5 pm.
 5. Pinching "Raise hand" shows an animated hand and the notebook tab. In the notebook I can see my to-do list, add, edit or remove a task, and see the stickers and achievements of the day.
+6. In the notebook's Me-time tab I can choose box breathing, eye movement calm or guided drawing. Eye movement shows what it is and isn't, the dot sweeps across in sets with rests, I can pause or stop at any time, and it asks how I feel. Guided drawing shows the leaf and draws it one line at a time. Each earns its own sticker, and every button is big enough to aim a hand at.
 
 ## Out of scope
 This version won't do the following. They're the bigger product, for later.
@@ -88,7 +98,9 @@ This version won't do the following. They're the bigger product, for later.
 - Skins and clothes other people can see through their glasses (needs two people and devices).
 - Levels, buying skins, and the 5-small-stickers-make-a-bigger-one progression.
 - Museum art styles that make the world look like a painting.
-- Drawing guides and step or distance tracking.
+- Seeing the real drawing on paper, and step or distance tracking.
+- Trauma processing with eye movements. Real EMDR is done with a trained therapist; this app only offers the calming eye movement exercise.
+- More exercises that suit glasses, for later: 5-4-3-2-1 grounding (name things you can see around you), muscle relaxation guided by your own hands, a mindful walk with gentle prompts, and a gratitude jar that fills with notes.
 - Setup questions and ability levels, 5-a-day suggestions, and morning, daytime and evening breathing routines.
 - Remembering stickers or tasks between sessions. Each preview run starts fresh with the same sample day.
 - Softening or blurring the real room. The display only adds light, so it can't blur what's really there.
@@ -103,6 +115,7 @@ This version won't do the following. They're the bigger product, for later.
 - Size against the spatial moment: from the middle of the large demo room, the reward appears in front of you rather than on the backsplash, because on the wall it would be tiny. To show the original moment in the video, walk up to the kitchen wall first.
 - Raise hand and the "I'm ready" signal: real hand gestures can't be shown in the preview. A "Raise hand" button and an "I'm ready" button stand in, and the video should explain that on real glasses you'd signal with your hand.
 - Demo video length: 64 seconds of breathing is too long for the 3-minute limit. The Lens keeps four rounds; show a quarter of a round at regular speed, then speed up or cut it.
+- Eye movement safety: self-guided eye movement work can stir up hard memories. Keep it short, slow and framed as calming only, with a calm-place prompt, rests, Stop always in reach, a check-in at the end and a pointer to a therapist. Never suggest it unprompted.
 - Wording: this is a supportive self-help idea, not medical treatment. Keep messages kind and never scolding, and describe it that way in the submission (default).
 
 ## Reference files

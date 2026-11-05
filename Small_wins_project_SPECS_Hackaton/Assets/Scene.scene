@@ -4,11 +4,11 @@
     - !<own> 0005641c-028d-459a-0000-000000014b4d
     - !<own> f5d74682-203a-4970-81ea-9fa7b88c96bb
     - !<own> 03293a0c-c390-4252-8d02-da7f15ef8a6d
-    - !<own> 8bd1737b-ba62-4a34-9a33-cb3f38f6e218
     - !<own> 5c91af05-6b78-47e2-b201-c4e0bf29e743
     - !<own> 4111a729-65a1-4cf6-995e-e61cf8d491db
     - !<own> f3ff450a-8849-4bfc-b878-c86e05ed05c4
     - !<own> b721c9c8-71f6-482a-b149-e47ffd1a589a
+    - !<own> 8f52b71d-58e2-4040-8ba9-282b27d8dd50
   layers: !<Layers/267ee9a7-aff2-4f9d-9a49-f71214747d03>
     userLayers:
       - id: 1
@@ -494,6 +494,8 @@
       invite: !<MappingBased.AssignableType_7> 4b35e0fd-c3ec-457a-abc2-789ac49464f4
       breathing: !<MappingBased.AssignableType_8> e33f4e98-e225-4f6e-bde8-51d6d0c5c00c
       notebook: !<MappingBased.AssignableType_9> 79f952ba-e54c-442e-8809-67456626246b
+      eyeMovement: !<MappingBased.AssignableType_10> 8c8da09f-82c5-4720-aa9d-1862c2693c85
+      drawing: !<MappingBased.AssignableType_11> 254f8380-47f6-43c0-a0ff-7b6e557e170b
   ScriptTypes:
     "":
       {}
@@ -1844,6 +1846,22 @@
   BlendNormals: false
   BlendShapes:
     {}
+- !<ScriptComponent/254f8380-47f6-43c0-a0ff-7b6e557e170b>
+  PrefabRemaps:
+    []
+  Name: SmallWinsDrawingUI
+  Enabled: true
+  ScriptAsset: !<reference> 604a9e4f-03f9-435e-b385-20e9999f8485
+  ScriptInputsDefault:
+    {}
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      {}
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/25c65113-ece1-4b8d-8de7-b0dde5199c8f>
   PrefabRemaps:
     - 0283fb48-2832-4616-a02a-ac72ce3edf0e: 8fc41744-3da9-4961-71f0-61a0835fd79c
@@ -3498,6 +3516,21 @@
     - !<own> 84333d6d-1107-4d53-8ec0-1b906c44ad09
   Components:
     []
+- !<SceneObject/5801f2b6-6570-479e-8d31-84f191bacde5>
+  PrefabRemaps:
+    []
+  Name: DrawingUI
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 254f8380-47f6-43c0-a0ff-7b6e557e170b
 - !<SceneObject/58ef319f-850e-40dd-8295-e6dc36ab4854>
   PrefabRemaps:
     []
@@ -5596,21 +5629,6 @@
     []
   Components:
     - !<own> e96fa241-3fac-465c-ad2e-b71442b16bde
-- !<SceneObject/8bd1737b-ba62-4a34-9a33-cb3f38f6e218>
-  PrefabRemaps:
-    []
-  Name: AiPreviewAgent Handler
-  Enabled: true
-  Layers: 1
-  LocalTransform: !<TransformEntity>
-    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
-    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
-    HasSegmentScaleCompensation: false
-  Children:
-    []
-  Components:
-    - !<own> 9cf10915-e669-4fa7-b33c-da9fce304805
 - !<RenderMeshVisual/8be31473-e549-44ae-bf7f-150569f2d7b3>
   PrefabRemaps:
     []
@@ -5669,6 +5687,22 @@
     Fingers_length: 0.000000
     Thumb_inflate: 0.000000
     Thumb_length: 0.000000
+- !<ScriptComponent/8c8da09f-82c5-4720-aa9d-1862c2693c85>
+  PrefabRemaps:
+    []
+  Name: SmallWinsEyeMovementUI
+  Enabled: true
+  ScriptAsset: !<reference> aa63c2d5-9e5a-49fe-9234-869fc6997efa
+  ScriptInputsDefault:
+    {}
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      {}
+  ScriptTypes:
+    "":
+      {}
 - !<SceneObject/8cb3dd13-6ebf-41e6-9a23-94a69dd96f87>
   PrefabRemaps:
     []
@@ -5795,6 +5829,21 @@
   BlendNormals: false
   BlendShapes:
     {}
+- !<SceneObject/8f52b71d-58e2-4040-8ba9-282b27d8dd50>
+  PrefabRemaps:
+    []
+  Name: AiPreviewAgent Handler
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> f1c5bdfa-bdd0-48a7-a5e3-8c833d69b748
 - !<SceneObject/8fb5b38c-915a-4b6e-ac65-685c324e8707>
   PrefabRemaps:
     []
@@ -6084,6 +6133,21 @@
     - !<own> e308f6b4-596f-49ae-af06-e74d30f166ce
   Components:
     []
+- !<SceneObject/97317869-bf7a-4f36-9802-3cc480dc3de7>
+  PrefabRemaps:
+    []
+  Name: EyeMovementUI
+  Enabled: true
+  Layers: 1
+  LocalTransform: !<TransformEntity>
+    Position: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Rotation: {x: 0.000000, y: 0.000000, z: 0.000000}
+    Scale: {x: 1.000000, y: 1.000000, z: 1.000000}
+    HasSegmentScaleCompensation: false
+  Children:
+    []
+  Components:
+    - !<own> 8c8da09f-82c5-4720-aa9d-1862c2693c85
 - !<SceneObject/973a5b28-2670-4b3f-9743-1ae2b0f207bb>
   PrefabRemaps:
     []
@@ -6262,22 +6326,6 @@
   ScriptInputs:
     "":
       drawDebug: false
-  ScriptTypes:
-    "":
-      {}
-- !<ScriptComponent/9cf10915-e669-4fa7-b33c-da9fce304805>
-  PrefabRemaps:
-    []
-  Name: AgentInspectScript
-  Enabled: true
-  ScriptAsset: !<reference> 0b25079c-f5bf-4c6d-96c4-f43b89dfa213
-  ScriptInputsDefault:
-    {}
-  ScriptTypesDefault:
-    {}
-  ScriptInputs:
-    "":
-      {}
   ScriptTypes:
     "":
       {}
@@ -8491,6 +8539,8 @@
     - !<own> fecc82c8-8a70-4a2c-a4fb-aa6be87f2cfa
     - !<own> 6a36e560-89cf-4d1f-8625-09e565b9f4e8
     - !<own> f4e8f7c0-b667-40b7-b992-94fc2963c0e3
+    - !<own> 97317869-bf7a-4f36-9802-3cc480dc3de7
+    - !<own> 5801f2b6-6570-479e-8d31-84f191bacde5
   Components:
     []
 - !<SceneObject/d9071294-12e8-425f-98f1-bf308a02639e>
@@ -9562,6 +9612,22 @@
   BlendNormals: false
   BlendShapes:
     {}
+- !<ScriptComponent/f1c5bdfa-bdd0-48a7-a5e3-8c833d69b748>
+  PrefabRemaps:
+    []
+  Name: AgentInspectScript
+  Enabled: true
+  ScriptAsset: !<reference> 0b25079c-f5bf-4c6d-96c4-f43b89dfa213
+  ScriptInputsDefault:
+    {}
+  ScriptTypesDefault:
+    {}
+  ScriptInputs:
+    "":
+      {}
+  ScriptTypes:
+    "":
+      {}
 - !<RenderMeshVisual/f2399793-10d9-4c72-ba46-05a3c1c215c3>
   PrefabRemaps:
     []

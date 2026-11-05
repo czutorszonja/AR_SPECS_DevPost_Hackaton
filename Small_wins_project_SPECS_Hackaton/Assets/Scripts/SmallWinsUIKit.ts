@@ -21,6 +21,9 @@ export const TEX = {
   dot: requireAsset("../Textures/BreathDot_128x128.png") as Texture,
   hand: requireAsset("../Textures/RaisedHand.png") as Texture,
   outside: requireAsset("../Textures/OutsideView.png") as Texture,
+  calm: requireAsset("../Textures/StickerCalm_256x256.png") as Texture,
+  drawing: requireAsset("../Textures/StickerDrawing_256x256.png") as Texture,
+  ink: requireAsset("../Textures/Ink.png") as Texture,
 }
 
 export function stickerTexture(art: StickerArt): Texture {
@@ -100,6 +103,34 @@ export function sizeImage(image: Image, width: number, height: number): void {
 
 export function setImageAlpha(image: Image, alpha: number): void {
   image.mainPass.baseColor = new vec4(1, 1, 1, alpha)
+}
+
+export function setImageColor(image: Image, color: vec4): void {
+  image.mainPass.baseColor = color
+}
+
+/** One material for many images of the same colour, such as the segments of a drawn line. */
+export function makeImageMaterial(texture: Texture, color: vec4): Material {
+  const mat = IMAGE_MATERIAL.clone()
+  mat.mainPass.baseTex = texture
+  mat.mainPass.baseColor = color
+  mat.mainPass.depthTest = true
+  mat.mainPass.depthWrite = false
+  return mat
+}
+
+/** A thin bar from one point to another on a flat surface, in that surface's centimetres. */
+export function addSegment(parent: SceneObject, name: string, mat: Material, from: vec2, to: vec2, thickness: number, z: number): SceneObject {
+  const so = child(parent, name)
+  const image = so.createComponent("Component.Image") as Image
+  image.clearMaterials()
+  image.addMaterial(mat)
+  const d = to.sub(from)
+  const t = so.getTransform()
+  t.setLocalPosition(new vec3((from.x + to.x) / 2, (from.y + to.y) / 2, z))
+  t.setLocalRotation(quat.fromEulerVec(new vec3(0, 0, Math.atan2(d.y, d.x))))
+  t.setLocalScale(new vec3(d.length + thickness * 0.6, thickness, 1))
+  return so
 }
 
 export function setImageTexture(image: Image, texture: Texture): void {

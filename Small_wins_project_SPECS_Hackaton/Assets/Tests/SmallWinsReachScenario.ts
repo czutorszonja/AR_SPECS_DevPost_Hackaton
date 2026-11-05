@@ -1,8 +1,10 @@
 import {createIKInteractor} from "Leaf.lspkg/Interactors/interactor/ik/visualizer/BitmojiAvatar"
 import {findInteractablesByName} from "Leaf.lspkg/Interactors/InteractableUtils"
 import {Scenario} from "Leaf.lspkg/Scenarios/scenario/Scenario"
+import {expect} from "Leaf.lspkg/Utils/common/Expect"
 import {sleep} from "Leaf.lspkg/Utils/common/Utils"
 import {SmallWinsDemoNavigation} from "../Scripts/SmallWinsDemoNavigation"
+import {SmallWinsState} from "../Scripts/SmallWinsState"
 import {shown, SmallWinsLeafInteractor, so, waitFor} from "./SmallWinsLeafHelpers"
 
 /**
@@ -25,12 +27,28 @@ export class SmallWinsReachScenario extends Scenario {
     await hand.tap("NotebookTab")
     await waitFor("the notebook", () => shown("Notebook"), 3000)
     await sleep(800)
-    await this.body.trigger(findInteractablesByName("AddTaskButton", undefined, true)[0])
-    await waitFor("the preset list", () => shown("PresetTask0"), 3000)
+    await this.reach("AddTaskButton", () => shown("PresetTask0"))
     await sleep(800)
-    await this.body.trigger(findInteractablesByName("PickerCancel", undefined, true)[0])
+    await this.reach("PickerCancel", () => !shown("PresetTask0"))
     await sleep(800)
-    await this.body.trigger(findInteractablesByName("NotebookClose", undefined, true)[0])
-    await waitFor("the notebook to close", () => !shown("Notebook"), 3000)
+    // Cancel closes the list without adding anything. (On its way down from the shoulder the simulated arm
+    // can brush a tab in the top row, so which page shows next isn't checked here.)
+    expect(SmallWinsState.instance.tasks.length).toBe(3)
+    await this.reach("NotebookClose", () => !shown("Notebook"))
+  }
+
+  /**
+   * Reach for a button and press it. A button that rebuilds its page is gone by the time the arm lets go,
+   * which the arm reports as an error; that's fine as long as the press did what it should.
+   */
+  private async reach(name: string, pressed: () => boolean): Promise<void> {
+    const target = findInteractablesByName(name, undefined, true)[0]
+    if (!target) throw new Error(name + " isn't on screen to reach for")
+    try {
+      await this.body.trigger(target)
+    } catch (e) {
+      print("reach-check: the arm's release after " + name + " reported: " + e)
+    }
+    await waitFor(name + " to take effect", pressed, 3000)
   }
 }

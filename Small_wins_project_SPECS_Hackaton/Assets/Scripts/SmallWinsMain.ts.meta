@@ -36,6 +36,8 @@
     dishPlate: false
     dishRewardAnchor: false
     dishesMessage: false
+    drawing: false
+    eyeMovement: false
     invite: false
     laundryHint: false
     laundryRewardAnchor: false
@@ -67,6 +69,8 @@
       invite: !<MappingBased.AssignableType_7> 00000000-0000-0000-0000-000000000000
       breathing: !<MappingBased.AssignableType_8> 00000000-0000-0000-0000-000000000000
       notebook: !<MappingBased.AssignableType_9> 00000000-0000-0000-0000-000000000000
+      eyeMovement: !<MappingBased.AssignableType_10> 00000000-0000-0000-0000-000000000000
+      drawing: !<MappingBased.AssignableType_11> 00000000-0000-0000-0000-000000000000
   ScriptTypes:
     -
       {}
@@ -93,4 +97,6 @@
     - // @input AssignableType_7 invite
     - // @input AssignableType_8 breathing
     - // @input AssignableType_9 notebook
+    - // @input AssignableType_10 eyeMovement
+    - // @input AssignableType_11 drawing
     - '// @ui {"widget":"group_end"}'

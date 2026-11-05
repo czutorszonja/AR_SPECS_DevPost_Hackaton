@@ -1,6 +1,6 @@
 import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
 
-export type StickerArt = "plate" | "clothes" | "pebbles" | "custom"
+export type StickerArt = "plate" | "clothes" | "pebbles" | "custom" | "calm" | "drawing"
 
 export interface SmallWinsTask {
   id: string
@@ -22,7 +22,8 @@ export const TASK_PRESETS = [
   "Tidy the desk",
 ]
 
-export const MAX_TASKS = 6
+// Four rows keep every button hand-sized on a page that still fits the narrow display.
+export const MAX_TASKS = 4
 
 /** The sample day. Nothing is remembered between preview runs (brief: out of scope). */
 export class SmallWinsState {
@@ -59,12 +60,15 @@ export class SmallWinsState {
     return this.tasks.find((t) => t.id === id)
   }
 
-  /** Marks a task done and saves its sticker. Only planned tasks earn one, so returns false if it was removed. */
-  completeTask(id: string): boolean {
+  /**
+   * Marks a task done and saves its sticker. Only planned tasks earn one, so returns false if it was removed.
+   * The art can differ from the task's own: any me-time exercise completes the mindfulness task, with its own sticker.
+   */
+  completeTask(id: string, art?: StickerArt): boolean {
     const task = this.getTask(id)
     if (!task) return false
     task.done = true
-    this.addSticker(task)
+    this.addSticker(task, art)
     this.onChanged.invoke()
     return true
   }
@@ -103,8 +107,8 @@ export class SmallWinsState {
     this.onChanged.invoke()
   }
 
-  private addSticker(task: SmallWinsTask): void {
+  private addSticker(task: SmallWinsTask, art?: StickerArt): void {
     if (this.stickers.some((s) => s.taskId === task.id)) return
-    this.stickers.push({taskId: task.id, art: task.art, label: task.title})
+    this.stickers.push({taskId: task.id, art: art ?? task.art, label: task.title})
   }
 }

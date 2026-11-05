@@ -1,3 +1,4 @@
+import {Button} from "SpectaclesUIKit.lspkg/Scripts/Components/Button/Button"
 import {DefaultLeafInteractor} from "Leaf.lspkg/Interactors/interactor/DefaultLeafInteractor"
 import {findInteractablesByName} from "Leaf.lspkg/Interactors/InteractableUtils"
 import {findSceneObjectByName, nextFrame, sleep} from "Leaf.lspkg/Utils/common/Utils"
@@ -115,4 +116,41 @@ export class SmallWinsLeafInteractor extends DefaultLeafInteractor {
     await waitFor("the me-time invitation", () => shown("MeTimeInvitation"), 18000)
     await sleep(500)
   }
+}
+
+/** Every UIKit button now on screen, with its target height in degrees as seen from the viewer. */
+export function visibleButtonSizes(): {name: string; degrees: number}[] {
+  const found: {name: string; degrees: number}[] = []
+  const eye = viewerPose().position
+  const visit = (so: SceneObject) => {
+    if (!so.isEnabledInHierarchy) return
+    const button = so.getComponent(Button.getTypeName()) as Button | null
+    if (button) {
+      const t = so.getTransform()
+      const height = Math.min(button.size.x * t.getWorldScale().x, button.size.y * t.getWorldScale().y)
+      const distance = Math.max(1, t.getWorldPosition().distance(eye))
+      found.push({name: so.name, degrees: 2 * Math.atan(height / 2 / distance) * (180 / Math.PI)})
+    }
+    for (let i = 0; i < so.getChildrenCount(); i++) visit(so.getChild(i))
+  }
+  for (let i = 0; i < global.scene.getRootObjectsCount(); i++) visit(global.scene.getRootObject(i))
+  return found
+}
+
+/** Opens the notebook the way a person does: raise the hand, then pinch the tab. */
+export async function openNotebook(hand: SmallWinsLeafInteractor): Promise<void> {
+  await hand.tap("RaiseHandButton")
+  await waitFor("the notebook tab", () => shown("NotebookTab"), 3000)
+  await hand.tap("NotebookTab")
+  await waitFor("the notebook", () => shown("Notebook"), 3000)
+  await sleep(800)
+}
+
+/** Opens Me-time and picks one of its exercises. */
+export async function chooseTherapy(hand: SmallWinsLeafInteractor, name: string): Promise<void> {
+  await openNotebook(hand)
+  await hand.tap("MeTimeTab")
+  await waitFor("the me-time list", () => shown(name), 3000)
+  await sleep(800)
+  await hand.tap(name)
 }

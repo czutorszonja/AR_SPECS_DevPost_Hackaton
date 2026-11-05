@@ -1,7 +1,9 @@
 import {SmallWinsBreathingUI} from "./SmallWinsBreathingUI"
 import {SmallWinsDragItem} from "./SmallWinsDragItem"
+import {SmallWinsDrawingUI} from "./SmallWinsDrawingUI"
+import {SmallWinsEyeMovementUI} from "./SmallWinsEyeMovementUI"
 import {SmallWinsInviteUI} from "./SmallWinsInviteUI"
-import {SmallWinsNotebookUI} from "./SmallWinsNotebookUI"
+import {SmallWinsNotebookUI, Therapy} from "./SmallWinsNotebookUI"
 import {SmallWinsRewardUI} from "./SmallWinsRewardUI"
 import {SmallWinsRoomController} from "./SmallWinsRoomController"
 import {SmallWinsState, StickerArt, TASK_DISHES, TASK_LAUNDRY, TASK_MINDFUL} from "./SmallWinsState"
@@ -43,6 +45,8 @@ export class SmallWinsMain extends BaseScriptComponent {
   @input invite: SmallWinsInviteUI
   @input breathing: SmallWinsBreathingUI
   @input notebook: SmallWinsNotebookUI
+  @input eyeMovement: SmallWinsEyeMovementUI
+  @input drawing: SmallWinsDrawingUI
   @ui.group_end
 
   private dishesLoaded = 0
@@ -85,9 +89,28 @@ export class SmallWinsMain extends BaseScriptComponent {
     this.invite.onDeclined.add(() => this.notebook.setHudHidden(false))
     this.invite.onReady.add(() => this.breathing.begin())
     this.breathing.onFinished.add(() => {
-      SmallWinsState.instance.completeTask(TASK_MINDFUL)
+      SmallWinsState.instance.completeTask(TASK_MINDFUL, "pebbles")
       this.notebook.setHudHidden(false)
     })
+    this.notebook.onTherapy.add((therapy) => this.startTherapy(therapy))
+    this.eyeMovement.onFinished.add(() => {
+      SmallWinsState.instance.completeTask(TASK_MINDFUL, "calm")
+      this.notebook.setHudHidden(false)
+    })
+    this.drawing.onFinished.add(() => {
+      SmallWinsState.instance.completeTask(TASK_MINDFUL, "drawing")
+      this.notebook.setHudHidden(false)
+    })
+    this.eyeMovement.onClosed.add(() => this.notebook.setHudHidden(false))
+    this.drawing.onClosed.add(() => this.notebook.setHudHidden(false))
+  }
+
+  /** Any of the me-time exercises completes the mindfulness task, each with its own sticker. */
+  private startTherapy(therapy: Therapy): void {
+    this.notebook.setHudHidden(true)
+    if (therapy === "breathing") this.breathing.begin()
+    else if (therapy === "eyes") this.eyeMovement.begin()
+    else this.drawing.begin()
   }
 
   /** The last dish, with the door closing, triggers the reward. */

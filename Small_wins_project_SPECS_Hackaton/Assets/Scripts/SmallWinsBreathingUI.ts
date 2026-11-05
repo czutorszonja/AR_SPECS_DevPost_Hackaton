@@ -95,10 +95,10 @@ export class SmallWinsBreathingUI extends BaseScriptComponent {
     this.wordText.getSceneObject().getTransform().setLocalPosition(new vec3(0, -1.2, 0.2))
     const dotImage = addImage(this.square, "BreathingDot", TEX.dot, 3.4)
     this.dot = dotImage.getSceneObject()
-    const row = flexContainer(this.square, "BreathingButtons", FlexDirection.Row, 28, 5, 2)
-    row.getTransform().setLocalPosition(new vec3(0, -SQUARE_CM / 2 - 4.5, 0.2))
-    this.pauseButton = flexButton(row, "PauseButton", "Pause", 11, 4.4, () => this.togglePause(), d)
-    flexButton(row, "FinishNowButton", "Finish now", 13, 4.4, () => this.finish(), d)
+    const row = flexContainer(this.square, "BreathingButtons", FlexDirection.Row, 30, 6, 2.5)
+    row.getTransform().setLocalPosition(new vec3(0, -SQUARE_CM / 2 - 5, 0.2))
+    this.pauseButton = flexButton(row, "PauseButton", "Pause", 12, 5.5, () => this.togglePause(), d)
+    flexButton(row, "FinishNowButton", "Finish now", 15, 5.5, () => this.finish(), d)
   }
 
   private buildReward(): void {
