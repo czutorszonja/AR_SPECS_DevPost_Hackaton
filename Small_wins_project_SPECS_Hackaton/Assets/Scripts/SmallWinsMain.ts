@@ -2,14 +2,26 @@ import {SmallWinsBreathingUI} from "./SmallWinsBreathingUI"
 import {SmallWinsDragItem} from "./SmallWinsDragItem"
 import {SmallWinsDrawingUI} from "./SmallWinsDrawingUI"
 import {SmallWinsEyeMovementUI} from "./SmallWinsEyeMovementUI"
+import {SmallWinsHomeTasks} from "./SmallWinsHomeTasks"
 import {SmallWinsInviteUI} from "./SmallWinsInviteUI"
 import {SmallWinsNotebookUI, Therapy} from "./SmallWinsNotebookUI"
 import {SmallWinsRewardUI} from "./SmallWinsRewardUI"
 import {SmallWinsRoomController} from "./SmallWinsRoomController"
-import {SmallWinsState, StickerArt, TASK_DISHES, TASK_LAUNDRY, TASK_MINDFUL} from "./SmallWinsState"
-import {addImage, TEX} from "./SmallWinsUIKit"
+import {SmallWinsState, StickerArt, TASK_CAT, TASK_DISHES, TASK_LAUNDRY, TASK_MINDFUL, TASK_PHONE, TASK_PLANTS, TASK_TABLE} from "./SmallWinsState"
+import {addImage, child, TEX} from "./SmallWinsUIKit"
+import {faceViewer, pointInFront} from "./SmallWinsViewer"
 
-/** Orchestrates the day: two chores, the me-time invitation, the breathing. */
+// The line that pops up with each job around the flat, and with anything ticked off the list.
+const TASK_MESSAGES: Record<string, string> = {
+  [TASK_PLANTS]: "Happy plants, happy home.",
+  [TASK_CAT]: "A full bowl and a very happy cat.",
+  [TASK_TABLE]: "A clear table, a clear head.",
+  [TASK_PHONE]: "A little message can mean a lot.",
+  [TASK_MINDFUL]: "A moment just for you. Well done.",
+}
+const LIST_MESSAGE = "Small win, well done."
+
+/** Orchestrates the day: two chores, the jobs around the flat, the me-time invitation and the exercises. */
 @component
 export class SmallWinsMain extends BaseScriptComponent {
   @ui.label("Small Wins")
@@ -47,12 +59,15 @@ export class SmallWinsMain extends BaseScriptComponent {
   @input notebook: SmallWinsNotebookUI
   @input eyeMovement: SmallWinsEyeMovementUI
   @input drawing: SmallWinsDrawingUI
+  @input homeTasks: SmallWinsHomeTasks
   @ui.group_end
 
   private dishesLoaded = 0
   private dishesResolved = false
   private laundryResolved = false
   private invited = false
+  /** Where a sticker plays when the task has no place of its own in the flat. */
+  private listAnchor: SceneObject
 
   private get laundryMessage(): string {
     return "Fresh clothes, well done, " + this.userName + "."
@@ -62,6 +77,7 @@ export class SmallWinsMain extends BaseScriptComponent {
     SmallWinsState.instance.reset()
     this.addHint(this.dishHint)
     this.addHint(this.laundryHint)
+    this.listAnchor = child(this.sceneObject, "ListRewardAnchor")
     this.createEvent("OnStartEvent").bind(() => this.wireFlow())
     this.createEvent("UpdateEvent").bind(() => this.notebook.setCardShowing(this.room.questUI.isCardVisible))
   }
@@ -103,6 +119,46 @@ export class SmallWinsMain extends BaseScriptComponent {
     })
     this.eyeMovement.onClosed.add(() => this.notebook.setHudHidden(false))
     this.drawing.onClosed.add(() => this.notebook.setHudHidden(false))
+    this.homeTasks.onDone.add((id) => {
+      if (SmallWinsState.instance.completeTask(id)) this.playReward(id)
+    })
+    this.notebook.onTaskTicked.add((id) => this.onTicked(id))
+  }
+
+  /** Ticked off the list: the job plays out where it lives in the flat, and its sticker pops up there. */
+  private onTicked(id: string): void {
+    this.notebook.setHudHidden(true)
+    if (this.homeTasks.anchorFor(id)) {
+      this.homeTasks.perform(id, () => this.playReward(id))
+      return
+    }
+    if (id === TASK_DISHES) {
+      this.dishHint.enabled = false
+      this.dishesResolved = true
+      this.reward.play(this.dishRewardAnchor, "plate", this.dishesMessage)
+    } else if (id === TASK_LAUNDRY) {
+      this.laundryHint.enabled = false
+      this.laundryResolved = true
+      this.reward.play(this.laundryRewardAnchor, "clothes", this.laundryMessage)
+    } else {
+      this.playReward(id)
+    }
+  }
+
+  private playReward(id: string): void {
+    const task = SmallWinsState.instance.getTask(id)
+    const art: StickerArt = task ? task.art : "custom"
+    const anchor = this.homeTasks.anchorFor(id) ?? this.inFront()
+    this.notebook.setHudHidden(true)
+    this.reward.play(anchor, art, TASK_MESSAGES[id] ?? LIST_MESSAGE)
+  }
+
+  private inFront(): SceneObject {
+    const t = this.listAnchor.getTransform()
+    const position = pointInFront(110, 0, 0)
+    t.setWorldPosition(position)
+    t.setWorldRotation(faceViewer(position))
+    return this.listAnchor
   }
 
   /** Any of the me-time exercises completes the mindfulness task, each with its own sticker. */

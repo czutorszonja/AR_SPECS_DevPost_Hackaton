@@ -13,11 +13,15 @@ import {
   flexPlace,
   flexText,
   makeImageMaterial,
+  setImageAlpha,
   setImageColor,
+  sizeImage,
+  smooth,
   TEX,
   TEXT_SOFT,
   tween,
 } from "./SmallWinsUIKit"
+import {SPRIG_STROKES} from "./SmallWinsSprig"
 import {faceViewer, pointInFront} from "./SmallWinsViewer"
 
 const VIEW_DISTANCE = 80
@@ -28,10 +32,13 @@ const PAPER_W = 34
 const PAPER_H = 24
 const LINE_CM = 0.45
 const STROKE_SECONDS = 3
-const REWARD_HOLD_SECONDS = 7
+const REWARD_HOLD_SECONDS = 8
+// The finale: the colour wash soaks in with a few sparkles, then the sticker and message join it.
+const WASH_SECONDS = 1.6
+const SPARKLE_COUNT = 7
 const BUTTON_H = 5
 
-export type DrawingPhase = "idle" | "intro" | "drawing" | "reward"
+export type DrawingPhase = "idle" | "intro" | "drawing" | "admiring" | "reward"
 
 interface Stroke {
   name: string
@@ -39,32 +46,9 @@ interface Stroke {
   paths: vec2[][]
 }
 
-/** Points along a curve from a to b, bending towards c. */
-function curve(a: vec2, c: vec2, b: vec2, steps: number): vec2[] {
-  const points: vec2[] = []
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps
-    const u = 1 - t
-    points.push(new vec2(u * u * a.x + 2 * u * t * c.x + t * t * b.x, u * u * a.y + 2 * u * t * c.y + t * t * b.y))
-  }
-  return points
-}
-
-/** Today's drawing: a leaf, built up one simple line at a time. */
-function leafStrokes(): Stroke[] {
-  const base = new vec2(0, -7)
-  const tip = new vec2(0, 9.5)
-  const veins: vec2[][] = []
-  for (const y of [-3.5, 0.5, 4.5]) {
-    veins.push([new vec2(0, y), new vec2(-4.2 + Math.abs(y) * 0.15, y + 3)])
-    veins.push([new vec2(0, y), new vec2(4.2 - Math.abs(y) * 0.15, y + 3)])
-  }
-  return [
-    {name: "the stem", paths: [curve(new vec2(0.4, -10.5), new vec2(-0.6, 0), new vec2(0, 8.5), 16)]},
-    {name: "the left edge", paths: [curve(base, new vec2(-11, 0.5), tip, 20)]},
-    {name: "the right edge", paths: [curve(base, new vec2(11, 0.5), tip, 20)]},
-    {name: "the veins", paths: veins},
-  ]
+/** Today's drawing: a leafy sprig, built up a few simple lines at a time. */
+function sprigStrokes(): Stroke[] {
+  return SPRIG_STROKES.map((stroke) => ({name: stroke.name, paths: stroke.paths.map((path) => path.map((p) => new vec2(p[0], p[1])))}))
 }
 
 /**
@@ -82,15 +66,21 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
   strokeIndex = 0
   progress = 0
 
-  private strokes = leafStrokes()
+  private strokes = sprigStrokes()
   private introRoot: SceneObject
   private sheetRoot: SceneObject
   private rewardRoot: SceneObject
   private pen: SceneObject
+  private wash: Image
+  private sparkles: Image[] = []
+  private buttonsRow: SceneObject
+  private admireTime = 0
   private stepLabel: Text
   private nextButton: ButtonHandle
   /** Ink segments for each stroke, in drawing order, with how far along the stroke each one ends. */
   private ink: {so: SceneObject; at: number}[][] = []
+  /** The faint guide under each stroke. It is hidden once inked, which also keeps the sheet's image count down. */
+  private guides: SceneObject[][] = []
 
   get strokeCount(): number {
     return this.strokes.length
@@ -128,7 +118,7 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
     const col = flexContainer(this.introRoot, "DrawIntroColumn", FlexDirection.Column, 41, 25, 1.2)
     col.getTransform().setLocalPosition(new vec3(0, 0, 0.6))
     flexText(col, "DrawIntroTitle", "Guided drawing", {role: "Title", distance: d, width: 40, height: 5})
-    flexText(col, "DrawIntroBody", "Grab a pen and some paper. Today: a leaf. Follow the dot, one line at a time.", {role: "Body", distance: d, width: 40, height: 7, wrap: true})
+    flexText(col, "DrawIntroBody", "Grab a pen and some paper. Today: a leafy sprig. Follow the dot, a few lines at a time.", {role: "Body", distance: d, width: 40, height: 7, wrap: true})
     flexText(col, "DrawIntroNote", "There's no wrong way to do it.", {role: "Body", distance: d, width: 40, height: 3.4, color: TEXT_SOFT})
     const row = flexContainer(col, "DrawIntroButtons", FlexDirection.Row, 40, BUTTON_H + 1, 2.5)
     flexPlace(row, 40, BUTTON_H + 1)
@@ -140,17 +130,25 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
     const d = TEXT_DISTANCE
     this.sheetRoot = child(this.sceneObject, "DrawSheet")
     this.sheetRoot.createComponent("Component.Canvas")
+    // A teal frame, so the cream sheet stands out from the warm white walls behind it.
+    // Plain images, drawn in the order they are made: frame, paper, colour wash, then the lines on top.
+    const frame = addImage(this.sheetRoot, "DrawFrame", TEX.ink, PAPER_W + 3, PAPER_H + 3)
+    frame.getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, -0.3))
+    setImageColor(frame, new vec4(0.13, 0.55, 0.51, 1))
     const paper = addImage(this.sheetRoot, "DrawPaper", TEX.ink, PAPER_W, PAPER_H)
     setImageColor(paper, new vec4(0.99, 0.96, 0.89, 1))
-    const guide = makeImageMaterial(TEX.ink, new vec4(0.55, 0.75, 0.72, 0.55))
+    this.wash = addImage(this.sheetRoot, "DrawWash", TEX.sprigWash, PAPER_W, PAPER_H)
+    this.wash.getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.1))
+    const guide = makeImageMaterial(TEX.ink, new vec4(0.42, 0.64, 0.61, 0.6))
     const inkMat = makeImageMaterial(TEX.ink, new vec4(0.85, 0.4, 0.23, 1))
     this.strokes.forEach((stroke, s) => {
       const segments: {so: SceneObject; at: number}[] = []
+      const guides: SceneObject[] = []
       const total = this.strokeLength(stroke)
       let walked = 0
       stroke.paths.forEach((path, p) => {
         for (let i = 0; i + 1 < path.length; i++) {
-          addSegment(this.sheetRoot, "DrawGuide" + s + "_" + p + "_" + i, guide, path[i], path[i + 1], LINE_CM * 0.6, 0.2)
+          guides.push(addSegment(this.sheetRoot, "DrawGuide" + s + "_" + p + "_" + i, guide, path[i], path[i + 1], LINE_CM * 0.6, 0.2))
           walked += path[i + 1].distance(path[i])
           const so = addSegment(this.sheetRoot, "DrawInk" + s + "_" + p + "_" + i, inkMat, path[i], path[i + 1], LINE_CM, 0.3)
           so.enabled = false
@@ -158,8 +156,15 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
         }
       })
       this.ink.push(segments)
+      this.guides.push(guides)
     })
-    this.pen = addImage(this.sheetRoot, "DrawPen", TEX.dot, 2.2).getSceneObject()
+    for (let i = 0; i < SPARKLE_COUNT; i++) {
+      const star = addImage(this.sheetRoot, "DrawFinaleSparkle" + i, TEX.star, 2)
+      const a = (i / SPARKLE_COUNT) * Math.PI * 2 + 0.4
+      star.getSceneObject().getTransform().setLocalPosition(new vec3(Math.cos(a) * (PAPER_W / 2 - 3), Math.sin(a) * (PAPER_H / 2 - 2.5), 0.6))
+      this.sparkles.push(star)
+    }
+    this.pen = addImage(this.sheetRoot, "DrawPen", TEX.pen, 2.6).getSceneObject()
 
     const top = child(this.sheetRoot, "DrawStepRoot", new vec3(0, PAPER_H / 2 + 4, 0))
     addPanel(this, top, 40, 6)
@@ -168,6 +173,7 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
 
     const row = flexContainer(this.sheetRoot, "DrawButtons", FlexDirection.Row, 36, BUTTON_H + 1, 3)
     row.getTransform().setLocalPosition(new vec3(0, -PAPER_H / 2 - 4.5, 0.2))
+    this.buttonsRow = row
     this.nextButton = flexButton(row, "DrawNextButton", "Next line", 15, BUTTON_H, () => this.next(), d)
     flexButton(row, "DrawFinishButton", "Finish", 15, BUTTON_H, () => this.finish(), d)
   }
@@ -175,12 +181,13 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
   private buildReward(): void {
     this.rewardRoot = child(this.sceneObject, "DrawReward")
     this.rewardRoot.createComponent("Component.Canvas")
-    addImage(this.rewardRoot, "DrawingSticker", TEX.drawing, 12).getSceneObject().getTransform().setLocalPosition(new vec3(0, 4, 0.2))
-    addImage(this.rewardRoot, "DrawSparkleA", TEX.star, 3).getSceneObject().getTransform().setLocalPosition(new vec3(-9, 8, 0.3))
-    addImage(this.rewardRoot, "DrawSparkleB", TEX.star, 2.2).getSceneObject().getTransform().setLocalPosition(new vec3(9, 2, 0.3))
-    const messageRoot = child(this.rewardRoot, "DrawRewardMessageRoot", new vec3(0, -6.5, 0.1))
+    // Over the sheet's top corner, with the message where the buttons were, so the drawing stays in view.
+    addImage(this.rewardRoot, "DrawingSticker", TEX.drawing, 10).getSceneObject().getTransform().setLocalPosition(new vec3(PAPER_W / 2 - 1, PAPER_H / 2 - 1, 1))
+    addImage(this.rewardRoot, "DrawSparkleA", TEX.star, 3).getSceneObject().getTransform().setLocalPosition(new vec3(PAPER_W / 2 - 8, PAPER_H / 2 + 2.5, 1.1))
+    addImage(this.rewardRoot, "DrawSparkleB", TEX.star, 2.2).getSceneObject().getTransform().setLocalPosition(new vec3(PAPER_W / 2 + 4, PAPER_H / 2 - 7, 1.1))
+    const messageRoot = child(this.rewardRoot, "DrawRewardMessageRoot", new vec3(0, -PAPER_H / 2 - 5.5, 0.1))
     addPanel(this, messageRoot, 46, 9)
-    addText(messageRoot, "DrawRewardMessage", "Lovely. Colour it in if you like, or keep it as it is.", {role: "Headline", distance: TEXT_DISTANCE, width: 44, height: 8.5, wrap: true})
+    addText(messageRoot, "DrawRewardMessage", "Look what you made. Colour yours in too, if you like.", {role: "Headline", distance: TEXT_DISTANCE, width: 44, height: 8.5, wrap: true})
       .getSceneObject()
       .getTransform()
       .setLocalPosition(new vec3(0, 0, 0.6))
@@ -196,6 +203,11 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
     this.phase = "drawing"
     this.showOnly(this.sheetRoot)
     for (const stroke of this.ink) for (const seg of stroke) seg.so.enabled = false
+    for (const stroke of this.guides) for (const g of stroke) g.enabled = true
+    this.wash.getSceneObject().enabled = false
+    this.sparkles.forEach((s) => (s.getSceneObject().enabled = false))
+    this.pen.enabled = true
+    this.buttonsRow.enabled = true
     this.beginStroke(0)
   }
 
@@ -209,19 +221,21 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
     this.strokeIndex = index
     this.progress = 0
     const last = index === this.strokes.length - 1
-    this.stepLabel.text = "Line " + (index + 1) + " of " + this.strokes.length + ": " + this.strokes[index].name
-    this.nextButton.label.text = last ? "I'm done" : "Next line"
+    this.stepLabel.text = "Step " + (index + 1) + " of " + this.strokes.length + ": " + this.strokes[index].name
+    this.nextButton.label.text = last ? "I'm done" : "Next step"
   }
 
   /** Moves on to the next line, finishing off the one being traced so the picture stays whole. */
   private next(): void {
     if (this.phase !== "drawing") return
     for (const seg of this.ink[this.strokeIndex]) seg.so.enabled = true
+    for (const g of this.guides[this.strokeIndex]) g.enabled = false
     if (this.strokeIndex >= this.strokes.length - 1) this.finish()
     else this.beginStroke(this.strokeIndex + 1)
   }
 
   private onUpdate(): void {
+    if (this.phase === "admiring" || this.phase === "reward") this.updateFinale()
     if (this.phase !== "drawing") return
     this.progress = Math.min(1, this.progress + getDeltaTime() / STROKE_SECONDS)
     const segments = this.ink[this.strokeIndex]
@@ -240,20 +254,52 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
     return new vec3(p.x, p.y, 0.5)
   }
 
+  /** Every line inked, the pen lifts, and the colour wash soaks in before the sticker arrives. */
   private finish(): void {
     if (this.phase !== "drawing") return
-    this.phase = "reward"
-    this.showOnly(this.rewardRoot)
-    fadeTree(this.rewardRoot, 1)
+    for (const stroke of this.ink) for (const seg of stroke) seg.so.enabled = true
+    for (const stroke of this.guides) for (const g of stroke) g.enabled = false
+    this.pen.enabled = false
+    this.buttonsRow.enabled = false
+    this.wash.getSceneObject().enabled = true
+    setImageAlpha(this.wash, 0)
+    this.sparkles.forEach((s) => (s.getSceneObject().enabled = true))
+    this.stepLabel.text = "Look what you made!"
+    this.phase = "admiring"
+    this.admireTime = 0
     this.onFinished.invoke()
+  }
+
+  private updateFinale(): void {
+    this.admireTime += getDeltaTime()
+    const t = this.admireTime
+    if (this.phase === "admiring") setImageAlpha(this.wash, smooth(t / WASH_SECONDS))
+    this.sparkles.forEach((star, i) => {
+      const twinkle = 0.5 + 0.5 * Math.sin(t * 5 + i * 1.9)
+      const grow = smooth((t - i * 0.12) / 0.4)
+      const size = 2.4 * grow * (0.7 + 0.5 * twinkle)
+      sizeImage(star, size, size)
+      if (this.phase === "admiring") setImageAlpha(star, grow * (0.5 + 0.5 * twinkle))
+    })
+    if (this.phase === "admiring" && t >= WASH_SECONDS + 0.4) this.showReward()
+  }
+
+  private showReward(): void {
+    this.phase = "reward"
+    this.rewardRoot.enabled = true
+    fadeTree(this.rewardRoot, 1)
     const later = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent
     later.bind(() => {
       tween(
         this,
         0.6,
-        (k) => fadeTree(this.rewardRoot, 1 - k),
+        (k) => {
+          fadeTree(this.rewardRoot, 1 - k)
+          fadeTree(this.sheetRoot, 1 - k)
+        },
         () => {
           this.showOnly(null)
+          fadeTree(this.sheetRoot, 1)
           this.phase = "idle"
         },
       )

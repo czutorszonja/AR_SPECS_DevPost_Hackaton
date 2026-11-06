@@ -24,6 +24,15 @@ export const TEX = {
   calm: requireAsset("../Textures/StickerCalm_256x256.png") as Texture,
   drawing: requireAsset("../Textures/StickerDrawing_256x256.png") as Texture,
   ink: requireAsset("../Textures/Ink.png") as Texture,
+  focus: requireAsset("../Textures/FocusDot_128x128.png") as Texture,
+  pen: requireAsset("../Textures/PenDot_128x128.png") as Texture,
+  sprigWash: requireAsset("../Textures/SprigWash_680x480.png") as Texture,
+  plant: requireAsset("../Textures/StickerPlant_256x256.png") as Texture,
+  cat: requireAsset("../Textures/StickerCat_256x256.png") as Texture,
+  phone: requireAsset("../Textures/StickerPhone_256x256.png") as Texture,
+  table: requireAsset("../Textures/StickerTable_256x256.png") as Texture,
+  droplet: requireAsset("../Textures/Droplet_64x64.png") as Texture,
+  heart: requireAsset("../Textures/Heart_96x96.png") as Texture,
 }
 
 export function stickerTexture(art: StickerArt): Texture {

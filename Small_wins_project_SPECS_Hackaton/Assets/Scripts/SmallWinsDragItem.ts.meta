@@ -28,9 +28,11 @@
   ExportUid: 00000000-0000-0000-0000-000000000000
   PackagePolicy: CanBeUnpacked
   ScriptInputsHidden:
+    dropOffset: false
     dropRadius: false
     dropZone: false
     grabSize: false
+    stayAfterDrop: false
   ScriptTypesHidden:
     {}
   ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
@@ -43,6 +45,8 @@
     - dropZone: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
       dropRadius: !<float> 45.000000
       grabSize: !<Vec3> {x: 22.000000, y: 16.000000, z: 22.000000}
+      stayAfterDrop: false
+      dropOffset: !<Vec3> {x: 0.000000, y: 0.000000, z: 0.000000}
   ScriptTypes:
     -
       {}
@@ -50,3 +54,5 @@
     - '// @input SceneObject dropZone {"hint":"Where this item has to be dropped"}'
     - '// @input float dropRadius = 45 {"hint":"How close to the drop zone counts as a drop, in cm"}'
     - '// @input vec3 grabSize = {22,16,22} {"hint":"Grab volume in cm. Keep it generous: targets should be big"}'
+    - '// @input bool stayAfterDrop {"hint":"Stay visible where it was dropped, like a mug set down on the counter, instead of going inside"}'
+    - '// @input vec3 dropOffset = {0,0,0} {"hint":"Where it settles, relative to the drop zone, when it stays"}'

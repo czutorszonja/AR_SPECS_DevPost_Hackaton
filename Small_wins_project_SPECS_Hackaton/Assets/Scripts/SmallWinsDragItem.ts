@@ -19,8 +19,27 @@ export class SmallWinsDragItem extends BaseScriptComponent {
   @hint("Grab volume in cm. Keep it generous: targets should be big")
   grabSize: vec3 = new vec3(22, 16, 22)
 
+  @input
+  @hint("Stay visible where it was dropped, like a mug set down on the counter, instead of going inside")
+  stayAfterDrop: boolean = false
+
+  @input
+  @hint("Where it settles, relative to the drop zone, when it stays")
+  dropOffset: vec3 = new vec3(0, 0, 0)
+
   readonly onDropped = new Event<SmallWinsDragItem>()
   dropped = false
+
+  /** Where the item started, so a task can carry it back after use. */
+  get homePosition(): vec3 {
+    return this.home
+  }
+
+  /** Carries the item to its drop zone by itself, as ticking the task off the list does. */
+  autoDrop(): void {
+    if (this.dropped) return
+    this.acceptDrop(this.getTransform().getWorldPosition(), 0.7)
+  }
 
   private home: vec3
   private interactable: Interactable
@@ -60,20 +79,23 @@ export class SmallWinsDragItem extends BaseScriptComponent {
     if (this.dropped) return
     const from = this.getTransform().getWorldPosition()
     if (this.isOverDropZone(from)) this.acceptDrop(from)
-    else this.moveTo(from, this.home)
+    else this.moveTo(from, this.home, 0.3)
   }
 
-  private acceptDrop(from: vec3): void {
+  private acceptDrop(from: vec3, seconds: number = 0.3): void {
     this.dropped = true
     this.interactable.enabled = false
-    this.moveTo(from, this.dropZone.getTransform().getWorldPosition(), () => {
-      this.sceneObject.enabled = false
+    const to = this.dropZone.getTransform().getWorldPosition().add(this.stayAfterDrop ? this.dropOffset : vec3.zero())
+    this.moveTo(from, to, seconds, () => {
+      if (!this.stayAfterDrop) this.sceneObject.enabled = false
       this.onDropped.invoke(this)
     })
   }
 
-  private moveTo(from: vec3, to: vec3, done?: () => void): void {
+  private moveTo(from: vec3, to: vec3, seconds: number, done?: () => void): void {
     const transform = this.getTransform()
-    tween(this, 0.3, (t) => transform.setWorldPosition(vec3.lerp(from, to, smooth(t))), done)
+    // A gentle arc when it travels by itself, so it reads as being carried rather than sliding through things.
+    const lift = seconds > 0.4 ? 25 : 0
+    tween(this, seconds, (t) => transform.setWorldPosition(vec3.lerp(from, to, smooth(t)).add(new vec3(0, Math.sin(t * Math.PI) * lift, 0))), done)
   }
 }

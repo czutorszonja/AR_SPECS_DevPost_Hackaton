@@ -99,9 +99,13 @@ export class SmallWinsEyeMovementUI extends BaseScriptComponent {
     const d = TEXT_DISTANCE
     this.trackRoot = child(this.sceneObject, "EyeTrack")
     this.trackRoot.createComponent("Component.Canvas")
-    const line = makeImageMaterial(TEX.ink, new vec4(0.98, 0.93, 0.8, 0.35))
+    // A teal band behind the track, so the dot never has to compete with the room behind it.
+    const band = addImage(this.trackRoot, "EyeTrackBand", TEX.ink, SWEEP_CM * 2 + 9, 9)
+    band.getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, -0.3))
+    band.mainPass.baseColor = new vec4(0.13, 0.55, 0.51, 0.92)
+    const line = makeImageMaterial(TEX.ink, new vec4(1, 0.98, 0.92, 0.55))
     addSegment(this.trackRoot, "EyeTrackLine", line, new vec2(-SWEEP_CM, 0), new vec2(SWEEP_CM, 0), 0.4, 0)
-    this.dot = addImage(this.trackRoot, "EyeDot", TEX.dot, 4.2).getSceneObject()
+    this.dot = addImage(this.trackRoot, "EyeDot", TEX.focus, 5).getSceneObject()
     this.dot.getTransform().setLocalPosition(new vec3(-SWEEP_CM, 0, 0.3))
 
     const top = child(this.trackRoot, "EyeHintRoot", new vec3(0, 11, 0))

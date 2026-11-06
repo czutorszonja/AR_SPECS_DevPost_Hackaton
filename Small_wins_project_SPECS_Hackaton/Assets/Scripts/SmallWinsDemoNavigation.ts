@@ -79,6 +79,17 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
     this.moveTarget = eye
   }
 
+  /** Walks to a spot and turns to look at something there, as a person would. */
+  standLooking(eye: vec3, target: vec3): void {
+    this.standAt(eye)
+    const d = target.sub(eye).normalize()
+    let wanted = Math.atan2(-d.x, -d.z) / DEG
+    while (wanted - this.yaw > 180) wanted -= 360
+    while (wanted - this.yaw < -180) wanted += 360
+    this.targetYaw = wanted
+    this.targetTilt = Math.max(-this.maxTilt, Math.min(this.maxTilt, Math.asin(d.y) / DEG))
+  }
+
   /** Turns to face -Z, allowing for any turn already made with the preview's own camera controls. */
   private faceAhead(): void {
     const look = this.viewerCamera.getTransform().getLocalRotation().multiplyVec3(new vec3(0, 0, -1))

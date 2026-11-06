@@ -9,7 +9,7 @@ function drawingUI(): SmallWinsDrawingUI {
   return so("DrawingUI").getComponent(SmallWinsDrawingUI.getTypeName()) as SmallWinsDrawingUI
 }
 
-/** Me-time: guided drawing, a leaf built up one line at a time as the pen dot traces each one. */
+/** Me-time: guided drawing, a leafy sprig built up a few lines at a time as the pen dot traces each one. */
 @component
 export class SmallWinsDrawingScenario extends Scenario {
   async run(): Promise<void> {
@@ -25,7 +25,7 @@ export class SmallWinsDrawingScenario extends Scenario {
     // The sheet is in view, the guide shows the whole leaf, and the pen inks the first line as it moves.
     expect(shown("DrawSheet")).toBe(true)
     expect(viewAngle(worldPos("DrawPaper"))).toBeLessThan(10)
-    expect(textOf("DrawStepLabel").startsWith("Line 1 of 4")).toBe(true)
+    expect(textOf("DrawStepLabel").startsWith("Step 1 of 4")).toBe(true)
     await sleep(1200)
     const partWay = drawingUI().inkShown
     expect(partWay).toBeGreaterThan(0)
@@ -37,13 +37,18 @@ export class SmallWinsDrawingScenario extends Scenario {
       const before = drawingUI().inkShown
       await hand.tap("DrawNextButton")
       await sleep(400)
-      expect(textOf("DrawStepLabel").startsWith("Line " + line + " of 4")).toBe(true)
+      expect(textOf("DrawStepLabel").startsWith("Step " + line + " of 4")).toBe(true)
       expect(drawingUI().inkShown).toBeGreaterThan(before - 1)
     }
     expect(textOf("DrawNextButtonLabel")).toBe("I'm done")
     await hand.tap("DrawNextButton")
 
-    await waitFor("the reward", () => shown("DrawReward"), 3000)
+    // The colour wash soaks in first, with every line kept, then the sticker joins the finished drawing.
+    expect(shown("DrawWash")).toBe(true)
+    expect(shown("DrawPaper")).toBe(true)
+    expect(textOf("DrawStepLabel")).toBe("Look what you made!")
+    await waitFor("the reward", () => shown("DrawReward"), 6000)
+    expect(shown("DrawSheet"), "the drawing stays in view with its sticker").toBe(true)
     expect(shown("DrawingSticker")).toBe(true)
     expect(state.getTask(TASK_MINDFUL).done).toBe(true)
     expect(state.stickers.some((s) => s.art === "drawing")).toBe(true)

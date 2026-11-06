@@ -1,0 +1,88 @@
+- !<AssetImportMetadata/6094db79-5040-46cb-a7ad-2f24b52cf976>
+  ImportedAssetIds:
+    TypeScriptAsset: !<reference> e701c158-48c6-43be-a19a-a76f88d70bad
+  ImporterName: TypeScriptAssetImporter
+  PrimaryAsset: !<reference> e701c158-48c6-43be-a19a-a76f88d70bad
+  PackageType: NotAPackage
+  LegacyPackagePolicy: ~
+  ExtraData:
+    {}
+  AssetDataMap:
+    TypeScriptAsset: !<own> 20ca4d0e-19ee-4ff5-8dc5-65ab712940b6
+  DependentFiles:
+    []
+  ImporterSettings: !<AssetImporterSettings>
+    {}
+  CompressionSettings: !<own> 00000000-0000-0000-0000-000000000000
+- !<TypeScriptAssetData/20ca4d0e-19ee-4ff5-8dc5-65ab712940b6>
+  SvgIcon: ""
+  SetupScript:
+    code: ""
+  Description: ""
+  VersionMajor: 0
+  VersionMinor: 0
+  VersionPatch: 0
+  VersionPrerelease: ""
+  UpdateOrder: 0
+  ComponentUid: 7c22c65b-de7a-464c-85dc-8e9f795d209f
+  ExportUid: 00000000-0000-0000-0000-000000000000
+  PackagePolicy: CanBeUnpacked
+  ScriptInputsHidden:
+    bowlEmpty: false
+    bowlFull: false
+    cat: false
+    catAnchor: false
+    catFood: false
+    phone: false
+    phoneAnchor: false
+    plant: false
+    plantAnchor: false
+    tableAnchor: false
+    tableItems: false
+    wateringCan: false
+  ScriptTypesHidden:
+    {}
+  ReadMe: !<reference> 00000000-0000-0000-0000-000000000000
+  DeclarationFile: !<reference> 00000000-0000-0000-0000-000000000000
+  Tags:
+    []
+  Attachments:
+    []
+  DefaultScriptInputs:
+    - wateringCan: !<MappingBased.AssignableType_1> 00000000-0000-0000-0000-000000000000
+      plant: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      plantAnchor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      catFood: !<MappingBased.AssignableType_2> 00000000-0000-0000-0000-000000000000
+      cat: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      bowlEmpty: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      bowlFull: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      catAnchor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      tableItems: !<MappingBased.AssignableType_3[]>
+        []
+      tableAnchor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      phone: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      phoneAnchor: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+  ScriptTypes:
+    -
+      {}
+  InputLines:
+    - '// @ui {"widget":"group_start", "label":"Water the plants"}'
+    - // @input AssignableType_1 wateringCan
+    - // @input SceneObject plant
+    - // @input SceneObject plantAnchor
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"group_start", "label":"Feed the cat"}'
+    - // @input AssignableType_2 catFood
+    - // @input SceneObject cat
+    - // @input SceneObject bowlEmpty
+    - // @input SceneObject bowlFull
+    - // @input SceneObject catAnchor
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"group_start", "label":"Clear the table"}'
+    - "// @input AssignableType_3[] tableItems"
+    - // @input SceneObject tableAnchor
+    - '// @ui {"widget":"group_end"}'
+    - '// @ui {"widget":"group_start", "label":"Text a friend"}'
+    - // @input SceneObject phone
+    - // @input SceneObject phoneAnchor
+    - '// @ui {"widget":"group_end"}'

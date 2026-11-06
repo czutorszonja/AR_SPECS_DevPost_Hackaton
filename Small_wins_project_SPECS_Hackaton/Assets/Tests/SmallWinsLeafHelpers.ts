@@ -137,19 +137,19 @@ export function visibleButtonSizes(): {name: string; degrees: number}[] {
   return found
 }
 
-/** Opens the notebook the way a person does: raise the hand, then pinch the tab. */
-export async function openNotebook(hand: SmallWinsLeafInteractor): Promise<void> {
+/** Opens one of the cards the way a person does: raise the hand, then pinch its choice. */
+export async function openNotebook(hand: SmallWinsLeafInteractor, tab: string = "TodoTab"): Promise<void> {
   await hand.tap("RaiseHandButton")
-  await waitFor("the notebook tab", () => shown("NotebookTab"), 3000)
-  await hand.tap("NotebookTab")
-  await waitFor("the notebook", () => shown("Notebook"), 3000)
+  await waitFor("the hand menu", () => shown(tab), 3000)
+  await sleep(300)
+  await hand.tap(tab)
+  await waitFor("the card", () => shown("Notebook"), 3000)
   await sleep(800)
 }
 
 /** Opens Me-time and picks one of its exercises. */
 export async function chooseTherapy(hand: SmallWinsLeafInteractor, name: string): Promise<void> {
-  await openNotebook(hand)
-  await hand.tap("MeTimeTab")
+  await openNotebook(hand, "MeTimeTab")
   await waitFor("the me-time list", () => shown(name), 3000)
   await sleep(800)
   await hand.tap(name)

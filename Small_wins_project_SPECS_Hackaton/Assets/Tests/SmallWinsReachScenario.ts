@@ -23,16 +23,16 @@ export class SmallWinsReachScenario extends Scenario {
     navigation.standAt(vec3.zero())
     await sleep(2500)
     await hand.tap("RaiseHandButton")
-    await waitFor("the hand", () => shown("NotebookTab"), 3000)
-    await hand.tap("NotebookTab")
+    await waitFor("the hand", () => shown("TodoTab"), 3000)
+    await sleep(300)
+    await hand.tap("TodoTab")
     await waitFor("the notebook", () => shown("Notebook"), 3000)
     await sleep(800)
     await this.reach("AddTaskButton", () => shown("PresetTask0"))
     await sleep(800)
     await this.reach("PickerCancel", () => !shown("PresetTask0"))
     await sleep(800)
-    // Cancel closes the list without adding anything. (On its way down from the shoulder the simulated arm
-    // can brush a tab in the top row, so which page shows next isn't checked here.)
+    // Cancel closes the list of choices without adding anything.
     expect(SmallWinsState.instance.tasks.length).toBe(3)
     await this.reach("NotebookClose", () => !shown("Notebook"))
   }
