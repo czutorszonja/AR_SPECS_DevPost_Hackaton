@@ -2,7 +2,7 @@ import {Interactable} from "SpectaclesInteractionKit.lspkg/Components/Interactio
 import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
 import {SmallWinsDragItem} from "./SmallWinsDragItem"
 import {SmallWinsState, TASK_CAT, TASK_PHONE, TASK_PLANTS, TASK_TABLE} from "./SmallWinsState"
-import {addImage, addPanel, addText, child, clamp01, setImageAlpha, sizeImage, smooth, TEX, tween} from "./SmallWinsUIKit"
+import {addImage, addPanel, addText, child, clamp01, setImageAlpha, sizeImage, smooth, TEX, tintPanel, tween} from "./SmallWinsUIKit"
 import {faceViewer} from "./SmallWinsViewer"
 
 const POUR_SECONDS = 1.4
@@ -125,7 +125,7 @@ export class SmallWinsHomeTasks extends BaseScriptComponent {
     this.heart.getSceneObject().enabled = false
 
     // A lit screen lying on the phone's face.
-    const glow = child(this.phone, "PhoneGlowRoot", new vec3(0, 1.4, 0))
+    const glow = child(this.phone, "PhoneGlowRoot", new vec3(0, 1.8, 0))
     glow.getTransform().setLocalRotation(quat.fromEulerVec(new vec3(-Math.PI / 2, 0, 0)))
     glow.createComponent("Component.Canvas")
     this.phoneGlow = addImage(glow, "PhoneGlow", TEX.ink, 6.5, 13)
@@ -135,8 +135,8 @@ export class SmallWinsHomeTasks extends BaseScriptComponent {
 
     this.phoneCard = child(this.sceneObject, "PhoneMessage")
     this.phoneCard.createComponent("Component.Canvas")
-    addPanel(this, this.phoneCard, 30, 7)
-    addText(this.phoneCard, "PhoneMessageText", PHONE_MESSAGE, {role: "Body", distance: 150, width: 28, height: 6, wrap: true})
+    addPanel(this, this.phoneCard, 46, 13)
+    addText(this.phoneCard, "PhoneMessageText", PHONE_MESSAGE, {role: "Headline", distance: 250, width: 43, height: 11, wrap: true})
       .getSceneObject()
       .getTransform()
       .setLocalPosition(new vec3(0, 0, 0.6))
@@ -236,10 +236,12 @@ export class SmallWinsHomeTasks extends BaseScriptComponent {
     const glow = this.phoneGlowRoot
     glow.enabled = true
     const card = this.phoneCard.getTransform()
-    const at = this.phone.getTransform().getWorldPosition().add(new vec3(0, 22, 0))
+    const at = this.phone.getTransform().getWorldPosition().add(new vec3(0, 30, 0))
     card.setWorldPosition(at)
     card.setWorldRotation(faceViewer(at))
     this.phoneCard.enabled = true
+    // The panel only builds its surface once shown, so it takes its teal then.
+    for (const t of [0, 0.1, 0.3]) this.later(t, () => tintPanel(this.phoneCard))
     tween(
       this,
       1.2,
@@ -249,7 +251,7 @@ export class SmallWinsHomeTasks extends BaseScriptComponent {
       },
       () => this.finish(TASK_PHONE),
     )
-    this.later(5, () => {
+    this.later(7, () => {
       this.phoneCard.enabled = false
       glow.enabled = false
     })
