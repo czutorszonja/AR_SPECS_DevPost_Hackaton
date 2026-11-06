@@ -19,7 +19,7 @@ import {
   TEXT_SOFT,
   tween,
 } from "./SmallWinsUIKit"
-import {faceViewer, pointInFront, pointInView} from "./SmallWinsViewer"
+import {faceViewer, pointAlongGaze, pointInView} from "./SmallWinsViewer"
 
 export type Therapy = "breathing" | "eyes" | "drawing"
 export type Card = "todo" | "wins" | "metime"
@@ -40,6 +40,8 @@ const CARD_DISTANCE = 70
 // Text is scaled well past the card's real distance, so it stays easy to read on the narrow display.
 const CARD_TEXT_DISTANCE = 140
 const CARD_DROP = 4
+// A card follows your gaze this far up or down, and no further; it always stays upright.
+const CARD_MAX_PITCH = 15
 // One thing at a time: each card is about two thirds of the display wide.
 const CARD_W = 33
 const INNER_W = CARD_W - 3
@@ -139,7 +141,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     this.lowerHand()
     this.hudRoot.enabled = false
     const t = this.bookRoot.getTransform()
-    const position = pointInFront(CARD_DISTANCE, 0, -CARD_DROP)
+    const position = pointAlongGaze(CARD_DISTANCE, CARD_MAX_PITCH, CARD_DROP)
     t.setWorldPosition(position)
     t.setWorldRotation(faceViewer(position))
     this.bookRoot.enabled = true

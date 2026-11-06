@@ -315,3 +315,59 @@ export function tween(script: BaseScriptComponent, duration: number, update: (t:
   })
   return cancel
 }
+
+/**
+ * A short "hurray" for a sticker: it pops in with one soft bounce, a gold ring pulses out behind it,
+ * and a ring of stars bursts outwards, twinkles, and fades. Build it once, play it each time.
+ */
+export class StickerBurst {
+  private stars: Image[] = []
+  private ring: Image
+  private centre: vec3
+
+  constructor(
+    root: SceneObject,
+    private sticker: Image,
+    private size: number,
+    private count: number = 10,
+  ) {
+    this.centre = sticker.getSceneObject().getTransform().getLocalPosition()
+    this.ring = addImage(root, sticker.getSceneObject().name + "Ring", TEX.ring, size)
+    this.ring.getSceneObject().getTransform().setLocalPosition(this.centre.add(new vec3(0, 0, -0.05)))
+    for (let i = 0; i < count; i++) {
+      const star = addImage(root, sticker.getSceneObject().name + "Star" + i, TEX.star, 2)
+      star.getSceneObject().getTransform().setLocalPosition(this.centre.add(new vec3(0, 0, 0.1)))
+      this.stars.push(star)
+    }
+  }
+
+  play(script: BaseScriptComponent, seconds: number = 1.8): void {
+    const sticker = this.sticker
+    tween(script, seconds, (k) => {
+      const t = k * seconds
+      const pop = burstPop(t) * this.size
+      sizeImage(sticker, pop, pop)
+      const ringK = clamp01(t / 0.7)
+      sizeImage(this.ring, this.size * (0.6 + 0.9 * ringK), this.size * (0.6 + 0.9 * ringK))
+      setImageAlpha(this.ring, t < 0.7 ? Math.sin(ringK * Math.PI) : 0)
+      this.stars.forEach((star, i) => {
+        const angle = (i / this.count) * Math.PI * 2 + 0.3
+        const out = smooth(t / 0.8)
+        const radius = this.size * (0.35 + out * (0.55 + 0.2 * (i % 2)))
+        star.getSceneObject().getTransform().setLocalPosition(this.centre.add(new vec3(Math.cos(angle) * radius, Math.sin(angle) * radius, 0.1)))
+        const twinkle = 0.5 + 0.5 * Math.sin(t * 9 + i * 1.7)
+        const starSize = (i % 3 === 0 ? 3 : 2.2) * (0.7 + 0.5 * twinkle) * Math.min(1, t / 0.15)
+        sizeImage(star, starSize, starSize)
+        setImageAlpha(star, (0.55 + 0.45 * twinkle) * (1 - clamp01((t - seconds * 0.55) / (seconds * 0.45))))
+      })
+    })
+  }
+}
+
+/** Up past full size, a small dip, then settle. */
+function burstPop(t: number): number {
+  if (t < 0.25) return 1.2 * smooth(t / 0.25)
+  if (t < 0.45) return 1.2 + (0.94 - 1.2) * smooth((t - 0.25) / 0.2)
+  if (t < 0.65) return 0.94 + 0.06 * smooth((t - 0.45) / 0.2)
+  return 1
+}

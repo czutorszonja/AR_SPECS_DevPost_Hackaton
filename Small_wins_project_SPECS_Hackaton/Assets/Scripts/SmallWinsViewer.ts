@@ -131,6 +131,19 @@ function clearDistance(origin: vec3, direction: vec3): number {
   return clear
 }
 
+/**
+ * Where you're looking, but only a little up or down: a card follows your gaze up to `maxPitchDegrees`,
+ * then stops, so looking at the floor doesn't send it there. Pair with faceViewer to keep it upright.
+ */
+export function pointAlongGaze(distance: number, maxPitchDegrees: number, drop: number): vec3 {
+  const pose = viewerPose()
+  const flat = flatForward(pose.forward)
+  const limit = (maxPitchDegrees * Math.PI) / 180
+  const pitch = Math.max(-limit, Math.min(limit, Math.asin(Math.max(-1, Math.min(1, pose.forward.y)))))
+  const direction = flat.uniformScale(Math.cos(pitch)).add(vec3.up().uniformScale(Math.sin(pitch)))
+  return pose.position.add(direction.uniformScale(distance)).add(vec3.up().uniformScale(-drop))
+}
+
 function flatForward(forward: vec3): vec3 {
   const flat = new vec3(forward.x, 0, forward.z)
   return flat.length < 0.001 ? new vec3(0, 0, -1) : flat.normalize()

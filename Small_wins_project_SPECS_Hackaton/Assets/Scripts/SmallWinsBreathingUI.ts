@@ -1,6 +1,6 @@
 import {FlexDirection} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexTypes"
 import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
-import {addImage, addPanel, addText, child, ButtonHandle, fadeTree, flexButton, flexContainer, smooth, TEX, tween} from "./SmallWinsUIKit"
+import {StickerBurst, addImage, addPanel, addText, child, ButtonHandle, fadeTree, flexButton, flexContainer, smooth, TEX, tween} from "./SmallWinsUIKit"
 import {faceViewer, pointInFront} from "./SmallWinsViewer"
 
 const VIEW_DISTANCE = 100
@@ -19,7 +19,8 @@ const CORNERS = [
   new vec2(TRACK, TRACK),
   new vec2(TRACK, -TRACK),
 ]
-const REWARD_HOLD_SECONDS = 7
+// Long enough to read, short enough to feel like a little celebration.
+const REWARD_HOLD_SECONDS = 4
 
 export type BreathingPhase = "idle" | "running" | "paused" | "homing" | "reward"
 
@@ -39,6 +40,7 @@ export class SmallWinsBreathingUI extends BaseScriptComponent {
   private introRoot: SceneObject
   private pauseButton: ButtonHandle
   private rewardRoot: SceneObject
+  private burst: StickerBurst
 
   onAwake() {
     this.buildSquare()
@@ -104,7 +106,9 @@ export class SmallWinsBreathingUI extends BaseScriptComponent {
   private buildReward(): void {
     this.rewardRoot = child(this.sceneObject, "BreathingReward")
     this.rewardRoot.createComponent("Component.Canvas")
-    addImage(this.rewardRoot, "PebbleSticker", TEX.pebbles, 11).getSceneObject().getTransform().setLocalPosition(new vec3(0, 3, 0.2))
+    const sticker = addImage(this.rewardRoot, "PebbleSticker", TEX.pebbles, 11)
+    sticker.getSceneObject().getTransform().setLocalPosition(new vec3(0, 3, 0.2))
+    this.burst = new StickerBurst(this.rewardRoot, sticker, 11)
     const a = addImage(this.rewardRoot, "PebbleSparkleA", TEX.star, 2.4)
     a.getSceneObject().getTransform().setLocalPosition(new vec3(-8, 6, 0.3))
     const b = addImage(this.rewardRoot, "PebbleSparkleB", TEX.star, 1.8)
@@ -182,6 +186,7 @@ export class SmallWinsBreathingUI extends BaseScriptComponent {
     this.phase = "reward"
     this.rewardRoot.enabled = true
     fadeTree(this.rewardRoot, 1)
+    this.burst.play(this)
     this.onFinished.invoke()
     const later = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent
     later.bind(() => {

@@ -1,6 +1,6 @@
 import {FlexDirection} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexTypes"
 import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
-import {addImage, addPanel, addSegment, addText, ButtonHandle, child, fadeTree, flexButton, flexContainer, flexPlace, flexText, makeImageMaterial, TEX, TEXT_SOFT, tween} from "./SmallWinsUIKit"
+import {StickerBurst, addImage, addPanel, addSegment, addText, ButtonHandle, child, fadeTree, flexButton, flexContainer, flexPlace, flexText, makeImageMaterial, TEX, TEXT_SOFT, tween} from "./SmallWinsUIKit"
 import {faceViewer, pointInFront} from "./SmallWinsViewer"
 
 const VIEW_DISTANCE = 100
@@ -13,7 +13,8 @@ const PASS_SECONDS = 1.1
 const PASSES_PER_SET = 12
 const SETS = 4
 const REST_SECONDS = 6
-const REWARD_HOLD_SECONDS = 7
+// Long enough to read the kind line, short enough to feel like a little celebration.
+const REWARD_HOLD_SECONDS = 5
 const BUTTON_H = 5.5
 
 export type EyePhase = "idle" | "intro" | "running" | "paused" | "resting" | "checkin" | "reward"
@@ -50,6 +51,7 @@ export class SmallWinsEyeMovementUI extends BaseScriptComponent {
   private setLabel: Text
   private hintText: Text
   private rewardText: Text
+  private burst: StickerBurst
   private pauseButton: ButtonHandle
 
   get dotX(): number {
@@ -139,7 +141,9 @@ export class SmallWinsEyeMovementUI extends BaseScriptComponent {
   private buildReward(): void {
     this.rewardRoot = child(this.sceneObject, "EyeReward")
     this.rewardRoot.createComponent("Component.Canvas")
-    addImage(this.rewardRoot, "CalmSticker", TEX.calm, 12).getSceneObject().getTransform().setLocalPosition(new vec3(0, 4, 0.2))
+    const sticker = addImage(this.rewardRoot, "CalmSticker", TEX.calm, 12)
+    sticker.getSceneObject().getTransform().setLocalPosition(new vec3(0, 4, 0.2))
+    this.burst = new StickerBurst(this.rewardRoot, sticker, 12)
     addImage(this.rewardRoot, "CalmSparkleA", TEX.star, 3).getSceneObject().getTransform().setLocalPosition(new vec3(-9, 8, 0.3))
     addImage(this.rewardRoot, "CalmSparkleB", TEX.star, 2.2).getSceneObject().getTransform().setLocalPosition(new vec3(9, 2, 0.3))
     const messageRoot = child(this.rewardRoot, "EyeRewardMessageRoot", new vec3(0, -6.5, 0.1))
@@ -218,6 +222,7 @@ export class SmallWinsEyeMovementUI extends BaseScriptComponent {
     this.rewardText.text = REWARD_LINES[feeling]
     this.showOnly(this.rewardRoot)
     fadeTree(this.rewardRoot, 1)
+    this.burst.play(this)
     this.onFinished.invoke(feeling)
     const later = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent
     later.bind(() => {

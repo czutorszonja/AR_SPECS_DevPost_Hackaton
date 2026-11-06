@@ -1,6 +1,6 @@
 import {FlexDirection} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexTypes"
 import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
-import {
+import {StickerBurst, 
   addImage,
   addPanel,
   addSegment,
@@ -32,7 +32,7 @@ const PAPER_W = 34
 const PAPER_H = 24
 const LINE_CM = 0.45
 const STROKE_SECONDS = 3
-const REWARD_HOLD_SECONDS = 8
+const REWARD_HOLD_SECONDS = 4.5
 // The finale: the colour wash soaks in with a few sparkles, then the sticker and message join it.
 const WASH_SECONDS = 1.6
 const SPARKLE_COUNT = 7
@@ -72,6 +72,7 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
   private rewardRoot: SceneObject
   private pen: SceneObject
   private wash: Image
+  private burst: StickerBurst
   private sparkles: Image[] = []
   private buttonsRow: SceneObject
   private admireTime = 0
@@ -183,7 +184,9 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
     this.rewardRoot = child(this.sceneObject, "DrawReward")
     this.rewardRoot.createComponent("Component.Canvas")
     // Over the sheet's top corner, with the message where the buttons were, so the drawing stays in view.
-    addImage(this.rewardRoot, "DrawingSticker", TEX.drawing, 10).getSceneObject().getTransform().setLocalPosition(new vec3(PAPER_W / 2 - 1, PAPER_H / 2 - 1, 1))
+    const sticker = addImage(this.rewardRoot, "DrawingSticker", TEX.drawing, 10)
+    sticker.getSceneObject().getTransform().setLocalPosition(new vec3(PAPER_W / 2 - 1, PAPER_H / 2 - 1, 1))
+    this.burst = new StickerBurst(this.rewardRoot, sticker, 10)
     addImage(this.rewardRoot, "DrawSparkleA", TEX.star, 3).getSceneObject().getTransform().setLocalPosition(new vec3(PAPER_W / 2 - 8, PAPER_H / 2 + 2.5, 1.1))
     addImage(this.rewardRoot, "DrawSparkleB", TEX.star, 2.2).getSceneObject().getTransform().setLocalPosition(new vec3(PAPER_W / 2 + 4, PAPER_H / 2 - 7, 1.1))
     const messageRoot = child(this.rewardRoot, "DrawRewardMessageRoot", new vec3(0, -PAPER_H / 2 - 5.5, 0.1))
@@ -288,6 +291,7 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
     this.phase = "reward"
     this.rewardRoot.enabled = true
     fadeTree(this.rewardRoot, 1)
+    this.burst.play(this)
     const later = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent
     later.bind(() => {
       tween(
