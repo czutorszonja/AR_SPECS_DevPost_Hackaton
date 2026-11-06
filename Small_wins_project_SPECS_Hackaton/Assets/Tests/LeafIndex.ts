@@ -7,6 +7,7 @@ import {SmallWinsButtonSizeScenario} from "./SmallWinsButtonSizeScenario"
 import {SmallWinsDemoScenario} from "./SmallWinsDemoScenario"
 import {SmallWinsDoorScenario} from "./SmallWinsDoorScenario"
 import {SmallWinsDrawingScenario} from "./SmallWinsDrawingScenario"
+import {SmallWinsEarnedBreakScenario} from "./SmallWinsEarnedBreakScenario"
 import {SmallWinsEyeMovementFullScenario} from "./SmallWinsEyeMovementFullScenario"
 import {SmallWinsEyeMovementScenario} from "./SmallWinsEyeMovementScenario"
 import {SmallWinsHomeTasksScenario} from "./SmallWinsHomeTasksScenario"
@@ -34,6 +35,7 @@ export class LeafIndex extends BaseScriptComponent {
     {id: "c3-breathing-full-64s", typename: SmallWinsBreathingFullScenario.getTypeName()},
     {id: "c3-no-thanks", typename: SmallWinsNoThanksScenario.getTypeName()},
     {id: "c3-sit-and-stand", typename: SmallWinsSeatScenario.getTypeName()},
+    {id: "c3-earned-break", typename: SmallWinsEarnedBreakScenario.getTypeName()},
     {id: "c4-door-quest", typename: SmallWinsDoorScenario.getTypeName()},
     {id: "c4-ignore-today", typename: SmallWinsIgnoreTodayScenario.getTypeName()},
     {id: "c4-ignore-until-5", typename: SmallWinsIgnoreUntil5Scenario.getTypeName()},

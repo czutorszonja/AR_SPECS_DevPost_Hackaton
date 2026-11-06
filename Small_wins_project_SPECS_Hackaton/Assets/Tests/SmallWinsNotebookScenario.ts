@@ -22,16 +22,18 @@ export class SmallWinsNotebookScenario extends Scenario {
     expect(shown("Notebook")).toBe(false)
     expect(shown("RaisedHandRoot")).toBe(false)
 
-    // Raise hand: an animated hand rises, with the three choices, Me-time on the left and the list on the right.
+    // Raise hand: an animated hand rises, with the three choices: the list on the left, me-time in the middle, wins on the right.
     await hand.tap("RaiseHandButton")
     expect(shown("AnimatedHand")).toBe(true)
-    for (const tab of ["MeTimeTab", "WinsTab", "TodoTab"]) expect(shown(tab), tab + " should show").toBe(true)
+    for (const tab of ["TodoTab", "MeTimeTab", "WinsTab"]) expect(shown(tab), tab + " should show").toBe(true)
     await sleep(700)
     expect(so("AnimatedHand").getTransform().getLocalPosition().y).toBeCloseTo(0, 0)
-    const left = worldPos("MeTimeTab")
-    const right = worldPos("TodoTab")
+    const left = worldPos("TodoTab")
+    const middle = worldPos("MeTimeTab")
+    const right = worldPos("WinsTab")
     const side = viewerPose().forward.cross(vec3.up()).normalize()
-    expect(right.sub(left).dot(side)).toBeGreaterThan(15)
+    expect(middle.sub(left).dot(side)).toBeGreaterThan(7)
+    expect(right.sub(middle).dot(side)).toBeGreaterThan(7)
 
     // The list opens on its own card at a reading spot about 70 cm away, a little below the eyes, and stays put.
     await hand.tap("TodoTab")

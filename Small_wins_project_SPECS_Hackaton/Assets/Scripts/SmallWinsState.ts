@@ -56,6 +56,8 @@ export class SmallWinsState {
   stickers: {taskId: string; art: StickerArt; label: string}[] = []
   reducedMotion = false
   onChanged = new Event<void>()
+  /** Each time something gets done, so the day can notice when you've earned a break. */
+  onCompleted = new Event<SmallWinsTask>()
 
   private nextId = 1
 
@@ -89,6 +91,7 @@ export class SmallWinsState {
     task.done = true
     this.addSticker(task, art)
     this.onChanged.invoke()
+    this.onCompleted.invoke(task)
     return true
   }
 
@@ -99,6 +102,7 @@ export class SmallWinsState {
     if (task.done) this.addSticker(task)
     else this.stickers = this.stickers.filter((s) => s.taskId !== id)
     this.onChanged.invoke()
+    if (task.done) this.onCompleted.invoke(task)
   }
 
   addTask(preset: TaskPreset): void {

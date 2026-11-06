@@ -164,15 +164,15 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     this.hudRoot.getTransform().setWorldPosition(pointInView(HUD_DISTANCE, HUD_RIGHT, -HUD_DROP))
   }
 
-  /** Me-time on the left, today's wins in the middle, the to-do list on the right. Big, well spaced tiles. */
+  /** The to-do list on the left, me-time in the middle, today's wins on the right. Big, well spaced tiles. */
   private buildMenu(): void {
     this.menuRoot = child(this.sceneObject, "HandMenu")
     this.menuRoot.createComponent("Component.Canvas")
     const row = flexContainer(this.menuRoot, "HandMenuRow", FlexDirection.Row, 3 * MENU_TILE_W + 2 * MENU_GAP, MENU_TILE_H, MENU_GAP)
     const d = HUD_TEXT_DISTANCE
+    flexButton(row, "TodoTab", "To-do list", MENU_TILE_W, MENU_TILE_H, () => this.open("todo"), d)
     flexButton(row, "MeTimeTab", "Me-time", MENU_TILE_W, MENU_TILE_H, () => this.open("metime"), d)
     flexButton(row, "WinsTab", "Today's wins", MENU_TILE_W, MENU_TILE_H, () => this.open("wins"), d)
-    flexButton(row, "TodoTab", "To-do list", MENU_TILE_W, MENU_TILE_H, () => this.open("todo"), d)
   }
 
   private toggleHand(): void {

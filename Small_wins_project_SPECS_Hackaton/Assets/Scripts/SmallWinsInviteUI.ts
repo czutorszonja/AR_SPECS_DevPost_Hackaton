@@ -20,7 +20,7 @@ export class SmallWinsInviteUI extends BaseScriptComponent {
   readonly onReady = new Event<void>()
 
   @input
-  @hint("Shown after both chores")
+  @hint("Shown when no line is given: normally it names what you've just done")
   inviteLine: string = "Well done for the dishes and the washing machine."
 
   @input
@@ -36,6 +36,7 @@ export class SmallWinsInviteUI extends BaseScriptComponent {
   promptLine: string = "Find somewhere comfortable to sit, in this room or another. Take as long as you need."
 
   private inviteRoot: SceneObject
+  private inviteText: Text
   private promptRoot: SceneObject
   private following = false
 
@@ -53,8 +54,9 @@ export class SmallWinsInviteUI extends BaseScriptComponent {
     hide.reset(0)
   }
 
-  /** Appears where the second reward just faded. */
-  showInvitation(anchor: SceneObject): void {
+  /** Appears where the last reward just faded, thanking you for what you've just done. */
+  showInvitation(anchor: SceneObject, line?: string): void {
+    this.inviteText.text = line ?? this.inviteLine
     const t = this.inviteRoot.getTransform()
     t.setWorldPosition(anchor.getTransform().getWorldPosition().add(new vec3(0, 6, 0.5)))
     t.setWorldRotation(anchor.getTransform().getWorldRotation())
@@ -65,11 +67,12 @@ export class SmallWinsInviteUI extends BaseScriptComponent {
 
   private buildInvite(): void {
     this.inviteRoot.createComponent("Component.Canvas")
-    addPanel(this, this.inviteRoot, 52, 32)
-    const col = flexContainer(this.inviteRoot, "InviteColumn", FlexDirection.Column, 49, 30, 0.8)
+    addPanel(this, this.inviteRoot, 52, 34.5)
+    const col = flexContainer(this.inviteRoot, "InviteColumn", FlexDirection.Column, 49, 32.5, 0.8)
     col.getTransform().setLocalPosition(new vec3(0, 0, 0.6))
     const d = INVITE_TEXT_DISTANCE
-    flexText(col, "InviteLine", this.inviteLine, {role: "Subheadline", distance: d, width: 48, height: 4.6, wrap: true})
+    // Room for two lines: it names up to three things you've done.
+    this.inviteText = flexText(col, "InviteLine", this.inviteLine, {role: "Subheadline", distance: d, width: 48, height: 7, wrap: true})
     flexText(col, "RewardLine", this.rewardLine, {role: "Body", distance: d, width: 48, height: 9.4, wrap: true})
     flexText(col, "QuestionLine", this.questionLine, {role: "Subheadline", distance: d, width: 48, height: 4.6, wrap: true})
     const row = flexContainer(col, "InviteButtons", FlexDirection.Row, 48, 8, 2)

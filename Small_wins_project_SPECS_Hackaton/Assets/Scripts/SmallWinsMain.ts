@@ -21,6 +21,29 @@ const TASK_MESSAGES: Record<string, string> = {
 }
 const LIST_MESSAGE = "Small win, well done."
 
+/**
+ * How much each job takes out of you. The invitation to take a break comes once what you've done since your
+ * last one adds up: the two big chores, one big chore and two small jobs, or four small ones.
+ */
+const EFFORT: Record<string, number> = {
+  [TASK_DISHES]: 2,
+  [TASK_LAUNDRY]: 2,
+}
+const BREAK_AFTER_EFFORT = 4
+// How the invitation thanks you for each job.
+const DONE_PHRASES: Record<string, string> = {
+  [TASK_DISHES]: "the dishes",
+  [TASK_LAUNDRY]: "the washing machine",
+  [TASK_PLANTS]: "watering the plants",
+  [TASK_CAT]: "feeding the cat",
+  [TASK_TABLE]: "clearing the table",
+  [TASK_PHONE]: "texting a friend",
+}
+const LIST_PHRASES: Record<string, string> = {
+  "Go for a short walk": "your walk",
+  "Read ten pages": "your reading",
+}
+
 /** Orchestrates the day: two chores, the jobs around the flat, the me-time invitation and the exercises. */
 @component
 export class SmallWinsMain extends BaseScriptComponent {
@@ -63,9 +86,11 @@ export class SmallWinsMain extends BaseScriptComponent {
   @ui.group_end
 
   private dishesLoaded = 0
-  private dishesResolved = false
-  private laundryResolved = false
-  private invited = false
+  /** What you've done since your last break, most recent last, and how much effort it all took. */
+  private doneSinceBreak: string[] = []
+  private countedSinceBreak: string[] = []
+  private effortSinceBreak = 0
+  private inviteOpen = false
   /** Where a sticker plays when the task has no place of its own in the flat. */
   private listAnchor: SceneObject
 
@@ -94,7 +119,6 @@ export class SmallWinsMain extends BaseScriptComponent {
     this.clothesPile.onDropped.add(() => {
       this.laundryHint.enabled = false
       this.room.closeWasher(() => {
-        this.laundryResolved = true
         this.resolveChore(TASK_LAUNDRY, "clothes", this.laundryMessage, this.laundryRewardAnchor)
       })
     })
@@ -102,8 +126,15 @@ export class SmallWinsMain extends BaseScriptComponent {
       if (!this.reward.isPlaying) this.notebook.setHudHidden(false)
       this.maybeInvite(anchor)
     })
-    this.invite.onDeclined.add(() => this.notebook.setHudHidden(false))
-    this.invite.onReady.add(() => this.breathing.begin())
+    this.invite.onDeclined.add(() => {
+      this.inviteOpen = false
+      this.notebook.setHudHidden(false)
+    })
+    this.invite.onReady.add(() => {
+      this.inviteOpen = false
+      this.breathing.begin()
+    })
+    SmallWinsState.instance.onCompleted.add((task) => this.noteDone(task.id, task.title))
     this.breathing.onFinished.add(() => {
       SmallWinsState.instance.completeTask(TASK_MINDFUL, "pebbles")
       this.notebook.setHudHidden(false)
@@ -134,11 +165,9 @@ export class SmallWinsMain extends BaseScriptComponent {
     }
     if (id === TASK_DISHES) {
       this.dishHint.enabled = false
-      this.dishesResolved = true
       this.reward.play(this.dishRewardAnchor, "plate", this.dishesMessage)
     } else if (id === TASK_LAUNDRY) {
       this.laundryHint.enabled = false
-      this.laundryResolved = true
       this.reward.play(this.laundryRewardAnchor, "clothes", this.laundryMessage)
     } else {
       this.playReward(id)
@@ -175,7 +204,6 @@ export class SmallWinsMain extends BaseScriptComponent {
     if (this.dishesLoaded < 3) return
     this.dishHint.enabled = false
     this.room.closeDishwasher(() => {
-      this.dishesResolved = true
       this.resolveChore(TASK_DISHES, "plate", this.dishesMessage, this.dishRewardAnchor)
     })
   }
@@ -187,14 +215,45 @@ export class SmallWinsMain extends BaseScriptComponent {
       this.notebook.setHudHidden(true)
       this.reward.play(anchor, art, message)
     } else {
+      // Off the list but still done: no sticker, but it still counts towards a break.
+      this.noteDone(taskId, "")
       this.maybeInvite(anchor)
     }
   }
 
+  /** Any me-time is a break, so the count starts again; anything else adds to how much you've done. */
+  private noteDone(id: string, title: string): void {
+    if (id === TASK_MINDFUL) {
+      this.doneSinceBreak = []
+      this.countedSinceBreak = []
+      this.effortSinceBreak = 0
+      return
+    }
+    // Ticking the same job off twice doesn't make it count twice.
+    if (this.countedSinceBreak.includes(id)) return
+    this.countedSinceBreak.push(id)
+    this.doneSinceBreak.push(DONE_PHRASES[id] ?? LIST_PHRASES[title] ?? "ticking things off your list")
+    this.effortSinceBreak += EFFORT[id] ?? 1
+  }
+
+  /** Once you've done enough since your last break, and the last sticker has had its moment. */
   private maybeInvite(anchor: SceneObject): void {
-    if (this.invited || !this.dishesResolved || !this.laundryResolved || this.reward.isPlaying) return
-    this.invited = true
+    if (this.inviteOpen || this.effortSinceBreak < BREAK_AFTER_EFFORT || this.reward.isPlaying) return
+    this.inviteOpen = true
+    const line = "Well done for " + this.listDone() + "."
+    // Saying No doesn't nag: the next invitation waits until you've done as much again.
+    this.doneSinceBreak = []
+    this.countedSinceBreak = []
+    this.effortSinceBreak = 0
     this.notebook.setHudHidden(true)
-    this.invite.showInvitation(anchor)
+    this.invite.showInvitation(anchor, line)
+  }
+
+  /** "the dishes and the washing machine", or the latest two "and everything else" after a busy stretch. */
+  private listDone(): string {
+    const done = this.doneSinceBreak.filter((p, i, all) => all.indexOf(p) === i)
+    if (done.length > 3) return done.slice(-2).join(", ") + " and everything else"
+    if (done.length === 1) return done[0]
+    return done.slice(0, -1).join(", ") + " and " + done[done.length - 1]
   }
 }

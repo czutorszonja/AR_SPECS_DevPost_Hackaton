@@ -22,8 +22,10 @@ const START = new vec3(76, EYE_Y, 430)
 @component
 export class SmallWinsDemoScenario extends Scenario {
   private nav: SmallWinsDemoNavigation
+  private startedAt = -1
 
   async run(): Promise<void> {
+    this.startedAt = getTime()
     const hand = new SmallWinsLeafInteractor()
     this.nav = so("ViewerRig (preview navigation)").getComponent(SmallWinsDemoNavigation.getTypeName()) as SmallWinsDemoNavigation
     this.nav.maxTurnSpeed = TURN_DEGREES_PER_SECOND
@@ -34,9 +36,11 @@ export class SmallWinsDemoScenario extends Scenario {
     await sleep(3000)
 
     // 1. The flat, facing the kitchen with its sticker hints.
+    this.mark("start")
     await sleep(BEAT_MS)
 
     // 2. Plan the day: raise your hand, open the list, add texting a friend.
+    this.mark("plan")
     await hand.tap("RaiseHandButton")
     await sleep(HOLD_MS)
     await hand.tap("TodoTab")
@@ -49,6 +53,7 @@ export class SmallWinsDemoScenario extends Scenario {
     await sleep(BEAT_MS)
 
     // 3. Walk up to the sink and load the dishes; the sticker pops on the backsplash right there.
+    this.mark("dishes")
     const sink = worldPos("DishMug")
     const dishwasher = worldPos("DishwasherDropZone")
     const dishes = new vec3((sink.x + dishwasher.x) / 2, sink.y - 5, (sink.z + dishwasher.z) / 2)
@@ -60,6 +65,7 @@ export class SmallWinsDemoScenario extends Scenario {
     await sleep(1000)
 
     // 4. Step back to take in the washer and the basket, load the clothes, then the me-time invitation.
+    this.mark("laundry")
     const washer = worldPos("WasherDropZone")
     const basket = worldPos("ClothesPile")
     const laundry = new vec3((washer.x + basket.x) / 2, washer.y + 30, (washer.z + basket.z) / 2)
@@ -67,11 +73,13 @@ export class SmallWinsDemoScenario extends Scenario {
     await sleep(1500)
     await hand.loadLaundry()
     await waitFor("the me-time invitation", () => shown("MeTimeInvitation"), 18000)
+    this.mark("invitation")
     await sleep(HOLD_MS)
     await hand.tap("YesButton")
     await sleep(BEAT_MS)
 
     // Across the room to the sofa, sit, and a little box breathing.
+    this.mark("sofa")
     const sofaSign = worldPos("SitOnSofaButton")
     await this.walkTo(new vec3(sofaSign.x - 40, EYE_Y, sofaSign.z - 230), sofaSign.add(new vec3(0, 20, 0)))
     await sleep(1000)
@@ -84,6 +92,7 @@ export class SmallWinsDemoScenario extends Scenario {
     await sleep(5000)
 
     // 5. Still on the sofa: a glance down at the phone, and a message to a friend.
+    this.mark("phone")
     this.nav.lookToward(worldPos("Phone").add(new vec3(0, 30, 0)))
     await this.settle()
     await sleep(1000)
@@ -94,22 +103,24 @@ export class SmallWinsDemoScenario extends Scenario {
     await this.settle()
 
     // Back to the middle of the room for some time to yourself.
+    this.mark("back")
     await this.walkTo(START, new vec3(-150, -20, 150))
     await sleep(1000)
 
-    // 6. Guided drawing, through to the watercolour finish.
+    // 6. Guided drawing, kept short: watch the first two lines, hurry through the last two, then the watercolour finish.
+    this.mark("drawing")
     await chooseTherapy(hand, "TherapyDrawing")
-    await sleep(HOLD_MS)
+    await sleep(BEAT_MS)
     await hand.tap("DrawStartButton")
-    for (let step = 0; step < 4; step++) {
-      await sleep(3200)
+    for (const ms of [2400, 2400, 1200, 1200]) {
+      await sleep(ms)
       await hand.tap("DrawNextButton")
     }
-    await sleep(5500)
-    await waitFor("the drawing to finish", () => !shown("DrawSheet"), 6000)
+    await waitFor("the drawing to finish", () => !shown("DrawSheet"), 11000)
     await sleep(1000)
 
     // 7. Eye movement calm: the safety line, a few passes, then Stop.
+    this.mark("eyes")
     await chooseTherapy(hand, "TherapyEyes")
     await sleep(HOLD_MS)
     await hand.tap("EyeStartButton")
@@ -120,6 +131,7 @@ export class SmallWinsDemoScenario extends Scenario {
     await sleep(1000)
 
     // 8. Over to the cat by the fridge, feed it from the list, then today's wins.
+    this.mark("cat")
     const cat = worldPos("Cat")
     const bowl = worldPos("CatBowl")
     const catCorner = new vec3((cat.x + bowl.x) / 2, cat.y + 50, (cat.z + bowl.z) / 2)
@@ -142,12 +154,14 @@ export class SmallWinsDemoScenario extends Scenario {
     await waitFor("the cat reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 14000)
     this.nav.lookToward(levelOverCat)
     await this.settle()
+    this.mark("wins")
     await openNotebook(hand, "WinsTab")
     await sleep(4000)
     await hand.tap("NotebookClose")
     await sleep(1500)
 
     // 9. The door from across the room, where its sign invites you out; then up to it, open it, and leave the quest for later.
+    this.mark("door")
     const door = doorCentre()
     await this.walkTo(new vec3(door.x + 420, EYE_Y, door.z - 20), door.add(new vec3(0, 40, 0)))
     await sleep(4000)
@@ -160,9 +174,18 @@ export class SmallWinsDemoScenario extends Scenario {
     await sleep(2000)
 
     // A last slow look back across the flat.
+    this.mark("closing")
     this.nav.lookToward(new vec3(300, -20, 600))
     await this.settle()
-    await sleep(3000)
+    // Long enough for the closing words.
+    await sleep(7000)
+    this.mark("end")
+  }
+
+  /** Prints how far into the video each beat starts, for timing the voiceover. */
+  private mark(beat: string): void {
+    if (this.startedAt < 0) this.startedAt = getTime()
+    print("DEMO beat " + beat + " at " + (getTime() - this.startedAt).toFixed(1) + " s")
   }
 
   /** Walks over at an easy pace and turns to face something, then waits until the view is still. */
