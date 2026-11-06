@@ -62,9 +62,28 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
   private startEye: vec3
   private moveTarget: vec3 | null = null
   private seated = false
+  /** Top speeds for a calm, filmable camera. Unlimited unless something (like the demo run) asks for it. */
+  maxTurnSpeed = Infinity
+  maxMoveSpeed = Infinity
 
   get isSeated(): boolean {
     return this.seated
+  }
+
+  /** True once the viewer has arrived and stopped turning. */
+  get isSettled(): boolean {
+    return this.moveTarget === null && Math.abs(this.targetYaw - this.yaw) < 0.5 && Math.abs(this.targetTilt - this.tilt) < 0.5
+  }
+
+  /** For diagnosing a camera that won't come to rest. */
+  get debugState(): string {
+    const m = this.moveTarget ? this.eye.distance(this.moveTarget).toFixed(2) : "none"
+    return "yaw " + this.yaw.toFixed(2) + "/" + this.targetYaw.toFixed(2) + " tilt " + this.tilt.toFixed(2) + "/" + this.targetTilt.toFixed(2) + " move " + m
+  }
+
+  /** Turns on the spot by this many degrees, positive to the left; a full 360 goes all the way round. */
+  turnBy(degrees: number): void {
+    this.targetYaw += degrees
   }
 
   /** Eases the viewer to a seat, facing the way they'd face sitting there. They stay put until they stand. */
@@ -159,14 +178,19 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
       this.lastLocal = local
     }
 
-    const k = Math.min(1, getDeltaTime() * EASE_RATE)
-    this.yaw += (this.targetYaw - this.yaw) * k
-    this.tilt += (this.targetTilt - this.tilt) * k
+    const dt = getDeltaTime()
+    const k = Math.min(1, dt * EASE_RATE)
+    // Unlimited stays unlimited even on a frame where no time passes (Infinity x 0 is not a number).
+    const turn = isFinite(this.maxTurnSpeed) ? this.maxTurnSpeed * dt : Infinity
+    this.yaw += clampAbs((this.targetYaw - this.yaw) * k, turn)
+    this.tilt += clampAbs((this.targetTilt - this.tilt) * k, turn)
     const facing = quat.fromEulerVec(new vec3(0, this.yaw * DEG, 0))
     const rotation = facing.multiply(quat.fromEulerVec(new vec3(this.tilt * DEG, 0, 0)))
 
     if (this.moveTarget) {
-      this.eye = vec3.lerp(this.eye, this.moveTarget, Math.min(1, getDeltaTime() * SIT_RATE))
+      let step = vec3.lerp(this.eye, this.moveTarget, Math.min(1, dt * SIT_RATE)).sub(this.eye)
+      if (isFinite(this.maxMoveSpeed) && step.length > this.maxMoveSpeed * dt) step = step.normalize().uniformScale(this.maxMoveSpeed * dt)
+      this.eye = this.eye.add(step)
       if (this.eye.distance(this.moveTarget) < 0.5) {
         this.eye = this.moveTarget
         this.moveTarget = null
@@ -188,4 +212,8 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
   private clamp(value: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, value))
   }
+}
+
+function clampAbs(value: number, limit: number): number {
+  return Math.max(-limit, Math.min(limit, value))
 }

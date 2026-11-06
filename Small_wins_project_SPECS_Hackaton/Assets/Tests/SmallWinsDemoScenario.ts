@@ -7,13 +7,17 @@ import {chooseTherapy, openNotebook, shown, SmallWinsLeafInteractor, so, waitFor
 // A breath between actions, so there is room to talk over the video.
 const BEAT_MS = 2500
 const HOLD_MS = 4000
+// A calm camera: an unhurried turn and a gentle walking pace.
+const TURN_DEGREES_PER_SECOND = 32
+const WALK_CM_PER_SECOND = 75
 // Standing eye height in the demo room, as at the start spot.
 const EYE_Y = 0
+const START = new vec3(76, EYE_Y, 430)
 
 /**
  * Not a test: plays the demo video's shot list hands-free, at a pace to talk over.
- * Shots: the flat, plan the day, dishes, laundry and breathing, text a friend, guided drawing,
- * eye movement calm, feed the cat and today's wins, the quest at the door.
+ * A slow look round the flat, plan the day, dishes, laundry and breathing on the sofa, text a friend,
+ * guided drawing, eye movement calm, feed the cat and today's wins, and the quest waiting at the door.
  */
 @component
 export class SmallWinsDemoScenario extends Scenario {
@@ -22,18 +26,16 @@ export class SmallWinsDemoScenario extends Scenario {
   async run(): Promise<void> {
     const hand = new SmallWinsLeafInteractor()
     this.nav = so("ViewerRig (preview navigation)").getComponent(SmallWinsDemoNavigation.getTypeName()) as SmallWinsDemoNavigation
+    this.nav.maxTurnSpeed = TURN_DEGREES_PER_SECOND
+    this.nav.maxMoveSpeed = WALK_CM_PER_SECOND
     // The test tool's own status line would show in the recording.
     await sleep(100)
     this.hideTestBanner()
     await sleep(3000)
 
-    // 1. The flat: a slow look round the kitchen and back.
-    const kitchen = new vec3(76, -30, 0)
-    this.nav.lookToward(new vec3(-300, -40, 200))
-    await sleep(2500)
-    this.nav.lookToward(new vec3(500, -40, 150))
-    await sleep(2500)
-    this.nav.lookToward(kitchen)
+    // 1. The flat: one slow turn all the way round, past the door with its quest sign, the sofa and the reading corner.
+    this.nav.turnBy(360)
+    await this.settle()
     await sleep(BEAT_MS)
 
     // 2. Plan the day: raise your hand, open the list, add texting a friend.
@@ -48,45 +50,56 @@ export class SmallWinsDemoScenario extends Scenario {
     await hand.tap("NotebookClose")
     await sleep(BEAT_MS)
 
-    // 3. Walk up to the sink, then load the dishes; the sticker pops on the backsplash right there.
+    // 3. Walk up to the sink and load the dishes; the sticker pops on the backsplash right there.
     const sink = worldPos("DishMug")
     const dishwasher = worldPos("DishwasherDropZone")
-    const dishes = new vec3((sink.x + dishwasher.x) / 2, sink.y - 15, (sink.z + dishwasher.z) / 2)
-    await this.walkTo(new vec3(dishes.x + 10, EYE_Y, dishes.z + 105), dishes)
+    const dishes = new vec3((sink.x + dishwasher.x) / 2, sink.y - 5, (sink.z + dishwasher.z) / 2)
+    await this.walkTo(new vec3(dishes.x + 10, EYE_Y, dishes.z + 135), dishes)
+    await sleep(1500)
     await hand.loadDishes()
     await waitFor("the dishes reward", () => shown("RewardPlate"), 8000)
     await waitFor("the dishes reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 14000)
     await sleep(1000)
 
-    // 4. Over to the basket and the washer, then the me-time invitation, the sofa and a little box breathing.
+    // 4. Step back to take in the washer and the basket, load the clothes, then the me-time invitation.
     const washer = worldPos("WasherDropZone")
     const basket = worldPos("ClothesPile")
-    const laundry = new vec3((washer.x + basket.x) / 2, washer.y, (washer.z + basket.z) / 2)
-    await this.walkTo(new vec3(laundry.x - 10, EYE_Y, laundry.z + 120), laundry)
+    const laundry = new vec3((washer.x + basket.x) / 2, washer.y + 30, (washer.z + basket.z) / 2)
+    await this.walkTo(new vec3(laundry.x - 20, EYE_Y, laundry.z + 240), laundry)
+    await sleep(1500)
     await hand.loadLaundry()
     await waitFor("the me-time invitation", () => shown("MeTimeInvitation"), 18000)
     await sleep(HOLD_MS)
     await hand.tap("YesButton")
     await sleep(BEAT_MS)
+
+    // Across the room to the sofa, sit, and a little box breathing.
     const sofaSign = worldPos("SitOnSofaButton")
-    await this.walkTo(new vec3(sofaSign.x, EYE_Y, sofaSign.z - 190), sofaSign)
+    await this.walkTo(new vec3(sofaSign.x - 40, EYE_Y, sofaSign.z - 230), sofaSign.add(new vec3(0, 20, 0)))
+    await sleep(1000)
     await hand.tap("SitOnSofaButton")
-    await sleep(3000)
+    await this.settle()
+    await sleep(1500)
     await hand.tap("ReadyButton")
-    await sleep(8000)
+    await sleep(9000)
     await hand.tap("FinishNowButton")
     await sleep(6000)
 
-    // 5. Still on the sofa: text a friend.
-    this.nav.lookToward(worldPos("Phone"))
-    await sleep(BEAT_MS)
+    // 5. Still on the sofa: a glance down at the phone, and a message to a friend.
+    this.nav.lookToward(worldPos("Phone").add(new vec3(0, 30, 0)))
+    await this.settle()
+    await sleep(1000)
     await hand.tap("Phone")
     await waitFor("the phone sticker", () => shown("RewardPlate"), 6000)
     await waitFor("the phone reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 14000)
     await hand.tap("StandUpButton")
-    await sleep(2500)
-    this.nav.lookToward(kitchen)
+    await this.settle()
+
+    // A wander through the reading corner by the palm, then back to the middle of the room.
+    await this.walkTo(new vec3(300, EYE_Y, 380), worldPos("WateringCan").add(new vec3(30, 80, -40)))
     await sleep(BEAT_MS)
+    await this.walkTo(START, new vec3(-150, -20, 150))
+    await sleep(1500)
 
     // 6. Guided drawing, through to the watercolour finish.
     await chooseTherapy(hand, "TherapyDrawing")
@@ -110,11 +123,12 @@ export class SmallWinsDemoScenario extends Scenario {
     await waitFor("the eye exercise to finish", () => !shown("EyeReward"), 8000)
     await sleep(1000)
 
-    // 8. Feed the cat from the list, then today's wins.
+    // 8. Over to the cat by the fridge, feed it from the list, then today's wins.
     const cat = worldPos("Cat")
     const bowl = worldPos("CatBowl")
-    const catCorner = new vec3((cat.x + bowl.x) / 2, cat.y + 15, (cat.z + bowl.z) / 2)
-    await this.walkTo(new vec3(catCorner.x + 55, EYE_Y, catCorner.z + 125), catCorner)
+    const catCorner = new vec3((cat.x + bowl.x) / 2, cat.y + 50, (cat.z + bowl.z) / 2)
+    await this.walkTo(new vec3(catCorner.x + 80, EYE_Y, catCorner.z + 200), catCorner)
+    await sleep(1500)
     await openNotebook(hand, "TodoTab")
     await hand.tap("AddTaskButton")
     await sleep(BEAT_MS)
@@ -127,23 +141,41 @@ export class SmallWinsDemoScenario extends Scenario {
     await openNotebook(hand, "WinsTab")
     await sleep(5000)
     await hand.tap("NotebookClose")
-    await sleep(BEAT_MS)
+    await sleep(1500)
 
-    // 9. The quest at the door, left for later.
+    // 9. The door from across the room, where its sign invites you out; then up to it, open it, and leave the quest for later.
     const door = doorCentre()
-    await this.walkTo(new vec3(door.x + 190, EYE_Y, door.z), door)
-    await sleep(BEAT_MS)
+    await this.walkTo(new vec3(door.x + 420, EYE_Y, door.z - 20), door.add(new vec3(0, 40, 0)))
+    await sleep(5000)
+    await this.walkTo(new vec3(door.x + 230, EYE_Y, door.z), door.add(new vec3(0, 10, 0)))
+    await sleep(1000)
     await hand.tap("EntryDoorTapTarget")
     await waitFor("the quest card", () => shown("QuestCard"), 4000)
     await sleep(6000)
     await hand.tap("IgnoreUntil5Button")
-    await sleep(4000)
+    await sleep(2000)
+
+    // A last slow look back across the flat.
+    this.nav.lookToward(new vec3(300, -20, 600))
+    await this.settle()
+    await sleep(3000)
   }
 
-  /** Walks over and turns to face something, then lets the view settle. */
+  /** Walks over at an easy pace and turns to face something, then waits until the view is still. */
   private async walkTo(eye: vec3, target: vec3): Promise<void> {
     this.nav.standLooking(eye, target)
-    await sleep(2200)
+    await this.settle()
+  }
+
+  private async settle(): Promise<void> {
+    // Never let a slow camera stop the recording: wait for stillness, but carry on after a while regardless.
+    let waited = 0
+    while (!this.nav.isSettled && waited < 15000) {
+      await sleep(100)
+      waited += 100
+    }
+    if (!this.nav.isSettled) print("DEMO camera did not settle: " + this.nav.debugState)
+    await sleep(400)
   }
 
   private hideTestBanner(): void {

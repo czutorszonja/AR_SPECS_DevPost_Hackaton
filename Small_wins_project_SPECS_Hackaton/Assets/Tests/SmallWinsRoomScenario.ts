@@ -13,9 +13,9 @@ export class SmallWinsRoomScenario extends Scenario {
       expect(shown(part), `${part} should be visible`).toBe(true)
     }
 
-    // About 10 m x 10.6 m, open plan, so both chores fit in view at once from the middle of the room.
+    // About 10 m x 9.6 m, open plan, so both chores fit in view at once from the middle of the room.
     expect(worldPos("WallRight").x - worldPos("WallDoorSideA").x).toBeCloseTo(996, 0)
-    expect(worldPos("WallBehindSofa").z - worldPos("WallKitchen").z).toBeCloseTo(1064, 0)
+    expect(worldPos("WallBehindSofa").z - worldPos("WallKitchen").z).toBeCloseTo(964, 0)
 
     // The kitchen and the sofa are both in the one room, with the door on another wall.
     const door = worldPos("EntryDoorHinge")

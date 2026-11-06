@@ -79,8 +79,7 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
   private nextButton: ButtonHandle
   /** Ink segments for each stroke, in drawing order, with how far along the stroke each one ends. */
   private ink: {so: SceneObject; at: number}[][] = []
-  /** The faint guide under each stroke. It is hidden once inked, which also keeps the sheet's image count down. */
-  private guides: SceneObject[][] = []
+  private guideImage: Image
 
   get strokeCount(): number {
     return this.strokes.length
@@ -139,24 +138,26 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
     setImageColor(paper, new vec4(0.99, 0.96, 0.89, 1))
     this.wash = addImage(this.sheetRoot, "DrawWash", TEX.sprigWash, PAPER_W, PAPER_H)
     this.wash.getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.1))
-    const guide = makeImageMaterial(TEX.ink, new vec4(0.42, 0.64, 0.61, 0.6))
+    // The faint guide is one painted image, and the ink has a canvas of its own: a canvas with a few hundred
+    // images starts dropping some, and the paper must never be one of them.
+    this.guideImage = addImage(this.sheetRoot, "DrawGuide", TEX.sprigGuide, PAPER_W, PAPER_H)
+    this.guideImage.getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
+    const inkRoot = child(this.sheetRoot, "DrawInkLayer", new vec3(0, 0, 0))
+    inkRoot.createComponent("Component.Canvas")
     const inkMat = makeImageMaterial(TEX.ink, new vec4(0.85, 0.4, 0.23, 1))
     this.strokes.forEach((stroke, s) => {
       const segments: {so: SceneObject; at: number}[] = []
-      const guides: SceneObject[] = []
       const total = this.strokeLength(stroke)
       let walked = 0
       stroke.paths.forEach((path, p) => {
         for (let i = 0; i + 1 < path.length; i++) {
-          guides.push(addSegment(this.sheetRoot, "DrawGuide" + s + "_" + p + "_" + i, guide, path[i], path[i + 1], LINE_CM * 0.6, 0.2))
           walked += path[i + 1].distance(path[i])
-          const so = addSegment(this.sheetRoot, "DrawInk" + s + "_" + p + "_" + i, inkMat, path[i], path[i + 1], LINE_CM, 0.3)
+          const so = addSegment(inkRoot, "DrawInk" + s + "_" + p + "_" + i, inkMat, path[i], path[i + 1], LINE_CM, 0.3)
           so.enabled = false
           segments.push({so, at: walked / total})
         }
       })
       this.ink.push(segments)
-      this.guides.push(guides)
     })
     for (let i = 0; i < SPARKLE_COUNT; i++) {
       const star = addImage(this.sheetRoot, "DrawFinaleSparkle" + i, TEX.star, 2)
@@ -203,7 +204,7 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
     this.phase = "drawing"
     this.showOnly(this.sheetRoot)
     for (const stroke of this.ink) for (const seg of stroke) seg.so.enabled = false
-    for (const stroke of this.guides) for (const g of stroke) g.enabled = true
+    this.guideImage.getSceneObject().enabled = true
     this.wash.getSceneObject().enabled = false
     this.sparkles.forEach((s) => (s.getSceneObject().enabled = false))
     this.pen.enabled = true
@@ -229,7 +230,6 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
   private next(): void {
     if (this.phase !== "drawing") return
     for (const seg of this.ink[this.strokeIndex]) seg.so.enabled = true
-    for (const g of this.guides[this.strokeIndex]) g.enabled = false
     if (this.strokeIndex >= this.strokes.length - 1) this.finish()
     else this.beginStroke(this.strokeIndex + 1)
   }
@@ -258,7 +258,7 @@ export class SmallWinsDrawingUI extends BaseScriptComponent {
   private finish(): void {
     if (this.phase !== "drawing") return
     for (const stroke of this.ink) for (const seg of stroke) seg.so.enabled = true
-    for (const stroke of this.guides) for (const g of stroke) g.enabled = false
+    this.guideImage.getSceneObject().enabled = false
     this.pen.enabled = false
     this.buttonsRow.enabled = false
     this.wash.getSceneObject().enabled = true
