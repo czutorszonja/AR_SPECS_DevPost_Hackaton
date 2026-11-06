@@ -4,6 +4,7 @@ import {SmallWinsBreathingFullScenario} from "./SmallWinsBreathingFullScenario"
 import {SmallWinsBreathingScenario} from "./SmallWinsBreathingScenario"
 import {SmallWinsChoresScenario} from "./SmallWinsChoresScenario"
 import {SmallWinsButtonSizeScenario} from "./SmallWinsButtonSizeScenario"
+import {SmallWinsDemoScenario} from "./SmallWinsDemoScenario"
 import {SmallWinsDoorScenario} from "./SmallWinsDoorScenario"
 import {SmallWinsDrawingScenario} from "./SmallWinsDrawingScenario"
 import {SmallWinsEyeMovementFullScenario} from "./SmallWinsEyeMovementFullScenario"
@@ -43,5 +44,6 @@ export class LeafIndex extends BaseScriptComponent {
     {id: "c7-home-tasks", typename: SmallWinsHomeTasksScenario.getTypeName()},
     {id: "button-sizes", typename: SmallWinsButtonSizeScenario.getTypeName()},
     {id: "reach-check", typename: SmallWinsReachScenario.getTypeName()},
+    {id: "demo-recording", typename: SmallWinsDemoScenario.getTypeName()},
   ]
 }

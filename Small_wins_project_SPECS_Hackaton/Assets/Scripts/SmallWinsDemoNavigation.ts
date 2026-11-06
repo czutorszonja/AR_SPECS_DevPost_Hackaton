@@ -82,6 +82,15 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
   /** Walks to a spot and turns to look at something there, as a person would. */
   standLooking(eye: vec3, target: vec3): void {
     this.standAt(eye)
+    this.turnToward(eye, target)
+  }
+
+  /** Turns the head towards something without moving, seated or standing. */
+  lookToward(target: vec3): void {
+    this.turnToward(this.moveTarget ?? this.eye ?? target, target)
+  }
+
+  private turnToward(eye: vec3, target: vec3): void {
     const d = target.sub(eye).normalize()
     let wanted = Math.atan2(-d.x, -d.z) / DEG
     while (wanted - this.yaw > 180) wanted -= 360
