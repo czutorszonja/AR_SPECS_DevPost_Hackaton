@@ -31,6 +31,12 @@ export class SmallWinsDemoScenario extends Scenario {
     this.startedAt = getTime()
     const hand = new SmallWinsLeafInteractor()
     this.nav = so("ViewerRig (preview navigation)").getComponent(SmallWinsDemoNavigation.getTypeName()) as SmallWinsDemoNavigation
+    // Always open on the same shot, whichever preview environment is chosen: mid-room, facing the kitchen.
+    this.nav.cancelCameraTurn = true
+    this.nav.maxTurnSpeed = Infinity
+    this.nav.maxMoveSpeed = Infinity
+    this.nav.standLooking(START, new vec3(START.x, EYE_Y - 30, START.z - 300))
+    await this.settle()
     this.nav.maxTurnSpeed = TURN_DEGREES_PER_SECOND
     this.nav.maxMoveSpeed = WALK_CM_PER_SECOND
     // The test tool's own status line would show in the recording.
@@ -103,7 +109,7 @@ export class SmallWinsDemoScenario extends Scenario {
     // 6. Still on the sofa: the other me-time choices, left open to talk about.
     this.mark("metime")
     await openNotebook(hand, "MeTimeTab")
-    await sleep(6500)
+    await sleep(5500)
     await hand.tap("NotebookClose")
     await sleep(600)
     await hand.tap("StandUpButton")
@@ -112,10 +118,13 @@ export class SmallWinsDemoScenario extends Scenario {
     // 7. Back in the middle of the room, add two more jobs: their sticker holders appear around the flat.
     this.mark("add")
     await this.walkTo(START, new vec3(76, -20, 150))
+    this.mark("add-walked")
     await openNotebook(hand, "TodoTab")
+    this.mark("add-list-open")
     await hand.tap("AddTaskButton")
     await sleep(PAGE_MS)
     await hand.tap("PresetTask2")
+    this.mark("add-first-added")
     await sleep(PAGE_MS)
     await hand.tap("AddTaskButton")
     await sleep(PAGE_MS)
@@ -133,6 +142,10 @@ export class SmallWinsDemoScenario extends Scenario {
     await this.walkTo(new vec3(pour.x - 150, EYE_Y, pour.z + 170), pour.add(new vec3(0, -10, 0)))
     await sleep(800)
     await hand.dragTo("WateringCan", worldPos("PlantPourPoint"))
+    // On a slow machine the can can trail the hand and miss; carry it over again rather than stop the recording.
+    if (!(await this.within(() => shown("RewardPlate") || this.canPouring(), 2500))) {
+      await hand.dragTo("WateringCan", worldPos("PlantPourPoint"))
+    }
     await waitFor("the plant sticker", () => shown("RewardPlate"), 9000)
     await waitFor("the plant reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 14000)
 
@@ -162,9 +175,23 @@ export class SmallWinsDemoScenario extends Scenario {
     this.mark("closing")
     this.nav.lookToward(new vec3(300, -20, 600))
     await this.settle()
-    // Long enough for the closing words.
-    await sleep(9000)
+    // Long enough for the closing words and what comes next.
+    await sleep(11000)
     this.mark("end")
+  }
+
+  /** Waits until something is true, for up to a while, and says whether it happened. */
+  private async within(condition: () => boolean, ms: number): Promise<boolean> {
+    for (let waited = 0; waited < ms; waited += 100) {
+      if (condition()) return true
+      await sleep(100)
+    }
+    return condition()
+  }
+
+  /** The can has landed by the plant when it is no longer back at home. */
+  private canPouring(): boolean {
+    return worldPos("WateringCan").distance(worldPos("PlantPourPoint")) < 40
   }
 
   /** Prints how far into the video each beat starts, for timing the voiceover. */
@@ -189,8 +216,14 @@ export class SmallWinsDemoScenario extends Scenario {
     await sleep(400)
   }
 
+  /**
+   * The test tool's status line and the see-through hands it animates to press buttons would both show in the
+   * recording. The presses still work without the hands (but not without the cursors, which drive the drags).
+   */
   private hideTestBanner(): void {
-    const banner = findSceneObjectByName("LeafDebugUICamera")
-    if (banner) banner.enabled = false
+    for (const name of ["LeafDebugUICamera", "HandVisuals"]) {
+      const so = findSceneObjectByName(name)
+      if (so) so.enabled = false
+    }
   }
 }

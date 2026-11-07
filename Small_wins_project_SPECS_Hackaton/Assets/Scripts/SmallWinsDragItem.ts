@@ -5,6 +5,10 @@ import {smooth, tween} from "./SmallWinsUIKit"
 import {viewerPose} from "./SmallWinsViewer"
 
 /** A dish or the pile of clothes. Pinch, drag and release over the appliance: that drop stands in for "task done". */
+// The pointer can drop its grab for a frame or two mid-drag (in the preview, as it slides over furniture).
+// Only a let-go that lasts longer than this counts, so the item doesn't twitch back towards home.
+const RELEASE_SETTLE_SECONDS = 0.15
+
 @component
 export class SmallWinsDragItem extends BaseScriptComponent {
   @input
@@ -44,6 +48,9 @@ export class SmallWinsDragItem extends BaseScriptComponent {
   private home: vec3
   private interactable: Interactable
   private visuals: {visual: RenderMeshVisual; order: number; materials: Material[]}[] = []
+  private carried = false
+  private releaseTimer: DelayedCallbackEvent
+  private glide: {t: Transform; local: vec3; pos: vec3}[] = []
 
   onAwake() {
     const collider = this.sceneObject.createComponent("Physics.ColliderComponent") as ColliderComponent
@@ -59,11 +66,21 @@ export class SmallWinsDragItem extends BaseScriptComponent {
 
     this.home = this.getTransform().getWorldPosition()
     this.collectVisuals(this.sceneObject)
+    this.releaseTimer = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent
+    this.releaseTimer.bind(() => {
+      this.setCarried(false)
+      this.onRelease()
+    })
+    this.createEvent("LateUpdateEvent").bind(() => this.glideAfterHand())
     this.createEvent("OnStartEvent").bind(() => {
-      manipulation.onManipulationStart.add(() => this.setCarried(true))
+      manipulation.onManipulationStart.add(() => {
+        // A let-go followed straight away by a re-grab is one carry, not a drop and a new pick-up.
+        this.releaseTimer.enabled = false
+        if (!this.carried) this.setCarried(true)
+      })
       manipulation.onManipulationEnd.add(() => {
-        this.setCarried(false)
-        this.onRelease()
+        this.releaseTimer.enabled = true
+        this.releaseTimer.reset(RELEASE_SETTLE_SECONDS)
       })
     })
   }
@@ -83,6 +100,17 @@ export class SmallWinsDragItem extends BaseScriptComponent {
    * In the preview a mouse drag keeps the item at the same depth, which slides it straight through the furniture.
    */
   private setCarried(carried: boolean): void {
+    this.carried = carried
+    if (carried) {
+      this.glide = []
+      for (let i = 0; i < this.sceneObject.getChildrenCount(); i++) {
+        const t = this.sceneObject.getChild(i).getTransform()
+        this.glide.push({t, local: t.getLocalPosition(), pos: t.getWorldPosition()})
+      }
+    } else {
+      this.glide.forEach((g) => g.t.setLocalPosition(g.local))
+      this.glide = []
+    }
     for (const entry of this.visuals) {
       entry.visual.setRenderOrder(carried ? 5000 : entry.order)
       for (const m of entry.materials) m.mainPass.depthTest = !carried
@@ -100,6 +128,20 @@ export class SmallWinsDragItem extends BaseScriptComponent {
     const along = zone.sub(eye).dot(dir)
     if (along <= 0) return false
     return eye.add(dir.uniformScale(along)).distance(zone) < this.dropRadius * 0.75
+  }
+
+  /**
+   * The grab point can jump a little from frame to frame (in the preview, the pointer's depth flickers as it
+   * crosses furniture), so what you see eases after it rather than twitching.
+   */
+  private glideAfterHand(): void {
+    if (!this.carried) return
+    const world = this.getTransform().getWorldTransform()
+    const k = Math.min(1, getDeltaTime() * 14)
+    for (const g of this.glide) {
+      g.pos = vec3.lerp(g.pos, world.multiplyPoint(g.local), k)
+      g.t.setWorldPosition(g.pos)
+    }
   }
 
   private onRelease(): void {

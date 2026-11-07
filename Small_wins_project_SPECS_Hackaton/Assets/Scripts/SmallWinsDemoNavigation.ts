@@ -62,6 +62,8 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
   private startEye: vec3
   private moveTarget: vec3 | null = null
   private seated = false
+  /** Set by the hands-free demo: the camera's own turn (preview environment start, right-drag) is cancelled out. */
+  cancelCameraTurn = false
   /** Top speeds for a calm, filmable camera. Unlimited unless something (like the demo run) asks for it. */
   maxTurnSpeed = Infinity
   maxMoveSpeed = Infinity
@@ -201,8 +203,10 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
     }
     this.lastLocal = local
 
-    rig.setWorldRotation(rotation)
-    rig.setWorldPosition(this.eye.sub(rotation.multiplyVec3(local)))
+    // A hands-free run looks exactly where it means to, whatever angle the preview environment starts its camera at.
+    const rigRotation = this.cancelCameraTurn ? rotation.multiply(camera.getLocalRotation().invert()) : rotation
+    rig.setWorldRotation(rigRotation)
+    rig.setWorldPosition(this.eye.sub(rigRotation.multiplyVec3(local)))
   }
 
   private keepInside(p: vec3): vec3 {

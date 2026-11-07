@@ -49,7 +49,7 @@
     -
       {}
   InputLines:
-    - '// @input string inviteLine = "Well done for the dishes and the washing machine." {"hint":"Shown after both chores"}'
+    - "// @input string inviteLine = \"Well done for the dishes and the washing machine.\" {\"hint\":\"Shown when no line is given: normally it names what you've just done\"}"
     - "// @input string rewardLine = \"Want to reward yourself with some me-time? Make a tea, sit down, take a few minutes.\" {\"hint\":\"Asks if you'd like to reward yourself\"}"
     - '// @input string questionLine = "Are you ready for some conscious breathing?" {"hint":"The question Yes and No answer"}'
     - '// @input string promptLine = "Find somewhere comfortable to sit, in this room or another. Take as long as you need." {"hint":"Shown after Yes. It waits as long as you need"}'

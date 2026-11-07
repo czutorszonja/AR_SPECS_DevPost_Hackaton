@@ -43,7 +43,7 @@ interface RewardRequest {
   message: string
 }
 
-/** The pop, stars, personal line and sticker strip, anchored to the wall beside the appliance. */
+/** The pop, stars, personal line and sticker strip, anchored to the wall beside the appliance, then gone. */
 @component
 export class SmallWinsRewardUI extends BaseScriptComponent {
   readonly onRewardFinished = new Event<SceneObject>()

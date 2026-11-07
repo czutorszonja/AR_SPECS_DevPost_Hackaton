@@ -1,12 +1,13 @@
 import {Interactable} from "SpectaclesInteractionKit.lspkg/Components/Interaction/Interactable/Interactable"
 import {SmallWinsDemoNavigation} from "./SmallWinsDemoNavigation"
 import {addButton, child} from "./SmallWinsUIKit"
-import {faceViewer, pointInFront} from "./SmallWinsViewer"
+import {faceViewer, pointInView} from "./SmallWinsViewer"
 
 const STAND_DISTANCE = 85
 const STAND_TEXT_DISTANCE = 170
-const STAND_RIGHT = 12
-const STAND_DROP = 17
+// Top right of the view: a demo control, so it keeps clear of the breathing square and its buttons.
+const STAND_RIGHT = 13
+const STAND_DROP = -15
 const FOLLOW_RATE = 4
 
 /**
@@ -77,7 +78,7 @@ export class SmallWinsDemoSeat extends BaseScriptComponent {
   private sit(): void {
     if (this.navigation.isSeated) return
     this.navigation.sitAt(this.seatEye)
-    this.standRoot.getTransform().setWorldPosition(pointInFront(STAND_DISTANCE, STAND_RIGHT, -STAND_DROP))
+    this.standRoot.getTransform().setWorldPosition(pointInView(STAND_DISTANCE, STAND_RIGHT, -STAND_DROP))
   }
 
   private stand(): void {
@@ -90,7 +91,7 @@ export class SmallWinsDemoSeat extends BaseScriptComponent {
     this.standRoot.enabled = seated
     if (seated) {
       const t = this.standRoot.getTransform()
-      const next = vec3.lerp(t.getWorldPosition(), pointInFront(STAND_DISTANCE, STAND_RIGHT, -STAND_DROP), Math.min(1, getDeltaTime() * FOLLOW_RATE))
+      const next = vec3.lerp(t.getWorldPosition(), pointInView(STAND_DISTANCE, STAND_RIGHT, -STAND_DROP), Math.min(1, getDeltaTime() * FOLLOW_RATE))
       t.setWorldPosition(next)
       t.setWorldRotation(faceViewer(next))
     } else {
