@@ -44,11 +44,14 @@ export class SmallWinsHomeTasksScenario extends Scenario {
     expect(shown("TaskHint_phone")).toBe(true)
 
     // Water the plants by hand: carry the can to the palm, it pours, and the plant's sticker pops up.
+    const canHome = worldPos("WateringCan")
     await hand.dragTo("WateringCan", worldPos("PlantPourPoint"))
     await waitFor("the plant sticker", () => shown("RewardPlate"), 8000)
     expect(state.getTask(TASK_PLANTS).done).toBe(true)
     expect(hasSticker("plant")).toBe(true)
     expect(shown("TaskHint_plants")).toBe(false)
+    // The can goes back where it lives instead of hanging in the air by the plant.
+    expect(worldPos("WateringCan").distance(canHome)).toBeLessThan(3)
     await rewardEnds()
 
     // Text a friend: tap the phone, it lights up with the message you sent.

@@ -50,7 +50,7 @@ Look and feel (from the learner's reference photos): an artsy, lived-in flat in 
   - Guided drawing: a cream sheet in a teal frame, about the size of an A4 page (34 x 24 cm), about 80 cm in front of you and just below eye level, like paper on a desk. The pen is a dark teal dot in a white ring.
 - Text on cards: large enough to read comfortably at a glance on the narrow display, on every card and button. Panels are sized to fit it.
 - Buttons: sized for a hand, not a mouse. Every button is at least about 3 degrees of your view (about 4 cm at notebook distance), the three choices by your hand and the exercise choices about 4 degrees, with clear gaps between them, so it's obvious where to point and pinch.
-- Jobs around the flat, each with its own place and sticker: a watering can by the palm in the reading corner, a ginger cat with its bowl and a bag of food by the fridge, a mug, plate and bowl left on the dining table, and a phone on the coffee table, in reach from the sofa. The sticker hint shows by each one once it's on today's list, and its sticker pops up right there.
+- Jobs around the flat, each with its own place and sticker: a watering can by the palm in the reading corner, a ginger cat with its bowl and a bag of food by the fridge, a mug, plate and bowl left on the dining table, a phone on the coffee table, in reach from the sofa, and a stack of books beside it for reading ten pages (tap them once you've read). The sticker hint shows by each one once it's on today's list, and its sticker pops up right there.
 - Raise hand button: in the bottom-left corner of your view wherever you look, clearly a demo control. It steps aside while a reward, the me-time invitation, the breathing, an exercise or the quest card is showing.
 
 ## Hands and input
@@ -95,7 +95,7 @@ Each one can be checked in Lens Studio's preview.
 4. When I look at the door I can see there's a quest or sticker to earn. When I tap the door, it animates open to the outside, with the option to start "Find 3 yellow things," ignore for today, or ignore until 5 pm.
 5. Pinching "Raise hand" shows an animated hand and three choices: To-do list, Me-time and Today's wins. Each opens one small card. In the list I can tick off, add, swap or remove a task, look back at yesterday and plan tomorrow, and Today's wins shows the day's stickers.
 6. In Me-time I can choose box breathing, eye movement calm or guided drawing. Eye movement shows what it is and isn't, the dot sweeps across in sets with rests, I can pause or stop at any time, and it asks how I feel. Guided drawing shows the leaf and draws it one line at a time. Each earns its own sticker, and every button is big enough to aim a hand at.
-7. I can add jobs around the flat to my list (water the plants, feed the cat, clear the table, text a friend). Each shows its sticker hint where it lives. Doing it there, or ticking it off the list, plays it out and pops its sticker up in the room.
+7. I can add jobs around the flat to my list (water the plants, feed the cat, clear the table, text a friend, read ten pages). Each shows its sticker hint where it lives. Doing it there, or ticking it off the list, plays it out and pops its sticker up in the room.
 
 ## Out of scope
 This version won't do the following. They're the bigger product, for later.

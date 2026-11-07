@@ -18,6 +18,7 @@ import {SmallWinsInViewScenario} from "./SmallWinsInViewScenario"
 import {SmallWinsNoThanksScenario} from "./SmallWinsNoThanksScenario"
 import {SmallWinsNotebookScenario} from "./SmallWinsNotebookScenario"
 import {SmallWinsReachScenario} from "./SmallWinsReachScenario"
+import {SmallWinsReadingScenario} from "./SmallWinsReadingScenario"
 import {SmallWinsReducedMotionScenario} from "./SmallWinsReducedMotionScenario"
 import {SmallWinsRoomScenario} from "./SmallWinsRoomScenario"
 import {SmallWinsSeatScenario} from "./SmallWinsSeatScenario"
@@ -46,6 +47,7 @@ export class LeafIndex extends BaseScriptComponent {
     {id: "c6-eye-movement-full", typename: SmallWinsEyeMovementFullScenario.getTypeName()},
     {id: "c6-guided-drawing", typename: SmallWinsDrawingScenario.getTypeName()},
     {id: "c7-home-tasks", typename: SmallWinsHomeTasksScenario.getTypeName()},
+    {id: "c7-reading", typename: SmallWinsReadingScenario.getTypeName()},
     {id: "button-sizes", typename: SmallWinsButtonSizeScenario.getTypeName()},
     {id: "reach-check", typename: SmallWinsReachScenario.getTypeName()},
     {id: "demo-recording", typename: SmallWinsDemoScenario.getTypeName()},

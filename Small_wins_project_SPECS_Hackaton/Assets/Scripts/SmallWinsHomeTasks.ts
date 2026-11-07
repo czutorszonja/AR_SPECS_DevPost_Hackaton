@@ -1,7 +1,7 @@
 import {Interactable} from "SpectaclesInteractionKit.lspkg/Components/Interaction/Interactable/Interactable"
 import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
 import {SmallWinsDragItem} from "./SmallWinsDragItem"
-import {SmallWinsState, TASK_CAT, TASK_PHONE, TASK_PLANTS, TASK_TABLE} from "./SmallWinsState"
+import {SmallWinsState, TASK_CAT, TASK_PHONE, TASK_PLANTS, TASK_READ, TASK_TABLE} from "./SmallWinsState"
 import {addImage, addPanel, addText, child, clamp01, floatGently, setImageAlpha, sizeImage, smooth, TEX, tintPanel, tween} from "./SmallWinsUIKit"
 import {faceViewer} from "./SmallWinsViewer"
 
@@ -13,6 +13,10 @@ const PHONE_MESSAGE = "Sent to Anna: Thinking of you! Coffee soon?"
  * The extra jobs around the flat, each with its own sticker: water the plants, feed the cat, clear the table,
  * text a friend. Each can be done by hand in the room, or ticked off the list, which plays it out by itself.
  */
+// The books on the coffee table, and their sticker spot just to the right of the phone's, in room coordinates.
+const BOOK_STACK = new vec3(115, -110, 662)
+const BOOK_ANCHOR = new vec3(132, -50, 664)
+
 @component
 export class SmallWinsHomeTasks extends BaseScriptComponent {
   @ui.group_start("Water the plants")
@@ -52,12 +56,14 @@ export class SmallWinsHomeTasks extends BaseScriptComponent {
   private phoneCard: SceneObject
   private phoneGlow: Image
   private phoneGlowRoot: SceneObject
+  private bookAnchor: SceneObject
 
   anchorFor(id: string): SceneObject | null {
     if (id === TASK_PLANTS) return this.plantAnchor
     if (id === TASK_CAT) return this.catAnchor
     if (id === TASK_TABLE) return this.tableAnchor
     if (id === TASK_PHONE) return this.phoneAnchor
+    if (id === TASK_READ) return this.bookAnchor
     return null
   }
 
@@ -66,7 +72,8 @@ export class SmallWinsHomeTasks extends BaseScriptComponent {
   }
 
   onAwake() {
-    for (const id of [TASK_PLANTS, TASK_CAT, TASK_TABLE, TASK_PHONE]) this.hints[id] = this.addHint(this.anchorFor(id), id)
+    this.buildBooks()
+    for (const id of [TASK_PLANTS, TASK_CAT, TASK_TABLE, TASK_PHONE, TASK_READ]) this.hints[id] = this.addHint(this.anchorFor(id), id)
     floatGently(this, Object.keys(this.hints).map((id) => this.hints[id]), () => SmallWinsState.instance.reducedMotion)
     this.buildEffects()
     this.createEvent("OnStartEvent").bind(() => {
@@ -96,6 +103,39 @@ export class SmallWinsHomeTasks extends BaseScriptComponent {
     else if (id === TASK_CAT) this.catFood.autoDrop()
     else if (id === TASK_TABLE) this.tableItems.forEach((item, i) => this.later(i * 0.35, () => item.autoDrop()))
     else if (id === TASK_PHONE) this.text()
+    else if (id === TASK_READ) this.read()
+  }
+
+  /**
+   * The stack of books on the coffee table: their sticker spot sits just beside them, clear of the phone's,
+   * and tapping them counts as reading. Built here, so the room keeps its own layout.
+   */
+  private buildBooks(): void {
+    const anchors = this.phoneAnchor.getParent()
+    this.bookAnchor = global.scene.createSceneObject("BookRewardAnchor")
+    this.bookAnchor.setParent(anchors)
+    this.bookAnchor.getTransform().setLocalPosition(BOOK_ANCHOR)
+    this.bookAnchor.getTransform().setLocalRotation(this.phoneAnchor.getTransform().getLocalRotation())
+    const books = global.scene.createSceneObject("BookTapTarget")
+    books.setParent(anchors)
+    books.getTransform().setLocalPosition(BOOK_STACK)
+    const collider = books.createComponent("Physics.ColliderComponent") as ColliderComponent
+    const shape = Shape.createBoxShape()
+    shape.size = new vec3(30, 22, 30)
+    collider.shape = shape
+    collider.fitVisual = false
+    this.createEvent("OnStartEvent").bind(() => {
+      const tap = books.createComponent(Interactable.getTypeName()) as Interactable
+      tap.onTriggerEnd.add(() => {
+        const task = SmallWinsState.instance.getTask(TASK_READ)
+        if (task && !task.done) this.read()
+      })
+    })
+  }
+
+  /** A quiet moment with a book: a short pause, then the sticker. */
+  private read(): void {
+    this.later(0.4, () => this.finish(TASK_READ))
   }
 
   /** The same sticker outline and star as the chores, shown while the job is on today's list. */
@@ -168,6 +208,10 @@ export class SmallWinsHomeTasks extends BaseScriptComponent {
       },
       () => {
         this.dropRoot.enabled = false
+        // Back to where it lives, rather than left hanging in the air by the plant.
+        const from = can.getWorldPosition()
+        const home = this.wateringCan.homePosition
+        tween(this, 0.7, (t) => can.setWorldPosition(vec3.lerp(from, home, smooth(t)).add(new vec3(0, Math.sin(t * Math.PI) * 15, 0))))
         this.sway(this.plant, () => this.finish(TASK_PLANTS))
       },
     )

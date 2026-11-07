@@ -43,6 +43,7 @@ export class SmallWinsDragItem extends BaseScriptComponent {
 
   private home: vec3
   private interactable: Interactable
+  private visuals: {visual: RenderMeshVisual; order: number; materials: Material[]}[] = []
 
   onAwake() {
     const collider = this.sceneObject.createComponent("Physics.ColliderComponent") as ColliderComponent
@@ -57,9 +58,35 @@ export class SmallWinsDragItem extends BaseScriptComponent {
     manipulation.setCanScale(false)
 
     this.home = this.getTransform().getWorldPosition()
+    this.collectVisuals(this.sceneObject)
     this.createEvent("OnStartEvent").bind(() => {
-      manipulation.onManipulationEnd.add(() => this.onRelease())
+      manipulation.onManipulationStart.add(() => this.setCarried(true))
+      manipulation.onManipulationEnd.add(() => {
+        this.setCarried(false)
+        this.onRelease()
+      })
     })
+  }
+
+  /** Its own copies of its materials, so drawing it on top changes only this item. */
+  private collectVisuals(o: SceneObject): void {
+    for (const visual of o.getComponents("Component.RenderMeshVisual") as RenderMeshVisual[]) {
+      const materials = visual.materials.map((m) => m.clone())
+      visual.materials = materials
+      this.visuals.push({visual, order: visual.getRenderOrder(), materials})
+    }
+    for (let i = 0; i < o.getChildrenCount(); i++) this.collectVisuals(o.getChild(i))
+  }
+
+  /**
+   * While you carry it, it draws over everything, so it never vanishes into the counter or a cupboard on the way.
+   * In the preview a mouse drag keeps the item at the same depth, which slides it straight through the furniture.
+   */
+  private setCarried(carried: boolean): void {
+    for (const entry of this.visuals) {
+      entry.visual.setRenderOrder(carried ? 5000 : entry.order)
+      for (const m of entry.materials) m.mainPass.depthTest = !carried
+    }
   }
 
   /** Over the zone in space, or over it along the line of sight: mouse drags in preview keep their depth. */

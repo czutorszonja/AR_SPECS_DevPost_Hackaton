@@ -7,7 +7,7 @@ import {SmallWinsInviteUI} from "./SmallWinsInviteUI"
 import {SmallWinsNotebookUI, Therapy} from "./SmallWinsNotebookUI"
 import {SmallWinsRewardUI} from "./SmallWinsRewardUI"
 import {SmallWinsRoomController} from "./SmallWinsRoomController"
-import {SmallWinsState, StickerArt, TASK_CAT, TASK_DISHES, TASK_LAUNDRY, TASK_MINDFUL, TASK_PHONE, TASK_PLANTS, TASK_TABLE} from "./SmallWinsState"
+import {SmallWinsState, StickerArt, TASK_CAT, TASK_DISHES, TASK_LAUNDRY, TASK_MINDFUL, TASK_PHONE, TASK_PLANTS, TASK_READ, TASK_TABLE} from "./SmallWinsState"
 import {addImage, child, floatGently, TEX} from "./SmallWinsUIKit"
 import {faceViewer, pointInFront} from "./SmallWinsViewer"
 
@@ -17,6 +17,7 @@ const TASK_MESSAGES: Record<string, string> = {
   [TASK_CAT]: "A full bowl and a very happy cat.",
   [TASK_TABLE]: "A clear table, a clear head.",
   [TASK_PHONE]: "A little message can mean a lot.",
+  [TASK_READ]: "Ten pages, just for you.",
   [TASK_MINDFUL]: "A moment just for you. Well done.",
 }
 const LIST_MESSAGE = "Small win, well done."
@@ -38,10 +39,10 @@ const DONE_PHRASES: Record<string, string> = {
   [TASK_CAT]: "feeding the cat",
   [TASK_TABLE]: "clearing the table",
   [TASK_PHONE]: "texting a friend",
+  [TASK_READ]: "your reading",
 }
 const LIST_PHRASES: Record<string, string> = {
   "Go for a short walk": "your walk",
-  "Read ten pages": "your reading",
 }
 
 /** Orchestrates the day: two chores, the jobs around the flat, the me-time invitation and the exercises. */

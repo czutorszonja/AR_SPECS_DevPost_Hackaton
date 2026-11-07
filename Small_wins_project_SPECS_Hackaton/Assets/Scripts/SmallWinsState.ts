@@ -1,6 +1,6 @@
 import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
 
-export type StickerArt = "plate" | "clothes" | "pebbles" | "custom" | "calm" | "drawing" | "plant" | "cat" | "phone" | "table"
+export type StickerArt = "plate" | "clothes" | "pebbles" | "custom" | "calm" | "drawing" | "plant" | "cat" | "phone" | "table" | "book"
 
 export interface SmallWinsTask {
   id: string
@@ -16,6 +16,7 @@ export const TASK_PLANTS = "plants"
 export const TASK_CAT = "cat"
 export const TASK_TABLE = "table"
 export const TASK_PHONE = "phone"
+export const TASK_READ = "read"
 
 export interface TaskPreset {
   title: string
@@ -31,7 +32,7 @@ export const TASK_PRESETS: TaskPreset[] = [
   {title: "Clear the table", id: TASK_TABLE, art: "table"},
   {title: "Text a friend", id: TASK_PHONE, art: "phone"},
   {title: "Go for a short walk", art: "custom"},
-  {title: "Read ten pages", art: "custom"},
+  {title: "Read ten pages", id: TASK_READ, art: "book"},
 ]
 
 // Five rows keep every button hand-sized on a card that still fits the narrow display.

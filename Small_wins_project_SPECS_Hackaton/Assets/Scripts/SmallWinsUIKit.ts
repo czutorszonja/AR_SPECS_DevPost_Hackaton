@@ -29,6 +29,7 @@ export const TEX = {
   sprigWash: requireAsset("../Textures/SprigWash_680x480.png") as Texture,
   sprigGuide: requireAsset("../Textures/SprigGuide_680x480.png") as Texture,
   plant: requireAsset("../Textures/StickerPlant_256x256.png") as Texture,
+  book: requireAsset("../Textures/StickerBook_256x256.png") as Texture,
   cat: requireAsset("../Textures/StickerCat_256x256.png") as Texture,
   phone: requireAsset("../Textures/StickerPhone_256x256.png") as Texture,
   table: requireAsset("../Textures/StickerTable_256x256.png") as Texture,
