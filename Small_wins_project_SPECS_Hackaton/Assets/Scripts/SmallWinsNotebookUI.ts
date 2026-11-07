@@ -1,7 +1,7 @@
 import {BackPlate} from "SpectaclesUIKit.lspkg/Scripts/BackPlate"
 import {FlexDirection, FlexJustify} from "SpectaclesUIKit.lspkg/Scripts/Components/Layout2D/Flex/FlexTypes"
 import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
-import {MAX_TASKS, presetsFor, SmallWinsState, TaskPreset} from "./SmallWinsState"
+import {Day, MAX_TASKS, presetsFor, SmallWinsState, SmallWinsTask, TaskPreset} from "./SmallWinsState"
 import {
   addButton,
   addImage,
@@ -39,7 +39,8 @@ const MENU_GAP = 1.6
 const CARD_DISTANCE = 70
 // Text is scaled well past the card's real distance, so it stays easy to read on the narrow display.
 const CARD_TEXT_DISTANCE = 140
-const CARD_DROP = 4
+// Just below the eyes; the tallest card (a full day) still fits the view.
+const CARD_DROP = 1.5
 // A card follows your gaze this far up or down, and no further; it always stays upright.
 const CARD_MAX_PITCH = 15
 // One thing at a time: each card is about two thirds of the display wide.
@@ -57,6 +58,16 @@ const WIN_CELL_H = 8.5
 const REFRESH_DELAY_SECONDS = 0.12
 
 const CARD_TITLES: Record<Card, string> = {todo: "To-do list", wins: "Today's wins", metime: "Me-time"}
+const DAY_TITLES: Record<Day, string> = {[-1]: "Yesterday", 0: "Today", 1: "Tomorrow"}
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+const DAY_BUTTON_W = 8.5
+
+/** "Fri 6 Nov", for today and the days either side. */
+function dateLabel(day: Day): string {
+  const d = new Date(Date.now() + day * 24 * 60 * 60 * 1000)
+  return DAY_NAMES[d.getDay()] + " " + d.getDate() + " " + MONTH_NAMES[d.getMonth()]
+}
 
 const THERAPIES: {id: Therapy; name: string; label: string}[] = [
   {id: "breathing", name: "TherapyBreathing", label: "Box breathing  ·  1 min"},
@@ -84,7 +95,9 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
   private bodyHost: SceneObject
   private body: SceneObject | null = null
   private card: Card = "todo"
-  private picker: {editingId: string | null} | null = null
+  /** Which day the planner shows: look back at yesterday, plan tomorrow. Opens on today. */
+  private day: Day = 0
+  private picker: {editingId: string | null; day: Day} | null = null
   private handRaised = false
   private hidden = false
   private cardShowing = false
@@ -146,12 +159,21 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     t.setWorldRotation(faceViewer(position))
     this.bookRoot.enabled = true
     this.card = card
+    this.day = 0
     this.picker = null
     this.refresh()
   }
 
   private updateHudVisibility(): void {
-    this.hudRoot.enabled = !this.hidden && !this.cardShowing && !this.bookRoot.enabled
+    const show = !this.hidden && !this.cardShowing && !this.bookRoot.enabled
+    // Coming back after a while, it starts in its corner rather than drifting over from where you last were.
+    if (show && !this.hudRoot.enabled) {
+      const t = this.hudRoot.getTransform()
+      const position = pointInView(HUD_DISTANCE, HUD_RIGHT, -HUD_DROP)
+      t.setWorldPosition(position)
+      t.setWorldRotation(faceViewer(position))
+    }
+    this.hudRoot.enabled = show
   }
 
   private buildHud(): void {
@@ -238,7 +260,13 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     const cardH = CARD_PAD + HEADER_H + GAP + bodyH + CARD_PAD
     this.plate.size = new vec2(CARD_W, cardH)
     this.header.getTransform().setLocalPosition(new vec3(0, cardH / 2 - CARD_PAD - HEADER_H / 2, 0.6))
-    this.title.text = this.picker ? (this.picker.editingId ? "Change this task" : "Add a task") : CARD_TITLES[this.card]
+    this.title.text = this.picker
+      ? this.picker.editingId
+        ? "Change this task"
+        : "Add a task"
+      : this.card === "todo"
+        ? DAY_TITLES[this.day] + "  ·  " + dateLabel(this.day)
+        : CARD_TITLES[this.card]
     this.bodyHost.getTransform().setLocalPosition(new vec3(0, cardH / 2 - CARD_PAD - HEADER_H - GAP - bodyH / 2, 0.6))
     this.body = flexContainer(this.bodyHost, "NotebookBody", FlexDirection.Column, INNER_W, bodyH, GAP, FlexJustify.Start)
     if (this.picker) this.buildPicker(this.body)
@@ -255,13 +283,46 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
 
   private todoRows(): number[] {
     const state = SmallWinsState.instance
-    const rows = state.tasks.map(() => BUTTON_H)
-    if (state.tasks.length < MAX_TASKS) rows.push(BUTTON_H)
-    return rows.length > 0 ? rows : [BUTTON_H]
+    const count = this.day === -1 ? state.yesterday.length : state.tasksFor(this.day).length
+    const rows = [BUTTON_H, ...new Array(count).fill(BUTTON_H)]
+    if (this.day !== -1 && count < MAX_TASKS) rows.push(BUTTON_H)
+    return rows
+  }
+
+  /** A day planner: step back to yesterday or on to tomorrow, see what else is on, then the day's tasks. */
+  private buildTodo(body: SceneObject): void {
+    this.buildDayNav(body)
+    if (this.day === 0) this.buildToday(body)
+    else if (this.day === 1) this.buildTomorrow(body)
+    else this.buildYesterday(body)
+  }
+
+  /** Yesterday and Tomorrow either side of what else the day holds, like a birthday or a concert. */
+  private buildDayNav(body: SceneObject): void {
+    const d = CARD_TEXT_DISTANCE
+    const nav = this.row(body, "DayNav", BUTTON_H, FlexJustify.SpaceBetween)
+    if (this.day > -1) {
+      flexButton(nav, "DayPrev", this.day === 1 ? "Today" : "Yesterday", DAY_BUTTON_W, BUTTON_H, () => this.showDay((this.day - 1) as Day), d)
+    } else {
+      flexPlace(child(nav, "DayPrevSpace"), DAY_BUTTON_W, BUTTON_H)
+    }
+    const state = SmallWinsState.instance
+    const note = this.day === -1 ? state.yesterday.length + " small wins" : state.events[this.day] || "Nothing else on"
+    flexText(nav, "DayNote", note, {role: "Body", distance: d, width: INNER_W - 2 * DAY_BUTTON_W - 2 * GAP, height: BUTTON_H, color: TEXT_SOFT, wrap: true})
+    if (this.day < 1) {
+      flexButton(nav, "DayNext", this.day === -1 ? "Today" : "Tomorrow", DAY_BUTTON_W, BUTTON_H, () => this.showDay((this.day + 1) as Day), d)
+    } else {
+      flexPlace(child(nav, "DayNextSpace"), DAY_BUTTON_W, BUTTON_H)
+    }
+  }
+
+  private showDay(day: Day): void {
+    this.day = day
+    this.requestRefresh()
   }
 
   /** Each task: tick it off, its sticker spot, and Edit (which can also remove it). */
-  private buildTodo(body: SceneObject): void {
+  private buildToday(body: SceneObject): void {
     const d = CARD_TEXT_DISTANCE
     const state = SmallWinsState.instance
     state.tasks.forEach((task, i) => {
@@ -272,10 +333,40 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
       flexPlace(art.getSceneObject(), 3.4, 3.4)
       flexButton(row, "TaskEdit" + i, "Edit", 5.5, BUTTON_H, () => this.openPicker(task.id), d)
     })
-    if (state.tasks.length < MAX_TASKS) {
-      const footer = this.row(body, "TodoFooter", BUTTON_H)
-      flexButton(footer, "AddTaskButton", "+ Add a task", 15, BUTTON_H, () => this.openPicker(null), d)
-    }
+    this.addTaskFooter(body, state.tasks)
+  }
+
+  /** Tomorrow's plan: change it as you like. Its ticks wait for the day, and its stickers for when it's done. */
+  private buildTomorrow(body: SceneObject): void {
+    const d = CARD_TEXT_DISTANCE
+    SmallWinsState.instance.tomorrow.forEach((task, i) => {
+      const row = this.row(body, "PlanRow" + i, BUTTON_H)
+      flexText(row, "PlanWhen" + i, "Plan", {role: "Body", distance: d, width: 6, height: BUTTON_H, color: TEXT_SOFT})
+      flexText(row, "PlanTitle" + i, task.title, {role: "Body", distance: d, width: 11.2, height: BUTTON_H, align: HorizontalAlignment.Left})
+      const art = addImage(row, "PlanArt" + i, TEX.outline, 3.4)
+      flexPlace(art.getSceneObject(), 3.4, 3.4)
+      flexButton(row, "PlanEdit" + i, "Edit", 5.5, BUTTON_H, () => this.openPicker(task.id), d)
+    })
+    this.addTaskFooter(body, SmallWinsState.instance.tomorrow)
+  }
+
+  /** Looking back: what you did yesterday, each with its sticker. Nothing about what you didn't. */
+  private buildYesterday(body: SceneObject): void {
+    const d = CARD_TEXT_DISTANCE
+    SmallWinsState.instance.yesterday.forEach((win, i) => {
+      const row = this.row(body, "PastRow" + i, BUTTON_H)
+      flexText(row, "PastDone" + i, "Done", {role: "Body", distance: d, width: 6, height: BUTTON_H, color: TEXT_SOFT})
+      flexText(row, "PastTitle" + i, win.title, {role: "Body", distance: d, width: 11.2, height: BUTTON_H, align: HorizontalAlignment.Left})
+      const art = addImage(row, "PastArt" + i, stickerTexture(win.art), 3.4)
+      flexPlace(art.getSceneObject(), 3.4, 3.4)
+      flexPlace(child(row, "PastSpace" + i), 5.5, BUTTON_H)
+    })
+  }
+
+  private addTaskFooter(body: SceneObject, tasks: SmallWinsTask[]): void {
+    if (tasks.length >= MAX_TASKS) return
+    const footer = this.row(body, "TodoFooter", BUTTON_H)
+    flexButton(footer, "AddTaskButton", "+ Add a task", 15, BUTTON_H, () => this.openPicker(null), CARD_TEXT_DISTANCE)
   }
 
   /** Ticking off plays the sticker out in the room. Unticking just takes it back off the page. */
@@ -347,12 +438,12 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
   }
 
   private openPicker(editingId: string | null): void {
-    this.picker = {editingId}
+    this.picker = {editingId, day: this.day}
     this.requestRefresh()
   }
 
   private pickerChoices(): TaskPreset[] {
-    return presetsFor(this.picker ? this.picker.editingId : null)
+    return this.picker ? presetsFor(this.picker.editingId, this.picker.day) : []
   }
 
   private pickerRows(): number[] {
@@ -364,8 +455,10 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     const d = CARD_TEXT_DISTANCE
     const state = SmallWinsState.instance
     const editingId = this.picker ? this.picker.editingId : null
+    const day: Day = this.picker ? this.picker.day : 0
     const choices = this.pickerChoices()
-    flexText(body, "PickerHeading", editingId ? "Swap it for" : "What counts for you today?", {role: "Subheadline", distance: d, width: INNER_W, height: 3, color: TEXT_SOFT})
+    const heading = editingId ? "Swap it for" : day === 1 ? "What would you like to do tomorrow?" : "What counts for you today?"
+    flexText(body, "PickerHeading", heading, {role: "Subheadline", distance: d, width: INNER_W, height: 3, color: TEXT_SOFT})
     const colW = (INNER_W - GAP) / 2
     for (let i = 0; i < choices.length; i += 2) {
       const row = this.row(body, "PresetRow" + i, BUTTON_H, FlexJustify.Start)
@@ -379,8 +472,8 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
           BUTTON_H,
           () => {
             this.picker = null
-            if (editingId) state.replaceTask(editingId, preset)
-            else state.addTask(preset)
+            if (editingId) state.replaceTask(editingId, preset, day)
+            else state.addTask(preset, day)
           },
           d,
         )
@@ -408,7 +501,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
         BUTTON_H,
         () => {
           this.picker = null
-          state.removeTask(editingId)
+          state.removeTask(editingId, day)
         },
         d,
       )

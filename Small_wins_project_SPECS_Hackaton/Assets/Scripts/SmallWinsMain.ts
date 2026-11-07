@@ -8,7 +8,7 @@ import {SmallWinsNotebookUI, Therapy} from "./SmallWinsNotebookUI"
 import {SmallWinsRewardUI} from "./SmallWinsRewardUI"
 import {SmallWinsRoomController} from "./SmallWinsRoomController"
 import {SmallWinsState, StickerArt, TASK_CAT, TASK_DISHES, TASK_LAUNDRY, TASK_MINDFUL, TASK_PHONE, TASK_PLANTS, TASK_TABLE} from "./SmallWinsState"
-import {addImage, child, TEX} from "./SmallWinsUIKit"
+import {addImage, child, floatGently, TEX} from "./SmallWinsUIKit"
 import {faceViewer, pointInFront} from "./SmallWinsViewer"
 
 // The line that pops up with each job around the flat, and with anything ticked off the list.
@@ -102,6 +102,7 @@ export class SmallWinsMain extends BaseScriptComponent {
     SmallWinsState.instance.reset()
     this.addHint(this.dishHint)
     this.addHint(this.laundryHint)
+    floatGently(this, [this.dishHint, this.laundryHint], () => SmallWinsState.instance.reducedMotion)
     this.listAnchor = child(this.sceneObject, "ListRewardAnchor")
     this.createEvent("OnStartEvent").bind(() => this.wireFlow())
     this.createEvent("UpdateEvent").bind(() => this.notebook.setCardShowing(this.room.questUI.isCardVisible))

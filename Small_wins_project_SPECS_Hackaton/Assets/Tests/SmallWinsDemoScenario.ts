@@ -2,11 +2,13 @@ import {Scenario} from "Leaf.lspkg/Scenarios/scenario/Scenario"
 import {findSceneObjectByName, sleep} from "Leaf.lspkg/Utils/common/Utils"
 import {SmallWinsDemoNavigation} from "../Scripts/SmallWinsDemoNavigation"
 import {doorCentre} from "./SmallWinsDoorScenario"
-import {chooseTherapy, openNotebook, shown, SmallWinsLeafInteractor, so, waitFor, worldPos} from "./SmallWinsLeafHelpers"
+import {openNotebook, shown, SmallWinsLeafInteractor, so, waitFor, worldPos} from "./SmallWinsLeafHelpers"
 
 // A breath between actions, so there is room to talk over the video.
 const BEAT_MS = 1800
 const HOLD_MS = 3000
+// The planner rebuilds a moment after each press; the next press waits for it.
+const PAGE_MS = 1000
 // A calm camera: an unhurried turn and a gentle walking pace.
 const TURN_DEGREES_PER_SECOND = 40
 const WALK_CM_PER_SECOND = 95
@@ -15,9 +17,10 @@ const EYE_Y = 0
 const START = new vec3(76, EYE_Y, 430)
 
 /**
- * Not a test: plays the demo video's shot list hands-free, at a pace to talk over.
- * A slow look round the flat, plan the day, dishes, laundry and breathing on the sofa, text a friend,
- * guided drawing, eye movement calm, feed the cat and today's wins, and the quest waiting at the door.
+ * Not a test: plays the demo video's shot list hands-free, at a pace to talk over, in under three minutes.
+ * The day planned the night before (with a look back at yesterday and on to tomorrow), the dishes, the laundry
+ * and an earned break with box breathing on the sofa, the me-time choices, two more jobs added with their sticker
+ * holders appearing in the flat, watering the plants, today's wins, and the quest waiting at the door.
  */
 @component
 export class SmallWinsDemoScenario extends Scenario {
@@ -35,156 +38,137 @@ export class SmallWinsDemoScenario extends Scenario {
     this.hideTestBanner()
     await sleep(3000)
 
-    // 1. The flat, facing the kitchen with its sticker hints.
+    // 1. The flat, facing the kitchen with the sticker holders for today's chores.
     this.mark("start")
     await sleep(BEAT_MS)
 
-    // 2. Plan the day: raise your hand, open the list, add texting a friend.
+    // 2. The day, planned the night before: today with the concert, a look back at yesterday, and on to tomorrow.
     this.mark("plan")
     await hand.tap("RaiseHandButton")
-    await sleep(HOLD_MS)
+    await sleep(2200)
     await hand.tap("TodoTab")
-    await sleep(BEAT_MS)
-    await hand.tap("AddTaskButton")
-    await sleep(BEAT_MS)
-    await hand.tap("PresetTask3")
-    await sleep(BEAT_MS)
+    await sleep(HOLD_MS)
+    await hand.tap("DayPrev")
+    await sleep(2500)
+    await hand.tap("DayNext")
+    await sleep(PAGE_MS)
+    await hand.tap("DayNext")
+    await sleep(2500)
+    await hand.tap("DayPrev")
+    await sleep(PAGE_MS)
     await hand.tap("NotebookClose")
-    await sleep(BEAT_MS)
+    await sleep(800)
 
-    // 3. Walk up to the sink and load the dishes; the sticker pops on the backsplash right there.
+    // 3. Walk up to the sink and load the dishes; the sticker pops right there.
     this.mark("dishes")
     const sink = worldPos("DishMug")
     const dishwasher = worldPos("DishwasherDropZone")
     const dishes = new vec3((sink.x + dishwasher.x) / 2, sink.y - 5, (sink.z + dishwasher.z) / 2)
     await this.walkTo(new vec3(dishes.x + 10, EYE_Y, dishes.z + 135), dishes)
-    await sleep(1500)
+    await sleep(1000)
     await hand.loadDishes()
     await waitFor("the dishes reward", () => shown("RewardPlate"), 8000)
     await waitFor("the dishes reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 14000)
-    await sleep(1000)
+    await sleep(600)
 
-    // 4. Step back to take in the washer and the basket, load the clothes, then the me-time invitation.
+    // 4. Step back to take in the washer and the basket, load the clothes: that's enough for an earned break.
     this.mark("laundry")
     const washer = worldPos("WasherDropZone")
     const basket = worldPos("ClothesPile")
     const laundry = new vec3((washer.x + basket.x) / 2, washer.y + 30, (washer.z + basket.z) / 2)
     await this.walkTo(new vec3(laundry.x - 20, EYE_Y, laundry.z + 240), laundry)
-    await sleep(1500)
+    await sleep(1000)
     await hand.loadLaundry()
     await waitFor("the me-time invitation", () => shown("MeTimeInvitation"), 18000)
     this.mark("invitation")
     await sleep(HOLD_MS)
     await hand.tap("YesButton")
-    await sleep(BEAT_MS)
+    await sleep(1200)
 
-    // Across the room to the sofa, sit, and a little box breathing.
+    // 5. Across the room to the sofa, sit, and a little box breathing.
     this.mark("sofa")
     const sofaSign = worldPos("SitOnSofaButton")
     await this.walkTo(new vec3(sofaSign.x - 40, EYE_Y, sofaSign.z - 230), sofaSign.add(new vec3(0, 20, 0)))
-    await sleep(1000)
+    await sleep(800)
     await hand.tap("SitOnSofaButton")
     await this.settle()
-    await sleep(1500)
+    await sleep(1200)
     await hand.tap("ReadyButton")
     await sleep(7000)
     await hand.tap("FinishNowButton")
-    await sleep(5000)
+    await waitFor("the pebbles sticker", () => shown("BreathingReward"), 4000)
+    await waitFor("the pebbles sticker to go", () => !shown("BreathingReward"), 9000)
+    await sleep(300)
 
-    // 5. Still on the sofa: a glance down at the phone, and a message to a friend.
-    this.mark("phone")
-    this.nav.lookToward(worldPos("Phone").add(new vec3(0, 30, 0)))
-    await this.settle()
-    await sleep(1000)
-    await hand.tap("Phone")
-    await waitFor("the phone sticker", () => shown("RewardPlate"), 6000)
-    await waitFor("the phone reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 14000)
+    // 6. Still on the sofa: the other me-time choices, left open to talk about.
+    this.mark("metime")
+    await openNotebook(hand, "MeTimeTab")
+    await sleep(6500)
+    await hand.tap("NotebookClose")
+    await sleep(600)
     await hand.tap("StandUpButton")
     await this.settle()
 
-    // Back to the middle of the room for some time to yourself.
-    this.mark("back")
-    await this.walkTo(START, new vec3(-150, -20, 150))
-    await sleep(1000)
-
-    // 6. Guided drawing, kept short: watch the first two lines, hurry through the last two, then the watercolour finish.
-    this.mark("drawing")
-    await chooseTherapy(hand, "TherapyDrawing")
-    await sleep(BEAT_MS)
-    await hand.tap("DrawStartButton")
-    for (const ms of [2400, 2400, 1200, 1200]) {
-      await sleep(ms)
-      await hand.tap("DrawNextButton")
-    }
-    await waitFor("the drawing to finish", () => !shown("DrawSheet"), 11000)
-    await sleep(1000)
-
-    // 7. Eye movement calm: the safety line, a few passes, then Stop.
-    this.mark("eyes")
-    await chooseTherapy(hand, "TherapyEyes")
-    await sleep(HOLD_MS)
-    await hand.tap("EyeStartButton")
-    await sleep(5000)
-    await hand.tap("EyeStopButton")
-    await sleep(5000)
-    await waitFor("the eye exercise to finish", () => !shown("EyeReward"), 8000)
-    await sleep(1000)
-
-    // 8. Over to the cat by the fridge, feed it from the list, then today's wins.
-    this.mark("cat")
-    const cat = worldPos("Cat")
-    const bowl = worldPos("CatBowl")
-    const catCorner = new vec3((cat.x + bowl.x) / 2, cat.y + 50, (cat.z + bowl.z) / 2)
-    const catSpot = new vec3(catCorner.x + 80, EYE_Y, catCorner.z + 200)
-    await this.walkTo(catSpot, catCorner)
-    await sleep(1500)
-    // Look up from the floor before raising your hand, so the list opens in view.
-    const levelOverCat = new vec3(catCorner.x, EYE_Y - 10, catCorner.z)
-    this.nav.lookToward(levelOverCat)
-    await this.settle()
+    // 7. Back in the middle of the room, add two more jobs: their sticker holders appear around the flat.
+    this.mark("add")
+    await this.walkTo(START, new vec3(76, -20, 150))
     await openNotebook(hand, "TodoTab")
     await hand.tap("AddTaskButton")
-    await sleep(BEAT_MS)
-    await hand.tap("PresetTask1")
-    await sleep(BEAT_MS)
-    await hand.tap("TaskTick4")
-    // Down to watch the bowl fill and the cat's happy bounce, then the sticker above it.
-    this.nav.lookToward(catCorner)
-    await waitFor("the cat sticker", () => shown("RewardPlate"), 8000)
-    await waitFor("the cat reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 14000)
-    this.nav.lookToward(levelOverCat)
-    await this.settle()
-    this.mark("wins")
-    await openNotebook(hand, "WinsTab")
-    await sleep(4000)
-    await hand.tap("NotebookClose")
+    await sleep(PAGE_MS)
+    await hand.tap("PresetTask2")
+    await sleep(PAGE_MS)
+    await hand.tap("AddTaskButton")
+    await sleep(PAGE_MS)
+    await hand.tap("PresetTask0")
     await sleep(1500)
+    await hand.tap("NotebookClose")
+    this.mark("holders")
+    this.nav.lookToward(worldPos("TaskHint_table"))
+    await this.settle()
+    await sleep(1800)
 
-    // 9. The door from across the room, where its sign invites you out; then up to it, open it, and leave the quest for later.
+    // 8. Over to the palm, and water it by hand: its sticker pops where the holder was.
+    this.mark("plants")
+    const pour = worldPos("PlantPourPoint")
+    await this.walkTo(new vec3(pour.x - 150, EYE_Y, pour.z + 170), pour.add(new vec3(0, -10, 0)))
+    await sleep(800)
+    await hand.dragTo("WateringCan", worldPos("PlantPourPoint"))
+    await waitFor("the plant sticker", () => shown("RewardPlate"), 9000)
+    await waitFor("the plant reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 14000)
+
+    // 9. Today's wins, all in one place.
+    this.mark("wins")
+    this.nav.lookToward(new vec3(pour.x - 150, EYE_Y - 10, pour.z - 100))
+    await this.settle()
+    await openNotebook(hand, "WinsTab")
+    await sleep(4500)
+    await hand.tap("NotebookClose")
+    await sleep(800)
+
+    // 10. The door from across the room, where its sign invites you out; then up to it, open it, and leave the quest for later.
     this.mark("door")
     const door = doorCentre()
     await this.walkTo(new vec3(door.x + 420, EYE_Y, door.z - 20), door.add(new vec3(0, 40, 0)))
-    await sleep(4000)
+    await sleep(3000)
     await this.walkTo(new vec3(door.x + 230, EYE_Y, door.z), door.add(new vec3(0, 10, 0)))
-    await sleep(1000)
+    await sleep(800)
     await hand.tap("EntryDoorTapTarget")
     await waitFor("the quest card", () => shown("QuestCard"), 4000)
-    await sleep(4500)
+    await sleep(4000)
     await hand.tap("IgnoreUntil5Button")
-    await sleep(2000)
+    await sleep(1500)
 
     // A last slow look back across the flat.
     this.mark("closing")
     this.nav.lookToward(new vec3(300, -20, 600))
     await this.settle()
     // Long enough for the closing words.
-    await sleep(7000)
+    await sleep(6000)
     this.mark("end")
   }
 
   /** Prints how far into the video each beat starts, for timing the voiceover. */
   private mark(beat: string): void {
-    if (this.startedAt < 0) this.startedAt = getTime()
     print("DEMO beat " + beat + " at " + (getTime() - this.startedAt).toFixed(1) + " s")
   }
 

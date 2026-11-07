@@ -296,6 +296,20 @@ export function smooth(t: number): number {
 }
 
 /** A small frame-driven tween, so sequences stay cancellable and readable from LEAF. */
+/** Sticker holders bob gently while they wait for you. They keep still when `still` says so (reduced motion). */
+export function floatGently(script: BaseScriptComponent, objects: SceneObject[], still: () => boolean): void {
+  const bases = objects.map((o) => o.getTransform().getLocalPosition())
+  let time = 0
+  script.createEvent("UpdateEvent").bind(() => {
+    time += getDeltaTime()
+    objects.forEach((o, i) => {
+      if (!o.enabled) return
+      const lift = still() ? 0 : Math.sin(time * 1.6 + i * 1.3) * 1.6
+      o.getTransform().setLocalPosition(bases[i].add(new vec3(0, lift, 0)))
+    })
+  })
+}
+
 export function tween(script: BaseScriptComponent, duration: number, update: (t: number) => void, done?: () => void): () => void {
   let elapsed = 0
   const event = script.createEvent("UpdateEvent")

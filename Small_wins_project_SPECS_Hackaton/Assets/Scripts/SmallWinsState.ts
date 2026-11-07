@@ -37,10 +37,19 @@ export const TASK_PRESETS: TaskPreset[] = [
 // Five rows keep every button hand-sized on a card that still fits the narrow display.
 export const MAX_TASKS = 5
 
-/** The presets you can still pick: a task that belongs to something in the flat can only be on the list once. */
-export function presetsFor(editingId: string | null): TaskPreset[] {
-  const state = SmallWinsState.instance
-  return TASK_PRESETS.filter((p) => !p.id || p.id === editingId || !state.getTask(p.id))
+/** The planner shows yesterday, today and tomorrow. */
+export type Day = -1 | 0 | 1
+
+/** Something you did yesterday, with the sticker it earned. */
+export interface PastWin {
+  title: string
+  art: StickerArt
+}
+
+/** The presets you can still pick: a task that belongs to something in the flat can only be on a day's list once. */
+export function presetsFor(editingId: string | null, day: Day = 0): TaskPreset[] {
+  const tasks = SmallWinsState.instance.tasksFor(day)
+  return TASK_PRESETS.filter((p) => !p.id || p.id === editingId || !tasks.some((t) => t.id === p.id))
 }
 
 /** The sample day. Nothing is remembered between preview runs (brief: out of scope). */
@@ -52,6 +61,12 @@ export class SmallWinsState {
   }
 
   tasks: SmallWinsTask[] = []
+  /** Looking back: yesterday's wins. A sample day, as nothing is remembered between runs. */
+  yesterday: PastWin[] = []
+  /** Planning ahead: you can add to tomorrow, change it and remove from it. Ticking waits for the day itself. */
+  tomorrow: SmallWinsTask[] = []
+  /** The rest of life sits alongside the small wins: birthdays, tickets, appointments. */
+  events: Record<Day, string> = {[-1]: "", 0: "", 1: ""}
   /** Earned stickers in the order they were earned. Max 5 are shown in the strip. */
   stickers: {taskId: string; art: StickerArt; label: string}[] = []
   reducedMotion = false
@@ -71,9 +86,25 @@ export class SmallWinsState {
       {id: TASK_DISHES, title: "Load the dishwasher", done: false, art: "plate"},
       {id: TASK_MINDFUL, title: "Mindfulness moment", done: false, art: "pebbles"},
     ]
+    this.yesterday = [
+      {title: "Load the dishwasher", art: "plate"},
+      {title: "Go for a short walk", art: "custom"},
+      {title: "Text a friend", art: "phone"},
+      {title: "Box breathing", art: "pebbles"},
+    ]
+    this.tomorrow = [
+      {id: "tomorrow-call", title: "Call Mum", done: false, art: "phone"},
+      {id: TASK_PLANTS, title: "Water the plants", done: false, art: "plant"},
+    ]
+    this.events = {[-1]: "", 0: "Concert at 7 pm", 1: "Mum's birthday"}
     this.stickers = []
     this.reducedMotion = false
     this.nextId = 1
+  }
+
+  /** Today's list, or tomorrow's plan. Yesterday is only for looking back. */
+  tasksFor(day: Day): SmallWinsTask[] {
+    return day === 1 ? this.tomorrow : day === 0 ? this.tasks : []
   }
 
   getTask(id: string): SmallWinsTask | undefined {
@@ -105,20 +136,22 @@ export class SmallWinsState {
     if (task.done) this.onCompleted.invoke(task)
   }
 
-  addTask(preset: TaskPreset): void {
-    if (this.tasks.length >= MAX_TASKS) return
-    if (preset.id && this.getTask(preset.id)) return
-    this.tasks.push(this.taskFrom(preset))
+  addTask(preset: TaskPreset, day: Day = 0): void {
+    const tasks = this.tasksFor(day)
+    if (day === -1 || tasks.length >= MAX_TASKS) return
+    if (preset.id && tasks.some((t) => t.id === preset.id)) return
+    tasks.push(this.taskFrom(preset))
     this.onChanged.invoke()
   }
 
   /** Edit swaps a task for another, in the same place on the list. Any sticker it had goes with it. */
-  replaceTask(id: string, preset: TaskPreset): void {
-    const index = this.tasks.findIndex((t) => t.id === id)
+  replaceTask(id: string, preset: TaskPreset, day: Day = 0): void {
+    const tasks = this.tasksFor(day)
+    const index = tasks.findIndex((t) => t.id === id)
     if (index < 0) return
-    if (preset.id && preset.id !== id && this.getTask(preset.id)) return
-    this.stickers = this.stickers.filter((s) => s.taskId !== id)
-    this.tasks[index] = this.taskFrom(preset)
+    if (preset.id && preset.id !== id && tasks.some((t) => t.id === preset.id)) return
+    if (day === 0) this.stickers = this.stickers.filter((s) => s.taskId !== id)
+    tasks[index] = this.taskFrom(preset)
     this.onChanged.invoke()
   }
 
@@ -126,9 +159,13 @@ export class SmallWinsState {
     return {id: preset.id ?? "custom" + this.nextId++, title: preset.title, done: false, art: preset.art}
   }
 
-  removeTask(id: string): void {
-    this.tasks = this.tasks.filter((t) => t.id !== id)
-    this.stickers = this.stickers.filter((s) => s.taskId !== id)
+  removeTask(id: string, day: Day = 0): void {
+    if (day === 1) {
+      this.tomorrow = this.tomorrow.filter((t) => t.id !== id)
+    } else if (day === 0) {
+      this.tasks = this.tasks.filter((t) => t.id !== id)
+      this.stickers = this.stickers.filter((s) => s.taskId !== id)
+    }
     this.onChanged.invoke()
   }
 

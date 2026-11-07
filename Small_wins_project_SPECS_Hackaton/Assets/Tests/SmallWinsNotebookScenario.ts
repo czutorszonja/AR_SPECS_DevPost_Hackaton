@@ -10,7 +10,7 @@ import {openNotebook, shown, SmallWinsLeafInteractor, so, textOf, waitFor, world
 const PAGE_SETTLE_MS = 800
 
 /**
- * Done criterion 5: Raise hand shows the hand and three choices (Me-time, Today's wins, To-do list).
+ * Done criterion 5: Raise hand shows the hand and three choices (To-do list, Me-time, Today's wins).
  * Each opens one small card: the list to tick, add, swap and remove tasks, and the day's stickers.
  */
 @component
@@ -39,7 +39,7 @@ export class SmallWinsNotebookScenario extends Scenario {
     await hand.tap("TodoTab")
     await waitFor("the list", () => shown("Notebook"), 3000)
     expect(shown("HandMenu")).toBe(false)
-    expect(textOf("NotebookTitle")).toBe("To-do list")
+    expect(textOf("NotebookTitle").startsWith("Today")).toBe(true)
     const eye = viewerPose().position
     const card = worldPos("Notebook")
     expect(new vec3(card.x - eye.x, 0, card.z - eye.z).length).toBeCloseTo(70, 0)

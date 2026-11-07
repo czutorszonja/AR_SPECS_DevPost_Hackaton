@@ -139,6 +139,9 @@ export function visibleButtonSizes(): {name: string; degrees: number}[] {
 
 /** Opens one of the cards the way a person does: raise the hand, then pinch its choice. */
 export async function openNotebook(hand: SmallWinsLeafInteractor, tab: string = "TodoTab"): Promise<void> {
+  // The button steps aside while a reward or an exercise is showing, and comes back when it's done.
+  await waitFor("the Raise hand button", () => shown("RaiseHandButton"), 12000)
+  await sleep(200)
   await hand.tap("RaiseHandButton")
   await waitFor("the hand menu", () => shown(tab), 3000)
   await sleep(300)

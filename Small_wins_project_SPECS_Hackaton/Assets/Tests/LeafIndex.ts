@@ -4,6 +4,7 @@ import {SmallWinsBreathingFullScenario} from "./SmallWinsBreathingFullScenario"
 import {SmallWinsBreathingScenario} from "./SmallWinsBreathingScenario"
 import {SmallWinsChoresScenario} from "./SmallWinsChoresScenario"
 import {SmallWinsButtonSizeScenario} from "./SmallWinsButtonSizeScenario"
+import {SmallWinsDayPlannerScenario} from "./SmallWinsDayPlannerScenario"
 import {SmallWinsDemoScenario} from "./SmallWinsDemoScenario"
 import {SmallWinsDoorScenario} from "./SmallWinsDoorScenario"
 import {SmallWinsDrawingScenario} from "./SmallWinsDrawingScenario"
@@ -40,6 +41,7 @@ export class LeafIndex extends BaseScriptComponent {
     {id: "c4-ignore-today", typename: SmallWinsIgnoreTodayScenario.getTypeName()},
     {id: "c4-ignore-until-5", typename: SmallWinsIgnoreUntil5Scenario.getTypeName()},
     {id: "c5-notebook", typename: SmallWinsNotebookScenario.getTypeName()},
+    {id: "c5-day-planner", typename: SmallWinsDayPlannerScenario.getTypeName()},
     {id: "c6-eye-movement", typename: SmallWinsEyeMovementScenario.getTypeName()},
     {id: "c6-eye-movement-full", typename: SmallWinsEyeMovementFullScenario.getTypeName()},
     {id: "c6-guided-drawing", typename: SmallWinsDrawingScenario.getTypeName()},

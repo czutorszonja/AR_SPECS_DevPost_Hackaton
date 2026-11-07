@@ -2,7 +2,7 @@ import {Interactable} from "SpectaclesInteractionKit.lspkg/Components/Interactio
 import Event from "SpectaclesInteractionKit.lspkg/Utils/Event"
 import {SmallWinsDragItem} from "./SmallWinsDragItem"
 import {SmallWinsState, TASK_CAT, TASK_PHONE, TASK_PLANTS, TASK_TABLE} from "./SmallWinsState"
-import {addImage, addPanel, addText, child, clamp01, setImageAlpha, sizeImage, smooth, TEX, tintPanel, tween} from "./SmallWinsUIKit"
+import {addImage, addPanel, addText, child, clamp01, floatGently, setImageAlpha, sizeImage, smooth, TEX, tintPanel, tween} from "./SmallWinsUIKit"
 import {faceViewer} from "./SmallWinsViewer"
 
 const POUR_SECONDS = 1.4
@@ -67,6 +67,7 @@ export class SmallWinsHomeTasks extends BaseScriptComponent {
 
   onAwake() {
     for (const id of [TASK_PLANTS, TASK_CAT, TASK_TABLE, TASK_PHONE]) this.hints[id] = this.addHint(this.anchorFor(id), id)
+    floatGently(this, Object.keys(this.hints).map((id) => this.hints[id]), () => SmallWinsState.instance.reducedMotion)
     this.buildEffects()
     this.createEvent("OnStartEvent").bind(() => {
       SmallWinsState.instance.onChanged.add(() => this.updateHints())
