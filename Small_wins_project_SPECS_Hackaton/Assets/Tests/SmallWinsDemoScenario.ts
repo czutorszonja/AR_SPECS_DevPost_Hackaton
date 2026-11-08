@@ -190,7 +190,7 @@ export class SmallWinsDemoScenario extends Scenario {
     this.nav.lookToward(new vec3(300, -20, 600))
     await this.settle()
     // Long enough for the closing words and what comes next.
-    await sleep(8500)
+    await sleep(13500)
     this.mark("end")
   }
 
