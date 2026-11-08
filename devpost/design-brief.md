@@ -11,6 +11,8 @@ You've just closed the dishwasher. You lift your eyes back towards the counter, 
 
 Who it's for: people who struggle with the tiniest things, and whose brain turns a small win into "look at me, the big loser." Only tasks you planned for yourself earn a sticker, so the rewards stay meaningful.
 
+It was designed with neurodivergent people and people struggling with their mental health in mind first, but it can be used for any kind of motivation: developing a habit, going to the gym, or learning a new skill that takes repetitive and often boring small steps. Other apps use streaks for this. Here the reward is visual, so you keep more of a memory of what you've done: you can go back in the calendar, see your achievements and see how far you've gone, whether you're working on taking care of your musts or you're already on track and want to stay motivated to study, exercise, eat well or plan your social life.
+
 The demo runs in one open-plan (American-style) kitchen and living room: two chores, a reward of me-time on the sofa, then an invitation outside at the door. The demo ends at the door.
 
 ## Why it belongs on glasses
@@ -41,15 +43,16 @@ Look and feel (from the learner's reference photos): an artsy, lived-in flat in 
 - Me-time invitation: appears where the last reward just faded, or in front of you if that spot is out of view.
 - "Find somewhere comfortable" prompt and I'm ready button: stay gently in front of you as you move, low in view and not stuck to your face (default), because you might sit anywhere, even in another room.
 - Breathing square: not tied to any place or piece of furniture. It appears wherever you are when you say you're ready: upright, about a metre in front of where you're looking, just below eye level. About the size of a side plate (20 cm, default). Once it appears it stays put, so it doesn't move if you turn to put your tea down. In the demo, the sofa is simply where the learner sits, and sitting there puts you lower and facing the kitchen. Mug of tea on the coffee table as a prop (default).
-- Quest sign: on the door at about eye height, big enough to read from across the room.
+- Quest sign: a solid teal sign at the top of the door, big enough to read from across the room. It stands about 30 cm in front of the door, so the door frame can't cut through it. It stays solid because it only covers a small part of the view.
 - Quest card: rides low in view when the door is open, leaving the top of the doorway clear to look through.
 - Raise hand: three big choices come up in a row just below the middle of your view, with the To-do list on the left, Me-time in the middle and Today's wins on the right. On real glasses they would sit by your raised hand.
 - Notebook cards: one small card at a time, about two thirds of the display wide (33 cm at 70 cm), a little below eye level, and it stays where you opened it. It grows only as tall as what's on it, so it never fills your view.
+- Card look: one teal everywhere. Big cards (about 10 cm tall or more, like the notebook, the me-time invitation, the "find somewhere comfortable" prompt and the quest card) are about 80% solid, so the room shows through and you don't walk into a chair or someone. Small one-line message strips stay solid. Writing straight on a big card is larger and heavier, so it reads against the room without a box behind each line.
 - Me-time exercises (chosen from the notebook): each opens about where the breathing would, in front of where you're looking, and stays put once it starts.
   - Eye movement calm: a teal band about 1 m in front of you at eye level, with a bright coral dot in a white ring, so it never blends into the room behind it. The dot sweeps about 21 cm each way, so it stays well inside the narrow display and you follow it with your eyes, not your head.
   - Guided drawing: a cream sheet in a teal frame, about the size of an A4 page (34 x 24 cm), about 80 cm in front of you and just below eye level, like paper on a desk. The pen is a dark teal dot in a white ring.
 - Text on cards: large enough to read comfortably at a glance on the narrow display, on every card and button. Panels are sized to fit it.
-- Buttons: sized for a hand, not a mouse. Every button is at least about 3 degrees of your view (about 4 cm at notebook distance), the three choices by your hand and the exercise choices about 4 degrees, with clear gaps between them, so it's obvious where to point and pinch.
+- Buttons: sized for a hand, not a mouse. Every button is at least about 3 degrees of your view (about 4 cm at notebook distance), the three choices by your hand and the exercise choices about 4 degrees, with clear gaps between them, so it's obvious where to point and pinch. Buttons are the same teal as the cards, with a thin cream outline: the outline is what says you can press it, and plain writing has none. They brighten when you aim at them.
 - Jobs around the flat, each with its own place and sticker: a watering can by the palm in the reading corner, a ginger cat with its bowl and a bag of food by the fridge, a mug, plate and bowl left on the dining table, a phone on the coffee table, in reach from the sofa, and a stack of books beside it for reading ten pages (tap them once you've read). The sticker hint shows by each one once it's on today's list, and its sticker pops up right there.
 - Raise hand button: in the bottom-left corner of your view wherever you look, clearly a demo control. It steps aside while a reward, the me-time invitation, the breathing, an exercise or the quest card is showing.
 
@@ -58,10 +61,10 @@ Look and feel (from the learner's reference photos): an artsy, lived-in flat in 
 - Dishes: pinch and drag items from the piled-up sink into the dishwasher, then release. The last one, with the door closing, triggers the reward.
 - Me-time: pinch Yes or No, then pinch "I'm ready" once you're sitting comfortably.
 - Breathing: pinch Pause or Finish now, at any time.
-- Sofa (demo): pinch the sofa or "Sit on the sofa" to sit, and "Stand up" to walk again.
+- Sofa (demo): pinch the sofa or "Sit on the sofa" to sit, and "Stand up" to walk again. "Stand up" sits at the top right of your view and steps aside while a card is open.
 - Door: pinch the door to open it, from anywhere in the room. Walking up to it doesn't open it. Pinch Start, Ignore for today, or Ignore until 5 pm on the quest card.
 - Notebook: pinch "Raise hand" (demo button). An animated hand raises with the three choices: To-do list, Me-time, Today's wins. Pinch one to open its card. Each card has a Close button.
-- To-do list: a small day planner that opens on today, titled with the date. Yesterday and Tomorrow buttons sit either side of what else the day holds, like "Concert at 7 pm" or "Mum's birthday", because small wins live alongside the rest of life. Yesterday shows only what you did, each with its sticker. Tomorrow is for planning ahead, the night before or in the morning: add, swap or remove its tasks; their ticks wait for the day. On today: tick a task off, Edit it (swap it for another, or remove it), or add one from a short list. Ticking a task off puts the card away and plays its sticker in the room: by the plant, the cat, the table or the phone if it has a place there, or in front of you if it doesn't.
+- To-do list: a small day planner that opens on today, titled with the date. Yesterday and Tomorrow buttons sit either side of what else the day holds, like "Concert at 7 pm" or "Mum's birthday", because small wins live alongside the rest of life. Yesterday shows only what you did, each with its sticker. Tomorrow is for planning ahead, the night before or in the morning: add, swap or remove its tasks; their circles stay empty until the day. On today, each row is a circle, the task's name and Edit, lined up edge to edge. Pinch the circle to tick the task off, and its sticker fills the circle; the circle grows a little when you aim at it. Edit swaps the task for another or removes it, and you can add one from a short list. Ticking a task off puts the card away and plays its sticker in the room: by the plant, the cat, the table or the phone if it has a place there, or in front of you if it doesn't.
 - Today's wins: the day's stickers, big, with what each was for, and the one reduced motion setting.
 - Me-time: a short list of exercises to choose from, one big tile each: Box breathing, Eye movement calm (EMDR-inspired) and Guided drawing. Pinch one to start it. Nothing is recommended or pushed; the list is just there when you want it.
 - Eye movement calm: pinch Start or Not now. While it runs, Pause and Stop are always there. At the end, pinch how you feel: Calmer, About the same, or Not great.
@@ -110,18 +113,19 @@ This version won't do the following. They're the bigger product, for later.
 - More exercises that suit glasses, for later: 5-4-3-2-1 grounding (name things you can see around you), muscle relaxation guided by your own hands, a mindful walk with gentle prompts, and a gratitude jar that fills with notes.
 - Setup questions and ability levels, 5-a-day suggestions, and morning, daytime and evening breathing routines.
 - Remembering stickers or tasks between sessions. Each preview run starts fresh with the same sample day.
+- Long-term goals and habits: a calendar that goes back further than yesterday, so you can follow a habit, a skill or a fitness goal and see how far you've gone.
 - Softening or blurring the real room. The display only adds light, so it can't blur what's really there.
 - Walking outside, or doing the quest itself. The demo ends at the door.
 
 ## Risks and open questions
 - Scope: three activities, a door and a furnished room are near the upper limit for one build. Learner kept this. If the build struggles, simplify the door first, then the room's furniture.
 - Virtual room on an additive display: dark surfaces (like the green cabinets in the storyboard) will fade or look see-through. Keep the warm look, but lighten colors until it reads in the preview.
-- Panels: the storyboard's dark green panels would look faint. Use brighter teal panels with light text, keeping the style as close as possible.
+- Panels: the storyboard's dark green panels would look faint, so cards use a medium-deep teal with light text. A big solid box in front of your face could also make you walk into something, so big cards are see-through (see "Card look"). "Feel unproven": how the balance between reading the card and seeing the room feels on real glasses.
 - Typing in the notebook: a keyboard may not work in the preview. If it doesn't, Add and Edit fall back to picking from a short preset list (default). Remove and tick off still work.
 - Sitting down: the preview camera doesn't sit, so a demo button moves you onto the sofa and another stands you up. Seated comfort is "feel unproven."
 - Size against the spatial moment: from the middle of the large demo room, the reward appears in front of you rather than on the backsplash, because on the wall it would be tiny. To show the original moment in the video, walk up to the kitchen wall first.
 - Raise hand and the "I'm ready" signal: real hand gestures can't be shown in the preview. A "Raise hand" button and an "I'm ready" button stand in, and the video should explain that on real glasses you'd signal with your hand.
-- Demo video length: 64 seconds of breathing is too long for the 3-minute limit. The Lens keeps four rounds; show a quarter of a round at regular speed, then speed up or cut it.
+- Demo video length: 64 seconds of breathing is too long for the 3-minute limit. The Lens keeps four rounds; the demo video shows about 6 seconds, then pinches Finish now.
 - Eye movement safety: self-guided eye movement work can stir up hard memories. Keep it short, slow and framed as calming only, with a calm-place prompt, rests, Stop always in reach, a check-in at the end and a pointer to a therapist. Never suggest it unprompted.
 - Wording: this is a supportive self-help idea, not medical treatment. Keep messages kind and never scolding, and describe it that way in the submission (default).
 
