@@ -6,6 +6,8 @@ import {keepInView} from "./SmallWinsViewer"
 // Text is scaled well past the card's real distance, so it stays easy to read on the narrow display.
 const TEXT_DISTANCE = 225
 const HINT_TEXT_DISTANCE = 480
+// How far the sign stands out from the door, in cm. Right against it, the frame cuts through the sign and flickers.
+const SIGN_CLEARANCE = 30
 
 // The card rides low in view, leaving the top of the doorway clear to look through.
 const CARD_IN_VIEW_DEGREES = 3
@@ -50,10 +52,10 @@ export class SmallWinsQuestUI extends BaseScriptComponent {
 
   onAwake() {
     this.hintRoot = child(this.hintAnchor, "QuestHint")
-    const sign = child(this.hintRoot, "QuestHintSign", new vec3(0, 36, 1))
+    const sign = child(this.hintRoot, "QuestHintSign", new vec3(0, 36, SIGN_CLEARANCE))
     addImage(sign, "QuestHintOutline", TEX.holderOutline, 42)
     addImage(sign, "QuestHintStar", TEX.holderStar, 25).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
-    const label = child(this.hintRoot, "QuestHintLabel", new vec3(0, -6, 1))
+    const label = child(this.hintRoot, "QuestHintLabel", new vec3(0, -6, SIGN_CLEARANCE))
     addPanel(this, label, 104, 34)
     addText(label, "QuestHintText", this.hintLine + "\n" + this.hintAction, {role: "Title", distance: HINT_TEXT_DISTANCE, width: 100, height: 32, wrap: true}).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.6))
     this.buildCard()
@@ -75,8 +77,11 @@ export class SmallWinsQuestUI extends BaseScriptComponent {
   }
 
   setCardVisible(visible: boolean): void {
+    // Appearing, it jumps straight to its reading spot in front of you: gliding out from beside the door frame,
+    // it would spend a moment at the frame's depth and flicker in and out behind it.
+    const appearing = visible && !this.cardRoot.enabled
     this.cardRoot.enabled = visible
-    if (visible) keepInView(this.cardRoot.getTransform(), {maxDegrees: CARD_IN_VIEW_DEGREES, maxDistance: CARD_IN_VIEW_DISTANCE, drop: CARD_BELOW_GAZE})
+    if (visible) keepInView(this.cardRoot.getTransform(), {maxDegrees: CARD_IN_VIEW_DEGREES, maxDistance: CARD_IN_VIEW_DISTANCE, drop: CARD_BELOW_GAZE, snap: appearing})
   }
 
   showStarted(started: boolean): void {

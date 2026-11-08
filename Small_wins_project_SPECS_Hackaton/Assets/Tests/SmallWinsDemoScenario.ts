@@ -46,7 +46,8 @@ export class SmallWinsDemoScenario extends Scenario {
 
     // 1. The flat, facing the kitchen with the sticker holders for today's chores.
     this.mark("start")
-    await sleep(BEAT_MS)
+    // Room to say hello and introduce the app before anything moves.
+    await sleep(BEAT_MS + 2500)
 
     // 2. The day, planned the night before: today with the concert, a look back at yesterday, and on to tomorrow.
     this.mark("plan")
@@ -109,7 +110,7 @@ export class SmallWinsDemoScenario extends Scenario {
     // 6. Still on the sofa: the other me-time choices, left open to talk about.
     this.mark("metime")
     await openNotebook(hand, "MeTimeTab")
-    await sleep(4500)
+    await sleep(4000)
     await hand.tap("NotebookClose")
     await sleep(600)
     await hand.tap("StandUpButton")
@@ -168,7 +169,7 @@ export class SmallWinsDemoScenario extends Scenario {
     this.nav.lookToward(new vec3(catCorner.x, EYE_Y - 10, catCorner.z))
     await this.settle()
     await openNotebook(hand, "WinsTab")
-    await sleep(3500)
+    await sleep(3000)
     await hand.tap("NotebookClose")
     await sleep(800)
 
@@ -176,7 +177,7 @@ export class SmallWinsDemoScenario extends Scenario {
     this.mark("door")
     const door = doorCentre()
     await this.walkTo(new vec3(door.x + 420, EYE_Y, door.z - 20), door.add(new vec3(0, 40, 0)))
-    await sleep(2500)
+    await sleep(2000)
     await this.walkTo(new vec3(door.x + 230, EYE_Y, door.z), door.add(new vec3(0, 10, 0)))
     await sleep(800)
     await hand.tap("EntryDoorTapTarget")
@@ -190,7 +191,7 @@ export class SmallWinsDemoScenario extends Scenario {
     this.nav.lookToward(new vec3(300, -20, 600))
     await this.settle()
     // Long enough for the closing words and what comes next.
-    await sleep(13500)
+    await sleep(9500)
     this.mark("end")
   }
 

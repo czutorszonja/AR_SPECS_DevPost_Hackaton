@@ -8,6 +8,9 @@ export type QuestState = "offered" | "started" | "ignoredToday" | "ignoredUntil5
 const DEG = Math.PI / 180
 
 /** Everything in the room that moves: the appliance doors, and the front door that opens when you tap it. */
+// Extra room, in degrees, before a showing sign or card hides again.
+const GAZE_SLACK_DEGREES = 10
+
 @component
 export class SmallWinsRoomController extends BaseScriptComponent {
   @input dishwasherHinge: SceneObject
@@ -34,6 +37,8 @@ export class SmallWinsRoomController extends BaseScriptComponent {
   private doorAngle = 0
   private cancelDoorTween: (() => void) | null = null
   private doorTap: Interactable
+  private hintShowing = false
+  private cardShowing = false
 
   onAwake() {
     this.doorCentre = this.entryDoorHinge.getTransform().getWorldPosition().add(new vec3(0, 0, 44))
@@ -93,8 +98,14 @@ export class SmallWinsRoomController extends BaseScriptComponent {
 
     const offered = this.questState === "offered"
     const onCard = offered || this.questState === "started"
-    this.questUI.setHintVisible(offered && !this.doorIsOpen && gaze < this.hintGazeDegrees)
-    this.questUI.setCardVisible(onCard && this.doorIsOpen && gaze < this.cardGazeDegrees)
+    // Once showing, the sign and card only go when you look clearly away, so a gaze right on the edge
+    // doesn't switch them on and off every frame (which flickers).
+    const hintLimit = this.hintGazeDegrees + (this.hintShowing ? GAZE_SLACK_DEGREES : 0)
+    const cardLimit = this.cardGazeDegrees + (this.cardShowing ? GAZE_SLACK_DEGREES : 0)
+    this.hintShowing = offered && !this.doorIsOpen && gaze < hintLimit
+    this.cardShowing = onCard && this.doorIsOpen && gaze < cardLimit
+    this.questUI.setHintVisible(this.hintShowing)
+    this.questUI.setCardVisible(this.cardShowing)
   }
 
   private setDoorOpen(open: boolean): void {
