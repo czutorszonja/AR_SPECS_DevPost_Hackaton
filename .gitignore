@@ -46,3 +46,6 @@ PluginsUserPreferences/
 /.gitattributes
 /.virtual-scene.json
 ls-live-instance.json
+
+# A local preview backdrop built from Lens Studio's own files; not ours to publish.
+PreviewStudio/

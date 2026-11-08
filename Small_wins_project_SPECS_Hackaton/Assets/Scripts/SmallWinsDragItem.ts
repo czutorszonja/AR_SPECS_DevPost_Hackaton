@@ -7,6 +7,8 @@ import {viewerPose} from "./SmallWinsViewer"
 /** A dish or the pile of clothes. Pinch, drag and release over the appliance: that drop stands in for "task done". */
 // The pointer can drop its grab for a frame or two mid-drag (in the preview, as it slides over furniture).
 // Only a let-go that lasts longer than this counts, so the item doesn't twitch back towards home.
+// How far a carried item comes towards you, at most, so it doesn't vanish into the furniture it passes.
+const CARRY_PULL_CM = 45
 const RELEASE_SETTLE_SECONDS = 0.15
 
 @component
@@ -47,7 +49,6 @@ export class SmallWinsDragItem extends BaseScriptComponent {
 
   private home: vec3
   private interactable: Interactable
-  private visuals: {visual: RenderMeshVisual; order: number; materials: Material[]}[] = []
   private carried = false
   private releaseTimer: DelayedCallbackEvent
   private glide: {t: Transform; local: vec3; pos: vec3}[] = []
@@ -65,7 +66,6 @@ export class SmallWinsDragItem extends BaseScriptComponent {
     manipulation.setCanScale(false)
 
     this.home = this.getTransform().getWorldPosition()
-    this.collectVisuals(this.sceneObject)
     this.releaseTimer = this.createEvent("DelayedCallbackEvent") as DelayedCallbackEvent
     this.releaseTimer.bind(() => {
       this.setCarried(false)
@@ -85,19 +85,9 @@ export class SmallWinsDragItem extends BaseScriptComponent {
     })
   }
 
-  /** Its own copies of its materials, so drawing it on top changes only this item. */
-  private collectVisuals(o: SceneObject): void {
-    for (const visual of o.getComponents("Component.RenderMeshVisual") as RenderMeshVisual[]) {
-      const materials = visual.materials.map((m) => m.clone())
-      visual.materials = materials
-      this.visuals.push({visual, order: visual.getRenderOrder(), materials})
-    }
-    for (let i = 0; i < o.getChildrenCount(); i++) this.collectVisuals(o.getChild(i))
-  }
-
   /**
-   * While you carry it, it draws over everything, so it never vanishes into the counter or a cupboard on the way.
-   * In the preview a mouse drag keeps the item at the same depth, which slides it straight through the furniture.
+   * While you carry it, what you see comes a little towards you, so it stays in front of the counter and the
+   * cupboards. In the preview a mouse drag keeps the item at the same depth, which would slide it through them.
    */
   private setCarried(carried: boolean): void {
     this.carried = carried
@@ -110,10 +100,6 @@ export class SmallWinsDragItem extends BaseScriptComponent {
     } else {
       this.glide.forEach((g) => g.t.setLocalPosition(g.local))
       this.glide = []
-    }
-    for (const entry of this.visuals) {
-      entry.visual.setRenderOrder(carried ? 5000 : entry.order)
-      for (const m of entry.materials) m.mainPass.depthTest = !carried
     }
   }
 
@@ -137,12 +123,18 @@ export class SmallWinsDragItem extends BaseScriptComponent {
   private glideAfterHand(): void {
     if (!this.carried) return
     const world = this.getTransform().getWorldTransform()
-    const k = Math.min(1, getDeltaTime() * 14)
+    const eye = viewerPose().position
+    const k = Math.min(1, getDeltaTime() * 18)
     for (const g of this.glide) {
-      g.pos = vec3.lerp(g.pos, world.multiplyPoint(g.local), k)
+      const held = world.multiplyPoint(g.local)
+      const toEye = eye.sub(held)
+      const pull = Math.min(CARRY_PULL_CM, toEye.length * 0.35)
+      const target = toEye.length > 0.001 ? held.add(toEye.normalize().uniformScale(pull)) : held
+      g.pos = vec3.lerp(g.pos, target, k)
       g.t.setWorldPosition(g.pos)
     }
   }
+
 
   private onRelease(): void {
     if (this.dropped) return

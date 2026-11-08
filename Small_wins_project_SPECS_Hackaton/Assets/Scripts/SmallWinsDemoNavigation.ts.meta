@@ -31,6 +31,7 @@
     boundsMax: false
     boundsMin: false
     maxTilt: false
+    previewFovDegrees: false
     tiltStep: false
     turnStep: false
     viewerCamera: false
@@ -48,6 +49,7 @@
     []
   DefaultScriptInputs:
     - viewerCamera: !<reference.SceneObject> 00000000-0000-0000-0000-000000000000
+      previewFovDegrees: !<float> 40.000000
       turnStep: !<float> 30.000000
       tiltStep: !<float> 15.000000
       maxTilt: !<float> 70.000000
@@ -62,6 +64,7 @@
       {}
   InputLines:
     - '// @input SceneObject viewerCamera {"hint":"The camera, parented to this rig"}'
+    - "// @input float previewFovDegrees = 40 {\"hint\":\"Preview only: how tall the view is, in degrees (0 keeps the glasses' own narrow view)\"}"
     - '// @input float turnStep = 30 {"hint":"Degrees per press of J or L"}'
     - '// @input float tiltStep = 15 {"hint":"Degrees per press of I or K"}'
     - '// @input float maxTilt = 70 {"hint":"Furthest the view can tilt up or down, in degrees"}'

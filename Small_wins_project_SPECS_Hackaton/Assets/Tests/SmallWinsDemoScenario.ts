@@ -20,7 +20,7 @@ const START = new vec3(76, EYE_Y, 430)
  * Not a test: plays the demo video's shot list hands-free, at a pace to talk over, in under three minutes.
  * The day planned the night before (with a look back at yesterday and on to tomorrow), the dishes, the laundry
  * and an earned break with box breathing on the sofa, the me-time choices, two more jobs added with their sticker
- * holders appearing in the flat, watering the plants, today's wins, and the quest waiting at the door.
+ * holders appearing in the flat, feeding the cat, today's wins, and the quest waiting at the door.
  */
 @component
 export class SmallWinsDemoScenario extends Scenario {
@@ -53,7 +53,7 @@ export class SmallWinsDemoScenario extends Scenario {
     await hand.tap("RaiseHandButton")
     await sleep(2200)
     await hand.tap("TodoTab")
-    await sleep(HOLD_MS)
+    await sleep(2500)
     await hand.tap("DayPrev")
     await sleep(2500)
     await hand.tap("DayNext")
@@ -70,24 +70,24 @@ export class SmallWinsDemoScenario extends Scenario {
     const sink = worldPos("DishMug")
     const dishwasher = worldPos("DishwasherDropZone")
     const dishes = new vec3((sink.x + dishwasher.x) / 2, sink.y - 5, (sink.z + dishwasher.z) / 2)
-    await this.walkTo(new vec3(dishes.x + 10, EYE_Y, dishes.z + 135), dishes)
+    await this.walkTo(new vec3(dishes.x + 10, EYE_Y, dishes.z + 190), dishes)
     await sleep(1000)
     await hand.loadDishes()
     await waitFor("the dishes reward", () => shown("RewardPlate"), 8000)
     await waitFor("the dishes reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 14000)
-    await sleep(600)
+    await sleep(300)
 
     // 4. Step back to take in the washer and the basket, load the clothes: that's enough for an earned break.
     this.mark("laundry")
     const washer = worldPos("WasherDropZone")
     const basket = worldPos("ClothesPile")
     const laundry = new vec3((washer.x + basket.x) / 2, washer.y + 30, (washer.z + basket.z) / 2)
-    await this.walkTo(new vec3(laundry.x - 20, EYE_Y, laundry.z + 240), laundry)
+    await this.walkTo(new vec3(laundry.x - 20, EYE_Y, laundry.z + 300), laundry)
     await sleep(1000)
     await hand.loadLaundry()
     await waitFor("the me-time invitation", () => shown("MeTimeInvitation"), 18000)
     this.mark("invitation")
-    await sleep(HOLD_MS)
+    await sleep(2500)
     await hand.tap("YesButton")
     await sleep(1200)
 
@@ -100,7 +100,7 @@ export class SmallWinsDemoScenario extends Scenario {
     await this.settle()
     await sleep(1200)
     await hand.tap("ReadyButton")
-    await sleep(7000)
+    await sleep(6000)
     await hand.tap("FinishNowButton")
     await waitFor("the pebbles sticker", () => shown("BreathingReward"), 4000)
     await waitFor("the pebbles sticker to go", () => !shown("BreathingReward"), 9000)
@@ -109,52 +109,66 @@ export class SmallWinsDemoScenario extends Scenario {
     // 6. Still on the sofa: the other me-time choices, left open to talk about.
     this.mark("metime")
     await openNotebook(hand, "MeTimeTab")
-    await sleep(5500)
+    await sleep(4500)
     await hand.tap("NotebookClose")
     await sleep(600)
     await hand.tap("StandUpButton")
     await this.settle()
 
-    // 7. Back in the middle of the room, add two more jobs: their sticker holders appear around the flat.
+    // 7. Back in the middle of the room, looking over at the dining table and the cat: no sticker holders yet.
+    //    Add the two jobs, and their holders appear right there, one by the table and one by the cat.
     this.mark("add")
-    await this.walkTo(START, new vec3(76, -20, 150))
-    this.mark("add-walked")
+    const tableAndCat = new vec3(-190, -70, 70)
+    await this.walkTo(START, tableAndCat)
+    await sleep(1800)
+    this.mark("add-open")
     await openNotebook(hand, "TodoTab")
-    this.mark("add-list-open")
     await hand.tap("AddTaskButton")
     await sleep(PAGE_MS)
+    // Clear the table first; then, with the table gone from the choices, Feed the cat is the second.
     await hand.tap("PresetTask2")
-    this.mark("add-first-added")
     await sleep(PAGE_MS)
     await hand.tap("AddTaskButton")
     await sleep(PAGE_MS)
-    await hand.tap("PresetTask0")
-    await sleep(1500)
+    await hand.tap("PresetTask1")
+    await sleep(1200)
     await hand.tap("NotebookClose")
     this.mark("holders")
+    await sleep(1800)
     this.nav.lookToward(worldPos("TaskHint_table"))
     await this.settle()
-    await sleep(1800)
+    await sleep(900)
+    this.nav.lookToward(worldPos("TaskHint_cat"))
+    await this.settle()
+    await sleep(900)
 
-    // 8. Over to the palm, and water it by hand: its sticker pops where the holder was.
-    this.mark("plants")
-    const pour = worldPos("PlantPourPoint")
-    await this.walkTo(new vec3(pour.x - 150, EYE_Y, pour.z + 170), pour.add(new vec3(0, -10, 0)))
+    // 8. Over to the cat by the fridge, a step back so the bag, the bowl and the cat are all in view, and feed it.
+    this.mark("cat")
+    const cat = worldPos("Cat")
+    const bowl = worldPos("CatBowl")
+    const catCorner = new vec3((cat.x + bowl.x) / 2, cat.y + 45, (cat.z + bowl.z) / 2)
+    await this.walkTo(new vec3(catCorner.x + 70, EYE_Y, catCorner.z + 270), catCorner)
     await sleep(800)
-    await hand.dragTo("WateringCan", worldPos("PlantPourPoint"))
-    // On a slow machine the can can trail the hand and miss; carry it over again rather than stop the recording.
-    if (!(await this.within(() => shown("RewardPlate") || this.canPouring(), 2500))) {
-      await hand.dragTo("WateringCan", worldPos("PlantPourPoint"))
+    await hand.dragTo("CatFood", worldPos("CatBowlDropZone"))
+    this.mark("cat-dragged")
+    // If the bag missed the bowl, tick it off the list instead: the same pour, full bowl and happy cat play out.
+    if (!(await this.within(() => shown("CatBowlFull") || shown("RewardPlate"), 3000))) {
+      this.mark("cat-from-list")
+      this.nav.lookToward(new vec3(catCorner.x, EYE_Y - 10, catCorner.z))
+      await this.settle()
+      await openNotebook(hand, "TodoTab")
+      await hand.tap("TaskTick4")
+      this.nav.lookToward(catCorner)
     }
-    await waitFor("the plant sticker", () => shown("RewardPlate"), 9000)
-    await waitFor("the plant reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 14000)
+    await waitFor("the cat sticker", () => shown("RewardPlate"), 10000)
+    await waitFor("the cat reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 14000)
 
-    // 9. Today's wins, all in one place.
+    // 9. Today's wins, all in one place: look up from the floor first, so the card opens in view.
     this.mark("wins")
-    this.nav.lookToward(new vec3(pour.x - 150, EYE_Y - 10, pour.z - 100))
+    this.nav.lookToward(new vec3(catCorner.x, EYE_Y - 10, catCorner.z))
     await this.settle()
     await openNotebook(hand, "WinsTab")
-    await sleep(4500)
+    await sleep(3500)
     await hand.tap("NotebookClose")
     await sleep(800)
 
@@ -162,7 +176,7 @@ export class SmallWinsDemoScenario extends Scenario {
     this.mark("door")
     const door = doorCentre()
     await this.walkTo(new vec3(door.x + 420, EYE_Y, door.z - 20), door.add(new vec3(0, 40, 0)))
-    await sleep(3000)
+    await sleep(2500)
     await this.walkTo(new vec3(door.x + 230, EYE_Y, door.z), door.add(new vec3(0, 10, 0)))
     await sleep(800)
     await hand.tap("EntryDoorTapTarget")
@@ -176,7 +190,7 @@ export class SmallWinsDemoScenario extends Scenario {
     this.nav.lookToward(new vec3(300, -20, 600))
     await this.settle()
     // Long enough for the closing words and what comes next.
-    await sleep(11000)
+    await sleep(8500)
     this.mark("end")
   }
 
@@ -187,11 +201,6 @@ export class SmallWinsDemoScenario extends Scenario {
       await sleep(100)
     }
     return condition()
-  }
-
-  /** The can has landed by the plant when it is no longer back at home. */
-  private canPouring(): boolean {
-    return worldPos("WateringCan").distance(worldPos("PlantPourPoint")) < 40
   }
 
   /** Prints how far into the video each beat starts, for timing the voiceover. */
@@ -218,10 +227,12 @@ export class SmallWinsDemoScenario extends Scenario {
 
   /**
    * The test tool's status line and the see-through hands it animates to press buttons would both show in the
-   * recording. The presses still work without the hands (but not without the cursors, which drive the drags).
+   * recording, and so would the mouse pointer's ray (a pale diagonal band that follows the mouse). The mouse would
+   * also compete with the test's hand for taps and drags. The demo needs none of them; it keeps the cursors, which
+   * drive the drags.
    */
   private hideTestBanner(): void {
-    for (const name of ["LeafDebugUICamera", "HandVisuals"]) {
+    for (const name of ["LeafDebugUICamera", "HandVisuals", "MouseInteractor"]) {
       const so = findSceneObjectByName(name)
       if (so) so.enabled = false
     }

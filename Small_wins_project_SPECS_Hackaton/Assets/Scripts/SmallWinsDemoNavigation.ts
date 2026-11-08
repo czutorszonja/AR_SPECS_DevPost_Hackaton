@@ -17,6 +17,7 @@ export class SmallWinsDemoNavigation extends BaseScriptComponent {
   @hint("The camera, parented to this rig")
   viewerCamera: SceneObject
 
+
   @input
   @hint("Degrees per press of J or L")
   turnStep: number = 30
