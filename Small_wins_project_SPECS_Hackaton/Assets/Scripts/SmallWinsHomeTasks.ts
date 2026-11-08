@@ -142,8 +142,8 @@ export class SmallWinsHomeTasks extends BaseScriptComponent {
   private addHint(anchor: SceneObject, id: string): SceneObject {
     const root = child(anchor, "TaskHint_" + id, new vec3(0, -14, 0))
     root.createComponent("Component.Canvas")
-    addImage(root, "TaskHintOutline_" + id, TEX.outline, 24)
-    addImage(root, "TaskHintStar_" + id, TEX.star, 12).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
+    addImage(root, "TaskHintOutline_" + id, TEX.holderOutline, 24)
+    addImage(root, "TaskHintStar_" + id, TEX.holderStar, 12).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
     return root
   }
 

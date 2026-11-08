@@ -51,8 +51,8 @@ export class SmallWinsQuestUI extends BaseScriptComponent {
   onAwake() {
     this.hintRoot = child(this.hintAnchor, "QuestHint")
     const sign = child(this.hintRoot, "QuestHintSign", new vec3(0, 36, 1))
-    addImage(sign, "QuestHintOutline", TEX.outline, 42)
-    addImage(sign, "QuestHintStar", TEX.star, 25).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
+    addImage(sign, "QuestHintOutline", TEX.holderOutline, 42)
+    addImage(sign, "QuestHintStar", TEX.holderStar, 25).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
     const label = child(this.hintRoot, "QuestHintLabel", new vec3(0, -6, 1))
     addPanel(this, label, 104, 34)
     addText(label, "QuestHintText", this.hintLine + "\n" + this.hintAction, {role: "Title", distance: HINT_TEXT_DISTANCE, width: 100, height: 32, wrap: true}).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.6))

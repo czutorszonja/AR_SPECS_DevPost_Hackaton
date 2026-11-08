@@ -16,6 +16,9 @@ export const TEX = {
   custom: requireAsset("../Textures/StickerCustom_256x256.png") as Texture,
   outline: requireAsset("../Textures/StickerOutline_256x256.png") as Texture,
   star: requireAsset("../Textures/StarGold.png") as Texture,
+  // Sticker holders in the flat: teal edges so they stand out on the warm cream and yellow walls.
+  holderOutline: requireAsset("../Textures/HolderOutline_512x512.png") as Texture,
+  holderStar: requireAsset("../Textures/HolderStar_512x512.png") as Texture,
   ring: requireAsset("../Textures/GoldRing_256x256.png") as Texture,
   square: requireAsset("../Textures/BreathSquareTeal.png") as Texture,
   dot: requireAsset("../Textures/BreathDot_128x128.png") as Texture,
