@@ -1,5 +1,6 @@
 import {Interactable} from "SpectaclesInteractionKit.lspkg/Components/Interaction/Interactable/Interactable"
 import {SmallWinsDemoNavigation} from "./SmallWinsDemoNavigation"
+import {SmallWinsNotebookUI} from "./SmallWinsNotebookUI"
 import {addButton, child} from "./SmallWinsUIKit"
 import {faceViewer, pointInView} from "./SmallWinsViewer"
 
@@ -88,7 +89,8 @@ export class SmallWinsDemoSeat extends BaseScriptComponent {
   private onUpdate(): void {
     const seated = this.navigation.isSeated
     this.sitRoot.enabled = !seated
-    this.standRoot.enabled = seated
+    // The cards are see-through now: with one open, the button would show through behind it.
+    this.standRoot.enabled = seated && !SmallWinsNotebookUI.anyCardOpen
     if (seated) {
       const t = this.standRoot.getTransform()
       const next = vec3.lerp(t.getWorldPosition(), pointInView(STAND_DISTANCE, STAND_RIGHT, -STAND_DROP), Math.min(1, getDeltaTime() * FOLLOW_RATE))

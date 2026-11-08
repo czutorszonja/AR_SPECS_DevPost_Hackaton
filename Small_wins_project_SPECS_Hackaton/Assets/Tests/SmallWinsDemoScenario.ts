@@ -1,6 +1,7 @@
 import {Scenario} from "Leaf.lspkg/Scenarios/scenario/Scenario"
 import {findSceneObjectByName, sleep} from "Leaf.lspkg/Utils/common/Utils"
 import {SmallWinsDemoNavigation} from "../Scripts/SmallWinsDemoNavigation"
+import {SmallWinsDragItem} from "../Scripts/SmallWinsDragItem"
 import {doorCentre} from "./SmallWinsDoorScenario"
 import {openNotebook, shown, SmallWinsLeafInteractor, so, waitFor, worldPos} from "./SmallWinsLeafHelpers"
 
@@ -9,6 +10,8 @@ const BEAT_MS = 1800
 const HOLD_MS = 3000
 // The planner rebuilds a moment after each press; the next press waits for it.
 const PAGE_MS = 1000
+// A second go at a drag that fell short gets longer, so a slow machine has more frames to arrive in.
+const RETRY_CARRY_MS = 2600
 // A calm camera: an unhurried turn and a gentle walking pace.
 const TURN_DEGREES_PER_SECOND = 40
 const WALK_CM_PER_SECOND = 95
@@ -47,7 +50,7 @@ export class SmallWinsDemoScenario extends Scenario {
     // 1. The flat, facing the kitchen with the sticker holders for today's chores.
     this.mark("start")
     // Room to say hello and introduce the app before anything moves.
-    await sleep(BEAT_MS + 2500)
+    await sleep(BEAT_MS + 7500)
 
     // 2. The day, planned the night before: today with the concert, a look back at yesterday, and on to tomorrow.
     this.mark("plan")
@@ -73,7 +76,9 @@ export class SmallWinsDemoScenario extends Scenario {
     const dishes = new vec3((sink.x + dishwasher.x) / 2, sink.y - 5, (sink.z + dishwasher.z) / 2)
     await this.walkTo(new vec3(dishes.x + 10, EYE_Y, dishes.z + 190), dishes)
     await sleep(1000)
-    await hand.loadDishes()
+    await this.load(hand, "DishPlate", dishwasher)
+    await this.load(hand, "DishBowl", dishwasher)
+    await this.load(hand, "DishMug", dishwasher)
     await waitFor("the dishes reward", () => shown("RewardPlate"), 8000)
     await waitFor("the dishes reward to end", () => !shown("RewardPlate") && !shown("RewardMessageRoot"), 14000)
     await sleep(300)
@@ -85,7 +90,7 @@ export class SmallWinsDemoScenario extends Scenario {
     const laundry = new vec3((washer.x + basket.x) / 2, washer.y + 30, (washer.z + basket.z) / 2)
     await this.walkTo(new vec3(laundry.x - 20, EYE_Y, laundry.z + 300), laundry)
     await sleep(1000)
-    await hand.loadLaundry()
+    await this.load(hand, "ClothesPile", washer)
     await waitFor("the me-time invitation", () => shown("MeTimeInvitation"), 18000)
     this.mark("invitation")
     await sleep(2500)
@@ -95,7 +100,8 @@ export class SmallWinsDemoScenario extends Scenario {
     // 5. Across the room to the sofa, sit, and a little box breathing.
     this.mark("sofa")
     const sofaSign = worldPos("SitOnSofaButton")
-    await this.walkTo(new vec3(sofaSign.x - 40, EYE_Y, sofaSign.z - 230), sofaSign.add(new vec3(0, 20, 0)))
+    // Looking a little below the Sit button keeps it above the see-through prompt rather than showing through it.
+    await this.walkTo(new vec3(sofaSign.x - 40, EYE_Y, sofaSign.z - 230), sofaSign.add(new vec3(0, -20, 0)))
     await sleep(800)
     await hand.tap("SitOnSofaButton")
     await this.settle()
@@ -193,6 +199,22 @@ export class SmallWinsDemoScenario extends Scenario {
     // Long enough for the closing words and what comes next.
     await sleep(9500)
     this.mark("end")
+  }
+
+  /**
+   * Carries a dish or the clothes to where they go. On a slow machine a drag can fall short, and that mustn't end
+   * the recording: it tries again with a longer carry, and failing that the item goes there by itself.
+   */
+  private async load(hand: SmallWinsLeafInteractor, name: string, zone: vec3): Promise<void> {
+    const item = so(name).getComponent(SmallWinsDragItem.getTypeName()) as SmallWinsDragItem
+    await hand.dragTo(name, zone)
+    if (await this.within(() => item.dropped, 1000)) return
+    print("DEMO drag fell short, trying again: " + name)
+    await hand.dragTo(name, zone, RETRY_CARRY_MS)
+    if (await this.within(() => item.dropped, 1000)) return
+    print("DEMO drag fell short again, placing it: " + name)
+    item.autoDrop()
+    await sleep(800)
   }
 
   /** Waits until something is true, for up to a while, and says whether it happened. */

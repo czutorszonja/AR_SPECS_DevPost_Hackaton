@@ -73,7 +73,7 @@ export class SmallWinsLeafInteractor extends DefaultLeafInteractor {
    * LEAF applies a drag vector every frame, so this steers the vector towards the
    * destination, slowing as it arrives, the way a hand would.
    */
-  async dragTo(name: string, destination: vec3): Promise<void> {
+  async dragTo(name: string, destination: vec3, carryMs: number = CARRY_MS): Promise<void> {
     const target = findInteractablesByName(name, undefined, true)[0]
     if (!target) throw new Error(`Item "${name}" cannot be grabbed`)
     const transform = target.getSceneObject().getTransform()
@@ -89,7 +89,7 @@ export class SmallWinsLeafInteractor extends DefaultLeafInteractor {
       }
     }
     steer()
-    await this.drag(target, step, CARRY_MS)
+    await this.drag(target, step, carryMs)
     carrying = false
     await sleep(600)
   }

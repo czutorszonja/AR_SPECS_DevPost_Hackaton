@@ -56,8 +56,9 @@ export class SmallWinsQuestUI extends BaseScriptComponent {
     addImage(sign, "QuestHintOutline", TEX.holderOutline, 42)
     addImage(sign, "QuestHintStar", TEX.holderStar, 25).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.2))
     const label = child(this.hintRoot, "QuestHintLabel", new vec3(0, -6, SIGN_CLEARANCE))
-    addPanel(this, label, 104, 34)
-    addText(label, "QuestHintText", this.hintLine + "\n" + this.hintAction, {role: "Title", distance: HINT_TEXT_DISTANCE, width: 100, height: 32, wrap: true}).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.6))
+    // Solid: seen from across the room, it covers only a small part of the view.
+    addPanel(this, label, 104, 34, true)
+    addText(label, "QuestHintText", this.hintLine + "\n" + this.hintAction, {role: "Title", distance: HINT_TEXT_DISTANCE, width: 100, height: 32, wrap: true, emphasis: false}).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.6))
     this.buildCard()
     const hide = this.createEvent("DelayedCallbackEvent")
     hide.bind(() => {

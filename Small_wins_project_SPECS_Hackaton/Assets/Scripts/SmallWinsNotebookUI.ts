@@ -13,6 +13,7 @@ import {
   flexContainer,
   flexPlace,
   flexText,
+  makePictureButton,
   smooth,
   stickerTexture,
   TEX,
@@ -62,6 +63,11 @@ const DAY_TITLES: Record<Day, string> = {[-1]: "Yesterday", 0: "Today", 1: "Tomo
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 const DAY_BUTTON_W = 8.5
+// A task row: its sticker circle (which is the tick), its name, and Edit, reaching both edges of the card.
+const TICK_W = BUTTON_H
+const STICKER_W = 3.4
+const EDIT_W = 5.5
+const TASK_TITLE_W = INNER_W - TICK_W - EDIT_W - 2 * GAP
 
 /** "Fri 6 Nov", for today and the days either side. */
 function dateLabel(day: Day): string {
@@ -104,6 +110,13 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
   private refreshEvent: DelayedCallbackEvent
   private refreshPending = false
 
+  private static instance: SmallWinsNotebookUI | null = null
+
+  /** Whether a card is open, for the demo button that would otherwise show through it. */
+  static get anyCardOpen(): boolean {
+    return !!SmallWinsNotebookUI.instance && SmallWinsNotebookUI.instance.isOpen
+  }
+
   get isOpen(): boolean {
     return this.bookRoot.enabled
   }
@@ -113,6 +126,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
   }
 
   onAwake() {
+    SmallWinsNotebookUI.instance = this
     this.buildHud()
     this.buildMenu()
     this.buildBook()
@@ -240,8 +254,8 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     this.bookRoot.createComponent("Component.Canvas")
     this.plate = addPanel(this, this.bookRoot, CARD_W, 30)
     this.header = flexContainer(this.bookRoot, "NotebookHeader", FlexDirection.Row, INNER_W, HEADER_H, GAP, FlexJustify.SpaceBetween)
-    this.title = flexText(this.header, "NotebookTitle", "", {role: "Headline", distance: CARD_TEXT_DISTANCE, width: 20, height: HEADER_H, align: HorizontalAlignment.Left})
-    flexButton(this.header, "NotebookClose", "Close", 9, BUTTON_H, () => this.closeBook(), CARD_TEXT_DISTANCE)
+    this.title = flexText(this.header, "NotebookTitle", "", {role: "Headline", distance: CARD_TEXT_DISTANCE, width: INNER_W - DAY_BUTTON_W - GAP, height: HEADER_H, align: HorizontalAlignment.Left})
+    flexButton(this.header, "NotebookClose", "Close", DAY_BUTTON_W, BUTTON_H, () => this.closeBook(), CARD_TEXT_DISTANCE)
     this.bodyHost = child(this.bookRoot, "NotebookBodyHost")
   }
 
@@ -321,17 +335,25 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     this.requestRefresh()
   }
 
-  /** Each task: tick it off, its sticker spot, and Edit (which can also remove it). */
+  /** A sticker or its empty circle, in the left-hand spot of a row, when it's only there to look at. */
+  private stickerSlot(row: SceneObject, name: string, texture: Texture): void {
+    const slot = child(row, name + "Slot")
+    flexPlace(slot, TICK_W, BUTTON_H)
+    addImage(slot, name, texture, STICKER_W).getSceneObject().getTransform().setLocalPosition(new vec3(0, 0, 0.1))
+  }
+
+  /** Each task: its circle, which you tap to earn the sticker that fills it; its name; and Edit (which can also remove it). */
   private buildToday(body: SceneObject): void {
     const d = CARD_TEXT_DISTANCE
     const state = SmallWinsState.instance
     state.tasks.forEach((task, i) => {
       const row = this.row(body, "TaskRow" + i, BUTTON_H)
-      flexButton(row, "TaskTick" + i, task.done ? "Done" : "Tick", 6, BUTTON_H, () => this.tick(task.id), d)
-      flexText(row, "TaskTitle" + i, task.title, {role: "Body", distance: d, width: 11.2, height: BUTTON_H, align: HorizontalAlignment.Left})
-      const art = addImage(row, "TaskArt" + i, task.done ? stickerTexture(task.art) : TEX.outline, 3.4)
-      flexPlace(art.getSceneObject(), 3.4, 3.4)
-      flexButton(row, "TaskEdit" + i, "Edit", 5.5, BUTTON_H, () => this.openPicker(task.id), d)
+      const tick = flexButton(row, "TaskTick" + i, "", TICK_W, BUTTON_H, () => this.tick(task.id), d)
+      const art = addImage(tick.so, "TaskArt" + i, task.done ? stickerTexture(task.art) : TEX.outline, STICKER_W).getSceneObject()
+      art.getTransform().setLocalPosition(new vec3(0, 0, 0.6))
+      makePictureButton(tick.button, art)
+      flexText(row, "TaskTitle" + i, task.title, {role: "Body", distance: d, width: TASK_TITLE_W, height: BUTTON_H, align: HorizontalAlignment.Left})
+      flexButton(row, "TaskEdit" + i, "Edit", EDIT_W, BUTTON_H, () => this.openPicker(task.id), d)
     })
     this.addTaskFooter(body, state.tasks)
   }
@@ -341,11 +363,9 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     const d = CARD_TEXT_DISTANCE
     SmallWinsState.instance.tomorrow.forEach((task, i) => {
       const row = this.row(body, "PlanRow" + i, BUTTON_H)
-      flexText(row, "PlanWhen" + i, "Plan", {role: "Body", distance: d, width: 6, height: BUTTON_H, color: TEXT_SOFT})
-      flexText(row, "PlanTitle" + i, task.title, {role: "Body", distance: d, width: 11.2, height: BUTTON_H, align: HorizontalAlignment.Left})
-      const art = addImage(row, "PlanArt" + i, TEX.outline, 3.4)
-      flexPlace(art.getSceneObject(), 3.4, 3.4)
-      flexButton(row, "PlanEdit" + i, "Edit", 5.5, BUTTON_H, () => this.openPicker(task.id), d)
+      this.stickerSlot(row, "PlanArt" + i, TEX.outline)
+      flexText(row, "PlanTitle" + i, task.title, {role: "Body", distance: d, width: TASK_TITLE_W, height: BUTTON_H, align: HorizontalAlignment.Left})
+      flexButton(row, "PlanEdit" + i, "Edit", EDIT_W, BUTTON_H, () => this.openPicker(task.id), d)
     })
     this.addTaskFooter(body, SmallWinsState.instance.tomorrow)
   }
@@ -355,18 +375,16 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
     const d = CARD_TEXT_DISTANCE
     SmallWinsState.instance.yesterday.forEach((win, i) => {
       const row = this.row(body, "PastRow" + i, BUTTON_H)
-      flexText(row, "PastDone" + i, "Done", {role: "Body", distance: d, width: 6, height: BUTTON_H, color: TEXT_SOFT})
-      flexText(row, "PastTitle" + i, win.title, {role: "Body", distance: d, width: 11.2, height: BUTTON_H, align: HorizontalAlignment.Left})
-      const art = addImage(row, "PastArt" + i, stickerTexture(win.art), 3.4)
-      flexPlace(art.getSceneObject(), 3.4, 3.4)
-      flexPlace(child(row, "PastSpace" + i), 5.5, BUTTON_H)
+      this.stickerSlot(row, "PastArt" + i, stickerTexture(win.art))
+      flexText(row, "PastTitle" + i, win.title, {role: "Body", distance: d, width: TASK_TITLE_W, height: BUTTON_H, align: HorizontalAlignment.Left})
+      flexPlace(child(row, "PastSpace" + i), EDIT_W, BUTTON_H)
     })
   }
 
   private addTaskFooter(body: SceneObject, tasks: SmallWinsTask[]): void {
     if (tasks.length >= MAX_TASKS) return
     const footer = this.row(body, "TodoFooter", BUTTON_H)
-    flexButton(footer, "AddTaskButton", "+ Add a task", 15, BUTTON_H, () => this.openPicker(null), CARD_TEXT_DISTANCE)
+    flexButton(footer, "AddTaskButton", "+ Add a task", INNER_W, BUTTON_H, () => this.openPicker(null), CARD_TEXT_DISTANCE)
   }
 
   /** Ticking off plays the sticker out in the room. Unticking just takes it back off the page. */
@@ -408,7 +426,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
       }
     }
     const footer = this.row(body, "WinsFooter", BUTTON_H)
-    flexButton(footer, "ReducedMotionButton", "Reduced motion: " + (state.reducedMotion ? "On" : "Off"), 20, BUTTON_H, () => state.setReducedMotion(!state.reducedMotion), d)
+    flexButton(footer, "ReducedMotionButton", "Reduced motion: " + (state.reducedMotion ? "On" : "Off"), INNER_W, BUTTON_H, () => state.setReducedMotion(!state.reducedMotion), d)
   }
 
   private meTimeRows(): number[] {
@@ -484,7 +502,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
       footer,
       "PickerCancel",
       "Cancel",
-      11,
+      editingId ? colW : INNER_W,
       BUTTON_H,
       () => {
         this.picker = null
@@ -497,7 +515,7 @@ export class SmallWinsNotebookUI extends BaseScriptComponent {
         footer,
         "PickerRemove",
         "Remove this task",
-        16,
+        colW,
         BUTTON_H,
         () => {
           this.picker = null

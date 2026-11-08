@@ -45,8 +45,19 @@ export function stickerTexture(art: StickerArt): Texture {
 }
 
 /** Brighter teal than the storyboard, because the display only adds light (brief: Risks). */
-export const PANEL_TEAL = new vec4(0.13, 0.55, 0.51, 1)
-const BUTTON_TEAL = new vec4(0.2, 0.68, 0.62, 1)
+export const PANEL_TEAL = new vec4(0.1, 0.46, 0.43, 1)
+// A card this tall (cm) would hide what's in front of you, so you could walk into a chair or a person:
+// big cards let the room show through. Small message strips stay solid, so a line of text is easy to read.
+const SEE_THROUGH_FROM_HEIGHT = 10
+const PANEL_SEE_THROUGH = new vec4(PANEL_TEAL.r, PANEL_TEAL.g, PANEL_TEAL.b, 0.8)
+// With the room showing through, writing on a big card is larger and heavier so it stays readable.
+const CARD_TEXT_SCALE = 1.15
+// This font has one weight, so a thin outline in the letters' own colour is what thickens them.
+const CARD_TEXT_THICKNESS = 0.12
+// One teal: a button is the card's own colour, and its cream outline is what says you can press it.
+const BUTTON_TEAL = PANEL_TEAL
+const BUTTON_OUTLINE = new vec4(1, 0.98, 0.9, 1)
+const BUTTON_OUTLINE_SIZE = 0.14
 const BUTTON_HOVER = new vec4(0.38, 0.84, 0.76, 1)
 const BUTTON_PRESSED = new vec4(0.55, 0.92, 0.82, 1)
 export const TEXT_LIGHT = new vec4(1, 0.98, 0.9, 1)
@@ -77,6 +88,18 @@ export interface TextOptions {
   color?: vec4
   wrap?: boolean
   align?: HorizontalAlignment
+  /** Larger, heavier writing. By default, only for writing straight on a see-through card. */
+  emphasis?: boolean
+}
+
+/** Whether writing placed here sits on a see-through card, rather than on a button or a solid strip. */
+function isOnSeeThroughCard(parent: SceneObject): boolean {
+  for (let so: SceneObject | null = parent; so; so = so.getParent()) {
+    if (so.getComponent(Button.getTypeName())) return false
+    const plate = so.getComponent(BackPlate.getTypeName()) as BackPlate | null
+    if (plate) return plate.size.y >= SEE_THROUGH_FROM_HEIGHT
+  }
+  return false
 }
 
 export function addText(parent: SceneObject, name: string, value: string, opts: TextOptions): Text {
@@ -85,7 +108,8 @@ export function addText(parent: SceneObject, name: string, value: string, opts: 
   const style = TYPE_SCALE[opts.role ?? "Body"]
   text.text = value
   text.depthTest = true
-  text.size = style.size * ((opts.distance ?? 110) / 110)
+  const emphasis = opts.emphasis ?? isOnSeeThroughCard(parent)
+  text.size = style.size * ((opts.distance ?? 110) / 110) * (emphasis ? CARD_TEXT_SCALE : 1)
   ;(text as Text & {weight?: number}).weight = style.weight
   text.horizontalAlignment = opts.align ?? HorizontalAlignment.Center
   text.verticalAlignment = VerticalAlignment.Center
@@ -93,6 +117,11 @@ export function addText(parent: SceneObject, name: string, value: string, opts: 
   text.verticalOverflow = VerticalOverflow.Overflow
   text.layoutRect = Rect.create(-opts.width / 2, opts.width / 2, -opts.height / 2, opts.height / 2)
   text.textFill.color = opts.color ?? TEXT_LIGHT
+  if (emphasis) {
+    text.outlineSettings.enabled = true
+    text.outlineSettings.fill.color = opts.color ?? TEXT_LIGHT
+    text.outlineSettings.size = CARD_TEXT_THICKNESS
+  }
   return text
 }
 
@@ -152,20 +181,21 @@ export function setImageTexture(image: Image, texture: Texture): void {
 }
 
 /** A flat teal surface. UIKit's BackPlate only offers grey styles, so its rectangle is recoloured once it exists. */
-export function addPanel(script: BaseScriptComponent, host: SceneObject, width: number, height: number): BackPlate {
+export function addPanel(script: BaseScriptComponent, host: SceneObject, width: number, height: number, solid: boolean = false): BackPlate {
   const plate = host.createComponent(BackPlate.getTypeName()) as BackPlate
   plate.size = new vec2(width, height)
   const tint = script.createEvent("DelayedCallbackEvent")
-  tint.bind(() => tintPanel(host))
+  tint.bind(() => tintPanel(host, solid))
   tint.reset(0)
   return plate
 }
 
-export function tintPanel(host: SceneObject): void {
+export function tintPanel(host: SceneObject, solid: boolean = false): void {
   const rect = host.getComponent(RoundedRectangle.getTypeName()) as RoundedRectangle | null
   if (!rect) return
+  const plate = host.getComponent(BackPlate.getTypeName()) as BackPlate | null
   rect.gradient = false
-  rect.backgroundColor = PANEL_TEAL
+  rect.backgroundColor = !solid && plate && plate.size.y >= SEE_THROUGH_FROM_HEIGHT ? PANEL_SEE_THROUGH : PANEL_TEAL
 }
 
 export function flexContainer(
@@ -225,6 +255,25 @@ function styleButton(button: Button): void {
   visual.defaultGradient = solidGradient(BUTTON_TEAL)
   visual.hoveredGradient = solidGradient(BUTTON_HOVER)
   visual.triggeredGradient = solidGradient(BUTTON_PRESSED)
+  // Likewise, each state's border is drawn from its gradient, not from its border colour.
+  visual.borderDefaultGradient = solidGradient(BUTTON_OUTLINE)
+  visual.borderHoveredGradient = solidGradient(BUTTON_OUTLINE)
+  visual.borderTriggeredGradient = solidGradient(BUTTON_OUTLINE)
+  visual.defaultHasBorder = true
+  visual.hoveredHasBorder = true
+  visual.triggeredHasBorder = true
+  visual.defaultBorderSize = BUTTON_OUTLINE_SIZE
+  visual.hoveredBorderSize = BUTTON_OUTLINE_SIZE
+  visual.triggeredBorderSize = BUTTON_OUTLINE_SIZE
+}
+
+/** A button whose picture is the whole of it: no shape of its own, and the picture grows a little when you aim at it. */
+export function makePictureButton(button: Button, picture: SceneObject): void {
+  const t = picture.getTransform()
+  const rest = t.getLocalScale()
+  button.onInitialized.add(() => (button.visual.renderMeshVisual.enabled = false))
+  button.onHoverEnter.add(() => t.setLocalScale(rest.uniformScale(1.15)))
+  button.onHoverExit.add(() => t.setLocalScale(rest))
 }
 
 function solidGradient(color: vec4): GradientParameters {
@@ -280,6 +329,7 @@ export function fadeTree(root: SceneObject, alpha: number): void {
   if (text) {
     const c = text.textFill.color
     text.textFill.color = new vec4(c.r, c.g, c.b, alpha)
+    if (text.outlineSettings.enabled) text.outlineSettings.fill.color = new vec4(c.r, c.g, c.b, alpha)
   }
   const image = root.getComponent("Component.Image") as Image | null
   if (image) setImageAlpha(image, alpha)
