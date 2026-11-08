@@ -1,0 +1,40 @@
+Small Wins
+Copyright (c) 2026 Szonja Czutor. All rights reserved.
+
+This repository contains Small Wins, a Lens for SPECS, including its code,
+design documents, concept, written content, stickers, artwork and other
+original material (the "Work"). The Work is proprietary. It is not open
+source, and no licence to it is granted except as stated below.
+
+YOU MAY
+
+- view the Work on GitHub, and fork it there, only as far as GitHub's Terms
+  of Service require for public repositories; and
+- if you are the Sponsor, the Administrator or a Judge of the Learn AR with
+  SPECS hackathon, run, test, evaluate, use and promote the Work as the
+  hackathon's Official Rules provide.
+
+YOU MAY NOT, WITHOUT PRIOR WRITTEN PERMISSION FROM THE COPYRIGHT HOLDER
+
+- copy, modify, publish, distribute, sublicense or sell the Work or any
+  part of it;
+- create derivative works based on the Work;
+- release a product, Lens or app that reproduces or closely imitates
+  Small Wins, including its combination of features, its design, its
+  stickers or its text, even if renamed or changed in minor ways; or
+- use the Work for any commercial purpose.
+
+THIRD-PARTY MATERIAL
+
+This notice does not apply to material owned by others, which stays under
+its owners' own terms. That includes the Lens Studio packages in
+Small_wins_project_SPECS_Hackaton/Packages (Leaf, Spectacles Interaction Kit,
+Spectacles UI Kit and Bitmoji 3D), the agent skill files in .agents/skills,
+and any other third-party assets.
+
+To ask for permission, contact the copyright holder through the GitHub
+profile https://github.com/czutorszonja.
+
+Nothing in this notice limits any right that cannot be limited by law.
+
+THE WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
